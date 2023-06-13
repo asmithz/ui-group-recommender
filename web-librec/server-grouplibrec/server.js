@@ -530,11 +530,11 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
                     const directorioUltimaRecomendacion = recomendaciones.sort()[recomendaciones.length - 1]
                     let trecomendaciones = fs.readFileSync(directorioResultadosSala + directorioUltimaRecomendacion + "/recommendations.txt", "utf-8")
                     let arrayRecomendaciones = trecomendaciones.split("\n")
-                    for (let i = 0; i < arrayRecomendaciones.length; i++) {
+                    for (let i = 0; i < arrayRecomendaciones.length-1; i++) {
                         let recomendacion = arrayRecomendaciones[i].split(",")
                         let grupo = recomendacion[0]
                         let item = recomendacion[1]
-                        let rating_grupo = recomendacion[2]
+                        let rating_individual = recomendacion[2]
                         let path_imagen = dir_movielens_images + "/" + String(item) + ".jpg"
                         if (fs.existsSync(path_imagen)) {
                             path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/" + String(item) + ".jpg"
@@ -545,7 +545,7 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
                         items.push({
                             idGrupo: grupo,
                             idItem: item,
-                            ratingGrupo: rating_grupo,
+                            rating: rating_individual,
                             pathImagen: path_imagen
                         })
                     }
@@ -636,7 +636,7 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
                     const directorioUltimaRecomendacion = recomendaciones.sort()[recomendaciones.length - 1]
                     let trecomendaciones = fs.readFileSync(directorioResultadosSala + directorioUltimaRecomendacion + "/recommendations.txt", "utf-8")
                     let arrayRecomendaciones = trecomendaciones.split("\n")
-                    for (let i = 0; i < arrayRecomendaciones.length; i++) {
+                    for (let i = 0; i < arrayRecomendaciones.length-1; i++) {
                         let recomendacion = arrayRecomendaciones[i].split(",")
                         let grupo = recomendacion[0]
                         let item = recomendacion[1]
@@ -651,7 +651,7 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
                         items.push({
                             idGrupo: grupo,
                             idItem: item,
-                            ratingGrupo: rating_grupo,
+                            rating: rating_grupo,
                             pathImagen: path_imagen
                         })
                     }

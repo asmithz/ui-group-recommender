@@ -4,7 +4,7 @@ import TarjetaItem from "./TarjetaItem"
 const ListaItems = (props) => {
     return (
         <>
-            <HorizontalScroll style={{ overflowX: "scroll", whiteSpace: "nowrap" }}>
+            <HorizontalScroll style={{ overflowX: "scroll", whiteSpace: "nowrap", backgroundColor: "#FF0000" }}>
                 {
                     props.recomendaciones.length > 0 &&
                     props.recomendaciones.map((item, index) => {

@@ -15,13 +15,15 @@ const TarjetaItem = (props) => {
         height: 150, 
         width: 90, 
         display: "inline-block",
-        border: "5px solid pink"
+        border: "5px solid pink",
+        borderRadius: "8%"
     }
 
     const styleNotDragged = {
         height: 150, 
         width: 90, 
-        display: "inline-block" 
+        display: "inline-block",
+        borderRadius: "8%"
     }
 
     return (
@@ -32,6 +34,8 @@ const TarjetaItem = (props) => {
                 src={props.item.pathImagen}
                 alt={props.item.idItem}
                 style={isDragging ? styleDragged : styleNotDragged} />
+            <br />
+            <p>{parseFloat(props.item.rating).toFixed(4)}</p>
         </div>
     )
 }

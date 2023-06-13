@@ -3,6 +3,8 @@ import axios from "axios"
 import { Rating } from "react-simple-star-rating"
 import Lottie from "lottie-react"
 import checkMark from "../animations/check-mark.json"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faArrowRight, faForward, faStar } from "@fortawesome/free-solid-svg-icons"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
@@ -19,7 +21,7 @@ const Calificar = (props) => {
     const [cargando, setCargando] = useState(false)
 
     const cerrarCalificaciones = () => {
-        props.cerrar(false)
+        props.cambiarEstado(false)
     }
 
     useEffect(() => {
@@ -59,7 +61,6 @@ const Calificar = (props) => {
         catch (error) {
             console.log(error)
         }
-        console.log(calificacion)
     }
 
     const puntuacionPelicula = (valor_rating) => {
@@ -77,21 +78,24 @@ const Calificar = (props) => {
         setPeliculaCalificada(false)
     }
 
+    const styleModal = {
+        backgroundColor: "white",
+        padding: "50px",
+        borderRadius: "10px"
+    }
+
     return (
         <>
             {
-                props.activo &&
-                <div className="modal is-active">
-                    <div className="modal-background"></div>
-                    <div className="modal-card">
-                        <header className="modal-card-head">
+                props.estado &&
+                <div className={props.estado ? "modal is-active" : "modal"}>
+                    <div className={props.estado ? "modal-background" : ""} onClick={() => props.cambiarEstado(false)}></div>
+                    <div className="modal-content" style={styleModal}>
                             <p className="modal-card-title">Califique las películas que haya visto</p>
-                            <button className="delete" aria-label="close" onClick={cerrarCalificaciones}></button>
-                        </header>
-                        <section className="modal-card-body">
+                            <br/>
                             <div className="columns">
                                 <div className="column">
-                                    <img src={imagen} alt={idPelicula} style={{ height: 500, width: 380 }} />
+                                    <img src={imagen} alt={idPelicula} style={{ height: 500, width: 380, borderRadius: "10px" }} />
                                 </div>
                                 <div className="column">
                                     <div className="columns">
@@ -122,20 +126,31 @@ const Calificar = (props) => {
                                     </div>
                                 </div>
                             </div>
-                        </section>
-                        <footer className="modal-card-foot">
                             {
                                 !peliculaCalificada &&
-                                <>
-                                    <button className="button is-success" onClick={calificarPelicula}>Calificar</button>
-                                    <button className="button is-success" onClick={saltarPelicula}>Saltar</button>
-                                </>
+                                <div className="columns has-text-centered">
+                                    <div className="column">
+                                        <button className="button is-info is-medium is-rounded" onClick={calificarPelicula}>
+                                            <FontAwesomeIcon icon={faStar}/>
+                                        </button>
+                                    </div>
+                                    <div className="column">
+                                        <button className="button is-warning is-medium is-rounded" onClick={saltarPelicula}>
+                                            <FontAwesomeIcon icon={faForward} />
+                                        </button>
+                                    </div>
+                                </div>
                             }
                             {
                                 peliculaCalificada &&
-                                <button className="button is-success" onClick={siguientePelicula}>Siguiente</button>
+                                <div className="columns has-text-centered">
+                                    <div className="column">
+                                        <button className="button is-success is-medium is-rounded is-right" onClick={siguientePelicula}>
+                                            <FontAwesomeIcon icon={faArrowRight}/>
+                                        </button>
+                                    </div>
+                                </div>
                             }
-                        </footer>
                     </div>
                 </div>
             }

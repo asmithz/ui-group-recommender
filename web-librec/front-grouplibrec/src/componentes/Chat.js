@@ -191,12 +191,12 @@ const Mensaje = (props) => {
                     {
                         props.mensaje.tipo_mensaje === "item" &&
                         <>
-                            <span>Recomiendo lo siguiente: </span>
+                        <br></br>
                             <img
                                 className="rounded object-cover"
                                 src={props.mensaje.pathItem}
                                 alt={props.mensaje.idItem}
-                                style={{ width: 90, height: 150 }}
+                                style={{ width: 90, height: 150, borderRadius: "8%" }}
                             />
                         </>
                     }
@@ -206,6 +206,5 @@ const Mensaje = (props) => {
     )
 
 }
-
 
 export default Chat

@@ -25,7 +25,7 @@ const Grupo = () => {
     const [idSesion, setIdSesion] = useState(sessionStorage.getItem("id_sesion"))
     const [usuarioSesion, setUsuarioSesion] = useState({})
     const [usuariosSesion, setUsuariosSesion] = useState([])
-    const [calificaciones, setCalificaciones] = useState(false)
+    const [calificacionesEstado, setCalificacionesEstado] = useState(false)
     const [emitirSignal, setEmitirSignal] = useState(0)
     const [recomendacionesIndividuales, setRecomendacionesIndividuales] = useState([])
     const [recomendacionesGrupales, setRecomendacionesGrupales] = useState([])
@@ -48,7 +48,7 @@ const Grupo = () => {
     }
 
     const activarCalificaciones = () => {
-        setCalificaciones(true)
+        setCalificacionesEstado(true)
     }
 
     // revisar si el usuario tiene sesion
@@ -311,25 +311,25 @@ const Grupo = () => {
                 { /* Recomendación Grupal solo líder */
                     liderGrupo.id_lider === idUsuario &&
                     <div className="column">
-                        <button className="button is-primary  is-large is-rounded" onClick={ejecutarRecomendacionGrupo}>
+                        <button className="button is-primary is-large is-rounded" onClick={ejecutarRecomendacionGrupo}>
                             <FontAwesomeIcon icon={faPeopleGroup}/>
                         </button>
                     </div>
                 }
                 <div className="column">
-                    <button className="button is-primary  is-large is-rounded" onClick={ejecutarRecomendacionIndividual}>
+                    <button className="button is-primary is-large is-rounded" onClick={ejecutarRecomendacionIndividual}>
                         <FontAwesomeIcon icon={faUser} />
                     </button>
                 </div>
                 <div className="column">
                     <Link to="/salas">
-                        <button className="button is-warning  is-large is-right is-rounded" onClick={salirGrupo}>
+                        <button className="button is-warning is-large is-right is-rounded" onClick={salirGrupo}>
                             <FontAwesomeIcon icon={faArrowRightFromBracket} />
                         </button>
                     </Link>
                 </div>
             </div>
-            <Calificar activo={calificaciones} cerrar={setCalificaciones} idUsuario={idUsuario} />
+            <Calificar estado={calificacionesEstado} cambiarEstado={setCalificacionesEstado} idUsuario={idUsuario} />
         </div>
     )
 }
