@@ -18,11 +18,6 @@ const Calificar = (props) => {
     const [puntuacion, setPuntuacion] = useState(1)
     const [calificar, setCalificar] = useState(0)
     const [peliculaCalificada, setPeliculaCalificada] = useState(false)
-    const [cargando, setCargando] = useState(false)
-
-    const cerrarCalificaciones = () => {
-        props.cambiarEstado(false)
-    }
 
     useEffect(() => {
         const mostrarPelicula = async () => {
