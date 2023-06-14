@@ -475,6 +475,12 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
         const db = client.db(dbName)
         const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(idUsuario) })
         if (usuario) {
+            // fecha recomendacion
+            const tiempo_actual = Date.now()
+            let date = new Date(tiempo_actual)
+            let timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            timeString = timeString.replace(/( AM| PM)$/, '')
+
             // crear directorio del usuario si no existe
             const directorioUsuario = dir_recommendations_users + "/" + idUsuario
             const directorioDataUsuario = directorioUsuario + "/data"
@@ -520,7 +526,7 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
             grouplibrec.stderr.on("data", (data) => {
                 console.log(`error: ${data}`)
             })
-            grouplibrec.on("close", (code) => {
+            grouplibrec.on("close", async (code) => {
                 if (code === 0) {
                     // devolver items recomendados para el grupo
                     console.log(`exit success: ${code}`)
@@ -543,7 +549,6 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
                             path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/no_existe.png"
                         }
                         items.push({
-                            idGrupo: grupo,
                             idItem: item,
                             rating: rating_individual,
                             pathImagen: path_imagen
@@ -552,6 +557,16 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
                     let items_ordenados = items.sort(function (a, b) {
                         return b.ratingGrupo - a.ratingGrupo
                     })
+                    
+                    await db.collection("usuarios").updateOne(
+                        { _id: new ObjectId(idUsuario) },
+                        { $push: 
+                            { recomendaciones: 
+                                { idSala: idGrupo, time: timeString, items: items_ordenados}
+                            } 
+                        }
+                    )
+                    
                     return res.json(items_ordenados)
                 }
                 else {
@@ -573,6 +588,12 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala) })
         const groupUsers = []
         if (sala) {
+            // fecha recomendacion
+            const tiempo_actual = Date.now()
+            let date = new Date(tiempo_actual)
+            let timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            timeString = timeString.replace(/( AM| PM)$/, '')
+
             // crear directorio del grupo si no existe
             const directorioGrupo = dir_recommendations_rooms + "/" + idSala
             const directorioDataGrupo = directorioGrupo + "/data"
@@ -626,7 +647,7 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
             grouplibrec.stderr.on("data", (data) => {
                 console.log(`error: ${data}`)
             })
-            grouplibrec.on("close", (code) => {
+            grouplibrec.on("close", async (code) => {
                 if (code === 0) {
                     // devolver items recomendados para el grupo
                     console.log(`exit success: ${code}`)
@@ -658,6 +679,19 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
                     let items_ordenados = items.sort(function (a, b) {
                         return b.ratingGrupo - a.ratingGrupo
                     })
+
+                    await db.collection("salas").updateOne(
+                        { _id: new ObjectId(idSala) },
+                        {
+                            $addToSet: {
+                                recomendaciones_grupal: {
+                                    time: timeString,
+                                    items: items_ordenados
+                                }
+                            }
+                        }
+                    )
+
                     return res.json(items_ordenados)
                 }
                 else {
@@ -669,6 +703,38 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
     catch (error) {
         console.log(error)
     }
+})
+
+app.get("/obtener-recomendaciones-usuario", async (req, res) => {
+    const idUsuario = req.query.idUsuario
+    const idSala = req.query.idSala
+    try{
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(idUsuario)})
+        if (usuario) {
+            const recomendacionesUsuario = usuario.recomendaciones.filter((recomendacion) => {
+                return recomendacion.idSala === idSala;
+            })
+        
+            if (recomendacionesUsuario.length > 0) {
+                return res.json(recomendacionesUsuario);
+            } else {
+                return res.json({
+                    error: "No recommendations found for the specified idSala.",
+                });
+            }
+        }
+        
+        return res.json({
+            error: "User not found.",
+        });
+
+    }
+    catch(error){
+        console.log(error)
+    }
+
 })
 
 app.get("/obtener-pelicula", (req, res) => {

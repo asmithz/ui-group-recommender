@@ -11,7 +11,6 @@ import ListaItems from "../componentes/ListaItems"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faArrowRightFromBracket ,faPeopleGroup, faStar, faUser } from "@fortawesome/free-solid-svg-icons"
 
-
 const socket = io(process.env.REACT_APP_SOCKET_URL)
 
 const api = axios.create({
@@ -279,9 +278,9 @@ const Grupo = () => {
                 {/* Recomendaciones */}
                 <div className="column is-half">
                     {/* Recomendaciones individuales */}
-                    <TarjetaRecomendaciones tipoRecomendacion="individual" recomendaciones={recomendacionesIndividuales} cargando={cargandoIndividual} />
+                    <TarjetaRecomendaciones idUsuario={idUsuario} idGrupo={idGrupo} tipoRecomendacion="individual" recomendaciones={recomendacionesIndividuales} cargando={cargandoIndividual} />
                     {/* Recomendaciones grupales */}
-                    <TarjetaRecomendaciones tipoRecomendacion="grupal" recomendaciones={recomendacionesGrupales} cargando={cargandoGrupo} />
+                    <TarjetaRecomendaciones idUsuario={idUsuario} idGrupo={idGrupo} tipoRecomendacion="grupal" recomendaciones={recomendacionesGrupales} cargando={cargandoGrupo} />
                 </div>
                 <div className="column">
                     { /* Chat Grupal */}

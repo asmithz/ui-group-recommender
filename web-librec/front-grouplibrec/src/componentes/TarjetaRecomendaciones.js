@@ -1,6 +1,7 @@
 import Lottie from "lottie-react"
 import loadingRecommendation from "../animations/loading-recommendation.json"
 import ListaItems from "./ListaItems"
+import PanelHistorialRecomendaciones from "./PanelHistorialRecomendaciones"
 
 const TarjetaRecomendaciones = (props) => {
     return (
@@ -11,9 +12,16 @@ const TarjetaRecomendaciones = (props) => {
                         <div className="column">
                             {
                                 props.tipoRecomendacion === "individual" &&
-                                <p className="is-size-4">
-                                    Recomendación Individual
-                                </p>
+                                <div className="columns">
+                                    <div className="column is-four-fifths">
+                                        <p className="is-size-4">
+                                            Recomendación Individual
+                                        </p>
+                                    </div>
+                                    <div className="column has-text-right">
+                                        <PanelHistorialRecomendaciones idUsuario={props.idUsuario} idGrupo={props.idGrupo} tipo="individual"/>
+                                    </div>
+                                </div>
                             }
                             {
                                 props.tipoRecomendacion === "grupal" &&
