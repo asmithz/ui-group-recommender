@@ -477,9 +477,6 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
         if (usuario) {
             // fecha recomendacion
             const tiempo_actual = Date.now()
-            let date = new Date(tiempo_actual)
-            let timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-            timeString = timeString.replace(/( AM| PM)$/, '')
 
             // crear directorio del usuario si no existe
             const directorioUsuario = dir_recommendations_users + "/" + idUsuario
@@ -562,7 +559,7 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
                         { _id: new ObjectId(idUsuario) },
                         { $push: 
                             { recomendaciones: 
-                                { idSala: idGrupo, time: timeString, items: items_ordenados}
+                                { idSala: idGrupo, time: tiempo_actual, items: items_ordenados}
                             } 
                         }
                     )
@@ -590,9 +587,6 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
         if (sala) {
             // fecha recomendacion
             const tiempo_actual = Date.now()
-            let date = new Date(tiempo_actual)
-            let timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-            timeString = timeString.replace(/( AM| PM)$/, '')
 
             // crear directorio del grupo si no existe
             const directorioGrupo = dir_recommendations_rooms + "/" + idSala
@@ -685,7 +679,7 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
                         {
                             $addToSet: {
                                 recomendaciones_grupal: {
-                                    time: timeString,
+                                    time: tiempo_actual,
                                     items: items_ordenados
                                 }
                             }
@@ -795,7 +789,39 @@ app.get("/obtener-pelicula", (req, res) => {
     })
 })
 
-app.get("/obtener-item", async (req, res) => {
+app.get("/obtener-item", async (req,res) => {
+    const idItem = req.query.idItem
+    let nombreItem = ""
+    let tipoItem
+    var data2 = fs.readFileSync(dir_movies_names, "utf-8")
+    data2 = data2.split("\n")
+    for (let item = 0; item < data2.length; item++) {
+        if (data2[item].split("::")[0] === String(idItem)) {
+            nombreItem = data2[item].split("::")[1]
+            tipoItem = data2[item].split("::")[2]
+                let path_imagen = dir_movielens_images + "/" + String(idItem) + ".jpg"
+                if (fs.existsSync(path_imagen)) {
+                    path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/" + String(idItem) + ".jpg"
+                }
+                else {
+                    path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/no_existe.png"
+                }
+            return res.json({
+                idItem: idItem,
+                nombreItem: nombreItem,
+                tipoItem: tipoItem,
+                pathItem: path_imagen 
+            })
+        }
+    }
+
+    return res.json({
+        estado : "no hay items"
+    })
+
+})
+
+app.get("/obtener-item-no-calificado", async (req, res) => {
     const id_usuario = req.query.id_usuario
     let idPelicula = Math.floor(Math.random() * 3952) + 1
     let nombrePelicula

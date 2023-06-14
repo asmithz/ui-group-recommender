@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import axios from "axios"
 import SlidingPane from "react-sliding-pane"
 import "react-sliding-pane/dist/react-sliding-pane.css"
@@ -10,7 +10,7 @@ import {
     AccordionItemHeading, 
     AccordionItemButton, 
     AccordionItemPanel } from "react-accessible-accordion"
-import 'react-accessible-accordion/dist/fancy-example.css'
+import '../css/StyleAcordionHistorial.css'
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
@@ -66,13 +66,13 @@ const PanelHistorialRecomendaciones = (props) => {
                             {
                                 props.tipo === "individual" ?
                                 <div>
-                                    <p className="is-size-4">
+                                    <p className="is-size-4 mb-5">
                                         Historial de sus recomendaciones
                                     </p>
                                     <div className="columns">
                                         <div className="column">
                                             { itemsIndividual.map((recomendacion, index) => {
-                                                return <ItemsRecomendados recomendacion={recomendacion} key={index} />
+                                                return <ItemsRecomendados recomendacion={recomendacion} key={index} index={index} />
                                             }) }
                                         </div>
                                     </div>
@@ -107,7 +107,16 @@ const PanelHistorialRecomendaciones = (props) => {
 }
 
 const ItemsRecomendados = (props) => {
-    console.log(props.recomendacion.items)
+    const convertirTiempo = (milisegundos) => {
+        var date = new Date(milisegundos)
+        var timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit'})
+        timeString = timeString.replace(/( AM| PM)$/, '')
+        var hours = date.getHours()
+        var amOrPm = hours >= 12 ? 'PM' : 'AM'
+        timeString += ' ' + amOrPm
+        return timeString
+    }
+
     return(
         <div className="columns">
             <div className="column">
@@ -115,7 +124,7 @@ const ItemsRecomendados = (props) => {
                     <AccordionItem>
                         <AccordionItemHeading>
                             <AccordionItemButton>
-                                <p>{props.recomendacion.time}</p>
+                                Recomendación realizada a las {convertirTiempo(props.recomendacion.time)}
                             </AccordionItemButton>
                         </AccordionItemHeading>
                         <AccordionItemPanel>
@@ -131,8 +140,38 @@ const ItemsRecomendados = (props) => {
 }
 
 const Item = (props) => {
+    const [itemInfo, setItemInfo] = useState({})
+    const obtenerItem = async () => {
+        try{
+            const itemInfo = await api.get("/obtener-item", { params: { idItem: props.item.idItem }}, {
+                headers: {
+                        "Content-type": "application/json"
+                    }
+            })
+            if(itemInfo){
+                setItemInfo(itemInfo.data)
+            }
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
+    useEffect(() => {
+        obtenerItem()
+    }, [])
+
     return(
-        <p>{props.item.idItem}</p>
+        <div className="columns">
+            <div className="column">
+                <img src={itemInfo.pathItem} alt={itemInfo.idItem}/>
+            </div>
+            <div className="column">
+                <p className="has-text-weight-bold">{itemInfo.nombreItem}</p>
+                <p>{itemInfo.tipoItem}</p>
+            </div>
+            <div className="column">
+            </div>
+        </div>
     )
 }
 

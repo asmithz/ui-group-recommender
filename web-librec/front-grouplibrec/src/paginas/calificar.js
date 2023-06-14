@@ -23,7 +23,7 @@ const Calificar = (props) => {
         const mostrarPelicula = async () => {
             setPuntuacion(1)
             if(props.idUsuario){
-                const pelicula = await api.get("/obtener-item", 
+                const pelicula = await api.get("/obtener-item-no-calificado", 
                 { 
                     params: {
                         id_usuario: props.idUsuario 
