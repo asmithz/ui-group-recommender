@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCrown, faPaperPlane } from "@fortawesome/free-solid-svg-icons"
 import { useDrop } from "react-dnd"
+import "../css/StyleItemHover.css"
 
 const Chat = (props) => {
     const idGrupo = props.idGrupo
@@ -193,7 +194,7 @@ const Mensaje = (props) => {
                         <>
                         <br></br>
                             <img
-                                className="rounded object-cover"
+                                className="rounded object-cover img-hover"
                                 src={props.mensaje.pathItem}
                                 alt={props.mensaje.idItem}
                                 style={{ width: 90, height: 150, borderRadius: "8%" }}

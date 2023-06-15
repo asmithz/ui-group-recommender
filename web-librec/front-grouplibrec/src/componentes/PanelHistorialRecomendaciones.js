@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import SlidingPane from "react-sliding-pane"
 import "react-sliding-pane/dist/react-sliding-pane.css"
+import '../css/StyleAcordionHistorial.css'
+import '../css/StyleItemHover.css'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faMagnifyingGlass, faAnglesLeft } from "@fortawesome/free-solid-svg-icons"
 import { 
@@ -10,7 +12,6 @@ import {
     AccordionItemHeading, 
     AccordionItemButton, 
     AccordionItemPanel } from "react-accessible-accordion"
-import '../css/StyleAcordionHistorial.css'
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
@@ -163,7 +164,7 @@ const Item = (props) => {
     return(
         <div className="columns">
             <div className="column">
-                <img src={itemInfo.pathItem} alt={itemInfo.idItem}/>
+                <img className="img-hover" src={itemInfo.pathItem} alt={itemInfo.idItem}/>
             </div>
             <div className="column">
                 <p className="has-text-weight-bold">{itemInfo.nombreItem}</p>

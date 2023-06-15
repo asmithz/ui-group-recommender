@@ -66,7 +66,7 @@ const Salas = () => {
                         </div>
                         <div className="columns">
                             <div className="column is-half is-offset-one-quarter">
-                                <table className="table">
+                                <table className="table is-rounded">
                                     <thead>
                                         <tr>
                                             <th style={{ width: "160px" }}>Nombre de la sala</th>
