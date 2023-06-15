@@ -533,7 +533,7 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
                     const directorioUltimaRecomendacion = recomendaciones.sort()[recomendaciones.length - 1]
                     let trecomendaciones = fs.readFileSync(directorioResultadosSala + directorioUltimaRecomendacion + "/recommendations.txt", "utf-8")
                     let arrayRecomendaciones = trecomendaciones.split("\n")
-                    for (let i = 0; i < arrayRecomendaciones.length-1; i++) {
+                    for (let i = 0; i < arrayRecomendaciones.length - 1; i++) {
                         let recomendacion = arrayRecomendaciones[i].split(",")
                         let grupo = recomendacion[0]
                         let item = recomendacion[1]
@@ -554,16 +554,18 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
                     let items_ordenados = items.sort(function (a, b) {
                         return b.ratingGrupo - a.ratingGrupo
                     })
-                    
+
                     await db.collection("usuarios").updateOne(
                         { _id: new ObjectId(idUsuario) },
-                        { $push: 
-                            { recomendaciones: 
-                                { idSala: idGrupo, time: tiempo_actual, items: items_ordenados}
-                            } 
+                        {
+                            $push:
+                            {
+                                recomendaciones:
+                                    { idSala: idGrupo, time: tiempo_actual, items: items_ordenados }
+                            }
                         }
                     )
-                    
+
                     return res.json(items_ordenados)
                 }
                 else {
@@ -651,7 +653,7 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
                     const directorioUltimaRecomendacion = recomendaciones.sort()[recomendaciones.length - 1]
                     let trecomendaciones = fs.readFileSync(directorioResultadosSala + directorioUltimaRecomendacion + "/recommendations.txt", "utf-8")
                     let arrayRecomendaciones = trecomendaciones.split("\n")
-                    for (let i = 0; i < arrayRecomendaciones.length-1; i++) {
+                    for (let i = 0; i < arrayRecomendaciones.length - 1; i++) {
                         let recomendacion = arrayRecomendaciones[i].split(",")
                         let grupo = recomendacion[0]
                         let item = recomendacion[1]
@@ -702,15 +704,15 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
 app.get("/obtener-recomendaciones-usuario", async (req, res) => {
     const idUsuario = req.query.idUsuario
     const idSala = req.query.idSala
-    try{
+    try {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
-        const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(idUsuario)})
+        const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(idUsuario) })
         if (usuario) {
             const recomendacionesUsuario = usuario.recomendaciones.filter((recomendacion) => {
                 return recomendacion.idSala === idSala;
             })
-        
+
             if (recomendacionesUsuario.length > 0) {
                 return res.json(recomendacionesUsuario);
             } else {
@@ -719,13 +721,13 @@ app.get("/obtener-recomendaciones-usuario", async (req, res) => {
                 });
             }
         }
-        
+
         return res.json({
             error: "User not found.",
         });
 
     }
-    catch(error){
+    catch (error) {
         console.log(error)
     }
 
@@ -789,7 +791,7 @@ app.get("/obtener-pelicula", (req, res) => {
     })
 })
 
-app.get("/obtener-item", async (req,res) => {
+app.get("/obtener-item", async (req, res) => {
     const idItem = req.query.idItem
     let nombreItem = ""
     let tipoItem
@@ -799,24 +801,24 @@ app.get("/obtener-item", async (req,res) => {
         if (data2[item].split("::")[0] === String(idItem)) {
             nombreItem = data2[item].split("::")[1]
             tipoItem = data2[item].split("::")[2]
-                let path_imagen = dir_movielens_images + "/" + String(idItem) + ".jpg"
-                if (fs.existsSync(path_imagen)) {
-                    path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/" + String(idItem) + ".jpg"
-                }
-                else {
-                    path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/no_existe.png"
-                }
+            let path_imagen = dir_movielens_images + "/" + String(idItem) + ".jpg"
+            if (fs.existsSync(path_imagen)) {
+                path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/" + String(idItem) + ".jpg"
+            }
+            else {
+                path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/no_existe.png"
+            }
             return res.json({
                 idItem: idItem,
                 nombreItem: nombreItem,
                 tipoItem: tipoItem,
-                pathItem: path_imagen 
+                pathItem: path_imagen
             })
         }
     }
 
     return res.json({
-        estado : "no hay items"
+        estado: "no hay items"
     })
 
 })
@@ -925,13 +927,13 @@ app.post("/enviar-al-stack", async (req, res) => {
     const idGrupo = req.body.idGrupo
     const idUsuario = req.body.idUsuario
     const idItem = req.body.idItem
-        let path_imagen = dir_movielens_images + "/" + String(idItem) + ".jpg"
-        if (fs.existsSync(path_imagen)) {
-            path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/" + String(idItem) + ".jpg"
-        }
-        else {
-            path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/no_existe.png"
-        }
+    let path_imagen = dir_movielens_images + "/" + String(idItem) + ".jpg"
+    if (fs.existsSync(path_imagen)) {
+        path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/" + String(idItem) + ".jpg"
+    }
+    else {
+        path_imagen = "http://" + server_ip + ":" + server_port + movielens_images + "/no_existe.png"
+    }
     try {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)

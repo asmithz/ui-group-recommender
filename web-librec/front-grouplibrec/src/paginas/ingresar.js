@@ -27,6 +27,9 @@ const Ingresar = () => {
                 socket.emit("generar-sesion", idSesion, resp.data.usuario_id)
                 navigate("/salas", { replace: true })
             }
+            else{
+                window.alert("Usuario o contraseña equivocada")
+            }
         }
         catch(error){
             console.log(error)
@@ -38,14 +41,19 @@ const Ingresar = () => {
     })
 
     const navegarCrearCuenta = () => {
-        navigate("/registrar", { replace: true })
+        navigate("/registrar", { replace: false })
     }
 
     const loginStyle = {
         display: "flex",
         alignItems: "center",
         justifyItems: "center",
-        height: "80vh"
+        height: "80vh",
+        marginLeft: "30%",
+        marginRight: "30%",
+    }
+
+    const tarjetaLoginStyle = {
     }
 
     useEffect(() => {
@@ -53,43 +61,55 @@ const Ingresar = () => {
     })
     
     return(
-        <div>
+        <div style={tarjetaLoginStyle}>
             <div className="columns" style={loginStyle}>
-                <div className="column is-half is-offset-one-quarter">
-                        <div className="column">
-                            <p className="is-size-1 has-text-centered">GroupLibrec</p>
-                        </div>
+                <div className="column">
+                    <p className="is-size-1 has-text-centered">Ingresar</p>
                     <Formik
                         initialValues={{
                             usuario: "",
                             password: ""
                         }}
-                        onSubmit={(valores) => loginInterfaz(valores)}>
+                        onSubmit={(valores) => loginInterfaz(valores)}
+                        validate={datos => {
+                                    const error = {}
+                                    if (!datos.usuario) {
+                                        error.usuario = "Debe indicar su usuario"
+                                    }
+                                    if (!datos.password) {
+                                        error.password = "Debe indicar su contraseña"
+                                    }
+                                    return error
+                                }}
+                        >
+                    {
+                        props => (
                         <Form>
                             <div className="field">
-                                <label>Usuario</label>
+                                <label className="has-text-weight-bold">Usuario</label>
                             </div>
                             <div className="field">
-                                <Field placeholder="Ingrese su usuario" className="input" type="text" name="usuario" />
+                                {props.errors.usuario && <p className="help is-danger">{props.errors.usuario}</p>}
+                                <Field placeholder="Ingrese su usuario" className={props.errors.usuario ? "input is-danger is-rounded" : "input is-rounded"} type="text" name="usuario" />
                             </div>
                             <div className="field">
-                                <label>Contraseña</label>
+                                <label className="has-text-weight-bold">Contraseña</label>
                             </div>
                             <div className="field">
-                                <Field placeholder="Ingrese su contraseña" className="input" type="password" name="password" />
+                                {props.errors.password && <p className="help is-danger">{props.errors.password}</p>}
+                                <Field placeholder="Ingrese su contraseña" className={props.errors.password ? "input is-danger is-rounded" : "input is-rounded"} type="password" name="password" />
                             </div>
                             <div className="field has-text-centered">
-                                <div className="columns">
-                                    <div className="column">
-                                        <button className="button is-primary" type="submit">Entrar</button>
-                                    </div>
-                                    <div className="column">
-                                        <a onClick={navegarCrearCuenta}>Crear cuenta</a>
-                                    </div>
-                                </div>
+                                <button className="button is-primary is-rounded pl-6 pr-6" type="submit">Entrar</button>
                             </div>
                         </Form>
+                        )
+                    }
+
                     </Formik>
+                    <div className="column has-text-centered">
+                    ¿No tiene una cuenta? <a onClick={navegarCrearCuenta}>Crear cuenta</a>
+                    </div>
                 </div>
             </div>
         </div>

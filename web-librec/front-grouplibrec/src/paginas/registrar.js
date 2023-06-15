@@ -2,114 +2,207 @@ import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { Formik, Form, Field } from "formik"
 import axios from "axios"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faUpload } from "@fortawesome/free-solid-svg-icons"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 })
 
-const api_url = process.env.REACT_APP_API_URL
-
 const Registrar = () => {
     const navigate = useNavigate()
-
-    const [imagenUsuario, setImagen] = useState("")
+    const [imagenUsuario, setImagen] = useState()
+    const [nombreImagen, setNombreImagen] = useState("")
+    const [seleccionImagen, setFileImagen] = useState()
+    const [preview, setPreview] = useState()
+    const MAX_IMAGE_WIDTH = 300
+    const MAX_IMAGE_HEIGHT = 300
+    const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpg"]
 
     const registrarUsuario = async (valores) => {
-        try{
+        try {
             // agregar la imagen seleccionada al json
-            valores.imagen_usuario = imagenUsuario
-            const resp = await api.post("/registrar-usuario", valores)
-            if(resp){
-                navigate("/ingresar", { replace: true })
-            }
+            valores.imagen_usuario = seleccionImagen
+            console.log(valores)
+            //const resp = await api.post("/registrar-usuario", valores)
+            //if (resp) {
+            //    navigate("/ingresar", { replace: true })
+            //}
         }
-        catch(error){
+        catch (error) {
             console.log(error)
         }
     }
 
-    return(
-        <div className="columns">
-            <div className="column is-half is-offset-one-quarter">
+    const onSelectFile = e => {
+        if (!e.target.files || e.target.files.length === 0) {
+            setFileImagen(undefined)
+            return
+        }
+
+        const selectedFile = e.target.files[0]
+        console.log(selectedFile)
+        const fileType = selectedFile.type
+
+        if (!ACCEPTED_IMAGE_TYPES.includes(fileType)) {
+            // Handle the case when the file type is not accepted
+            alert('Solo se aceptan imagenes JPG y PNG.');
+            return;
+        }
+
+        const image = new Image()
+
+        image.onload = function () {
+            if (this.width > MAX_IMAGE_WIDTH || this.height > MAX_IMAGE_HEIGHT) {
+                // Handle the case when the image dimensions exceed the maximum limits
+                window.alert('Largo de imagen exedido.')
+                return
+            }
+        }
+
+        setFileImagen(selectedFile)
+        setNombreImagen(selectedFile.name)
+    }
+
+    useEffect(() => {
+        if (!seleccionImagen) {
+            setPreview(undefined)
+            return
+        }
+        const objectUrl = URL.createObjectURL(seleccionImagen)
+        setPreview(objectUrl)
+        // free memory when ever this component is unmounted
+        return () => URL.revokeObjectURL(objectUrl)
+
+    }, [seleccionImagen])
+
+    const registrarStyle = {
+        alignItems: "center",
+        justifyItems: "center",
+        marginTop: "5%",
+        marginLeft: "25%",
+        marginRight: "25%",
+    }
+
+    const containerStyleImage = {
+        width: "200px",
+        heigth: "200px",
+        overflow: "hidden"
+    }
+
+    const imagePreviewStyle = {
+        width: "100%",
+        height: "100%",
+        objectFit: "cover"
+    }
+
+    return (
+        <div style={registrarStyle}>
+            <div>
                 <div>
-                    <p className="is-size-1 has-text-centered">Registre su usuario en GroupLibrec</p>
+                    <p className="is-size-1 has-text-centered">Registre su usuario </p>
                 </div>
-                <div>
-                    <Formik
-                        initialValues={{
-                            usuario: "",
-                            nombre: "",
-                            imagen_usuario: "",
-                            edad: "",
-                            educacion: "",
-                            password: "",
-                            recomendaciones: []
-                        }}
-                        onSubmit={(valores) => registrarUsuario(valores)}>
-                        <Form>
-                            {/* Avatar */}
-                            <div className="field">
-                                <label className="label">Seleccione su avatar de usuario</label>
-                            </div>
+                <Formik
+                    initialValues={{
+                        usuario: "",
+                        nombre: "",
+                        imagen_usuario: "",
+                        edad: "",
+                        educacion: "",
+                        password: "",
+                        recomendaciones: []
+                    }}
+                    onSubmit={(valores) => registrarUsuario(valores)}>
+                    <Form>
                         <div className="columns">
                             <div className="column">
-                                <img src={api_url+"/iconos/icono1.png"} style={{ width: 100, height: 100 }} onClick={() => setImagen("http://192.168.1.10:8000/iconos/icono1.png")} alt="user1" />
+                                {/* Nombre Usuario*/}
+                                <div className="field">
+                                    <label className="label">Nombre de usuario</label>
+                                </div>
+                                <div className="field">
+                                    <Field placeholder="Ingrese su nombre de usuario" className="input is-rounded" type="text" name="usuario" />
+                                </div>
                             </div>
                             <div className="column">
-                                <img src={api_url+"/iconos/icono2.png"} style={{ width: 100, height: 100 }} onClick={() => setImagen("http://192.168.1.10:8000/iconos/icono2.png")} alt="user2" />
-                            </div>
-                            <div className="column">
-                                <img src={api_url+"/iconos/icono3.png"} style={{ width: 100, height: 100 }} onClick={() => setImagen("http://192.168.1.10:8000/iconos/icono3.png")} alt="user3" />
-                            </div>
-                            <div className="column">
-                                <img src={api_url+"/iconos/icono4.png"} style={{ width: 100, height: 100 }} onClick={() => setImagen("http://192.168.1.10:8000/iconos/icono4.png")} alt="user4" />
-                            </div>
-                            <div className="column">
-                                <img src={api_url+"/iconos/icono5.png"} style={{ width: 100, height: 100 }} onClick={() => setImagen("http://192.168.1.10:8000/iconos/icono5.png")} alt="user5" />
+                                {/* Nombre */}
+                                <div className="field">
+                                    <label className="label">Nombre y apellido</label>
+                                </div>
+                                <div className="field">
+                                    <Field placeholder="Ingrese su nombre" className="input is-rounded" type="text" name="nombre" />
+                                </div>
                             </div>
                         </div>
-                            {/* Nombre Usuario*/}
-                            <div className="field">
-                                <label className="label">Nombre de usuario</label>
+                        <div className="columns">
+                            <div className="column">
+                                {/* Edad */}
+                                <div className="field">
+                                    <label className="label">Edad</label>
+                                </div>
+                                <div className="field">
+                                    <Field placeholder="Ingrese su edad" className="input is-rounded" type="text" name="edad" />
+                                </div>
                             </div>
-                            <div className="field">
-                                <Field placeholder="Ingrese su nombre de usuario" className="input" type="text" name="usuario" />
+                            <div className="column">
+                                {/* Trabajo */}
+                                <div className="field">
+                                    <label className="label">A qué se dedica</label>
+                                </div>
+                                <div className="field">
+                                    <Field placeholder="Ingrese profesión o estado educativo" className="input is-rounded" type="text" name="educacion" />
+                                </div>
                             </div>
-                            {/* Nombre */}
-                            <div className="field">
-                                <label className="label">Nombre y apellido</label>
+                        </div>
+                        {/* Avatar */}
+                        <div className="field">
+                            <label className="label">Seleccione su avatar de usuario</label>
+                            <div className="columns">
+                                <div className="column">
+                                    <div className="file has-name is-fullwidth">
+                                        <label className="file-label">
+                                            <input className="file-input" type="file" onChange={onSelectFile} />
+                                            <span className="file-cta">
+                                                <span className="file-icon">
+                                                    <FontAwesomeIcon icon={faUpload} />
+                                                </span>
+                                                <span className="file-label">
+                                                    Suba su avatar…
+                                                </span>
+                                            </span>
+                                            {
+                                                nombreImagen !== "" &&
+                                                <span className="file-name has-text-centered" style={{ backgroundColor: "white" }}>
+                                                    {nombreImagen}
+                                                </span>
+                                            }
+                                        </label>
+                                    </div>
+                                </div>
+                                <div className="column">
+                                    <div className="has-text-centered">
+                                        <div style={containerStyleImage}>
+                                            {nombreImagen &&
+                                                <img src={preview} style={imagePreviewStyle} />
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="field">
-                                <Field placeholder="Ingrese su nombre" className="input" type="text" name="nombre" />
-                            </div>
-                            {/* Edad */}
-                            <div className="field">
-                                <label className="label">Edad</label>
-                            </div>
-                            <div className="field">
-                                <Field placeholder="Ingrese su edad" className="input" type="text" name="edad" />
-                            </div>
-                            {/* Trabajo */}
-                            <div className="field">
-                                <label className="label">A qué se dedica</label>
-                            </div>
-                            <div className="field">
-                                <Field placeholder="Ingrese profesión o estado educativo" className="input" type="text" name="educacion" />
-                            </div>
-                            {/* Contraseña */}
-                            <div className="field">
-                                <label className="label">Contraseña</label>
-                            </div>
-                            <div className="field">
-                                <Field placeholder="Ingrese una contraseña" className="input" type="password" name="password" />
-                            </div>
-                            {/* Boton */}
-                            <div className="field">
-                                <button className="button is-primary" type="submit">Entrar</button>
-                            </div>
-                        </Form>
-                    </Formik>
-                </div>
+                        </div>
+                        {/* Contraseña */}
+                        <div className="field">
+                            <label className="label">Contraseña</label>
+                        </div>
+                        <div className="field">
+                            <Field placeholder="Ingrese una contraseña" className="input is-rounded" type="password" name="password" />
+                        </div>
+                        {/* Boton */}
+                        <div className="field has-text-centered">
+                            <button className="button is-primary is-rounded pl-6 pr-6" type="submit">Registrar</button>
+                        </div>
+                    </Form>
+                </Formik>
             </div>
         </div>
     )
