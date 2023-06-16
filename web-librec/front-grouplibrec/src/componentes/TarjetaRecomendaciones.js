@@ -15,7 +15,7 @@ const TarjetaRecomendaciones = (props) => {
                                 <div className="columns">
                                     <div className="column is-four-fifths">
                                         <p className="is-size-4">
-                                            Recomendación Individual
+                                            Sus recomendaciones
                                         </p>
                                     </div>
                                     <div className="column has-text-right">
@@ -25,9 +25,16 @@ const TarjetaRecomendaciones = (props) => {
                             }
                             {
                                 props.tipoRecomendacion === "grupal" &&
-                                <p className="is-size-4">
-                                    Recomendación Grupal
-                                </p>
+                                <div className="columns">
+                                    <div className="column is-four-fifths">
+                                        <p className="is-size-4">
+                                            Recomendaciones de la sala
+                                        </p>
+                                    </div>
+                                    <div className="column has-text-right">
+                                        <PanelHistorialRecomendaciones idUsuario={props.idUsuario} idGrupo={props.idGrupo} tipo="grupal"/>
+                                    </div>
+                                </div>
                             }
                         </div>
                     </div>

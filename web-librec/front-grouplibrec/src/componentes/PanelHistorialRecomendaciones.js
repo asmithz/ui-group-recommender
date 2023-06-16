@@ -6,39 +6,67 @@ import '../css/StyleAcordionHistorial.css'
 import '../css/StyleItemHover.css'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faMagnifyingGlass, faAnglesLeft } from "@fortawesome/free-solid-svg-icons"
-import { 
-    Accordion, 
-    AccordionItem, 
-    AccordionItemHeading, 
-    AccordionItemButton, 
-    AccordionItemPanel } from "react-accessible-accordion"
+import {
+    Accordion,
+    AccordionItem,
+    AccordionItemHeading,
+    AccordionItemButton,
+    AccordionItemPanel
+} from "react-accessible-accordion"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 })
 
 const PanelHistorialRecomendaciones = (props) => {
-    const [panelIndividual, setPanelIndividual] = useState(false)
     const [itemsIndividual, setItemsIndividual] = useState([])
+    const [itemsGrupal, setItemsGrupal] = useState([])
+    const [panelIndividual, setPanelIndividual] = useState(false)
     const [panelGrupal, setPanelGrupal] = useState(false)
 
     const obtenerRecomendacionesIndividuales = async () => {
-        try{
-            const items = await api.get("/obtener-recomendaciones-usuario", 
-                {   params: {
+        try {
+            const items = await api.get("/obtener-recomendaciones-usuario",
+                {
+                    params: {
                         idSala: props.idGrupo,
                         idUsuario: props.idUsuario
                     }
                 },
-                {   headers: {
+                {
+                    headers: {
                         "Content-type": "application/json"
                     }
                 })
-                if(items){
-                    setItemsIndividual(items.data)
-                }
+            if (items) {
+                setItemsIndividual(items.data)
+            }
         }
-        catch(error){
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+    const obtenerRecomendacionesGrupales = async () => {
+        try {
+            const items = await api.get("/obtener-recomendaciones-grupo",
+                {
+                    params: {
+                        idSala: props.idGrupo,
+                    }
+                },
+                {
+                    headers: {
+                        "Content-type": "application/json"
+                    }
+                })
+            console.log(items)
+            if (items) {
+                console.log(items)
+                setItemsGrupal(items.data)
+            }
+        }
+        catch (error) {
             console.log(error)
         }
     }
@@ -48,61 +76,95 @@ const PanelHistorialRecomendaciones = (props) => {
         setPanelIndividual(true)
     }
 
-    return(
+    const abrirPanelGrupal = () => {
+        obtenerRecomendacionesGrupales()
+        setPanelGrupal(true)
+    }
+
+    return (
         <>
-        {
-            props.tipo === "individual" &&
-            <>
-                <SlidingPane 
-                    isOpen={panelIndividual}
-                    from="left"
-                    onRequestClose={() => {
-                        setPanelIndividual(false)
-                    }}
-                    width="800px"
-                    hideHeader={true}
-                >
-                    <div className="columns">
-                        <div className="column">
-                            {
-                                props.tipo === "individual" ?
+            {
+                props.tipo === "individual" &&
+                <>
+                    <SlidingPane
+                        isOpen={panelIndividual}
+                        from="left"
+                        onRequestClose={() => {
+                            setPanelIndividual(false)
+                        }}
+                        width="800px"
+                        hideHeader={true}
+                    >
+                        <div className="columns">
+                            <div className="column">
                                 <div>
                                     <p className="is-size-4 mb-5">
                                         Historial de sus recomendaciones
                                     </p>
                                     <div className="columns">
                                         <div className="column">
-                                            { itemsIndividual.map((recomendacion, index) => {
-                                                return <ItemsRecomendados recomendacion={recomendacion} key={index} index={index} />
-                                            }) }
+                                            {
+                                                itemsIndividual.length > 0 &&
+                                                itemsIndividual.map((recomendacion, index) => {
+                                                    return <ItemsRecomendados recomendacion={recomendacion} key={index} index={index} />
+                                                })}
                                         </div>
                                     </div>
                                 </div>
-                                    :
+                            </div>
+                            <div className="column has-text-right">
+                                <button className="button is-danger is-light is-rounded" onClick={() => setPanelIndividual(false)}>
+                                    <FontAwesomeIcon icon={faAnglesLeft} style={{ color: "#f47b7b" }} />
+                                </button>
+                            </div>
+                        </div>
+                    </SlidingPane>
+                    <button className="button is-primary is-rounded is-light" onClick={abrirPanelIndividual}>
+                        <FontAwesomeIcon icon={faMagnifyingGlass} />
+                    </button>
+                </>
+            }
+            {
+                props.tipo === "grupal" &&
+                <>
+                    <SlidingPane
+                        isOpen={panelGrupal}
+                        from="left"
+                        onRequestClose={() => {
+                            setPanelGrupal(false)
+                        }}
+                        width="800px"
+                        hideHeader={true}
+                    >
+                        <div className="columns">
+                            <div className="column">
                                 <div>
-                                    <p className="is-size-4">
-                                        Historial de las recomendaciones del grupo
+                                    <p className="is-size-4 mb-5">
+                                        Historial de recomendaciones de la sala
                                     </p>
                                     <div className="columns">
                                         <div className="column">
-
+                                            {
+                                                itemsGrupal.length > 0 &&
+                                                itemsGrupal.map((recomendacion, index) => {
+                                                    return <ItemsRecomendados recomendacion={recomendacion} key={index} index={index} />
+                                                })}
                                         </div>
                                     </div>
                                 </div>
-                            }
+                            </div>
+                            <div className="column has-text-right">
+                                <button className="button is-danger is-light is-rounded" onClick={() => setPanelGrupal(false)}>
+                                    <FontAwesomeIcon icon={faAnglesLeft} style={{ color: "#f47b7b" }} />
+                                </button>
+                            </div>
                         </div>
-                        <div className="column has-text-right">
-                            <button className="button is-danger is-light is-rounded" onClick={() => setPanelIndividual(false)}>
-                                <FontAwesomeIcon icon={faAnglesLeft}  style={{ color: "#f47b7b" }}/>
-                            </button>
-                        </div>
-                    </div>
-                </SlidingPane>
-                <button className="button is-primary is-rounded is-light" onClick={abrirPanelIndividual}>
-                    <FontAwesomeIcon icon={faMagnifyingGlass}/>
-                </button>
-            </>
-        }
+                    </SlidingPane>
+                    <button className="button is-primary is-rounded is-light" onClick={abrirPanelGrupal}>
+                        <FontAwesomeIcon icon={faMagnifyingGlass} />
+                    </button>
+                </>
+            }
         </>
     )
 }
@@ -110,7 +172,7 @@ const PanelHistorialRecomendaciones = (props) => {
 const ItemsRecomendados = (props) => {
     const convertirTiempo = (milisegundos) => {
         var date = new Date(milisegundos)
-        var timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit'})
+        var timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
         timeString = timeString.replace(/( AM| PM)$/, '')
         var hours = date.getHours()
         var amOrPm = hours >= 12 ? 'PM' : 'AM'
@@ -118,7 +180,7 @@ const ItemsRecomendados = (props) => {
         return timeString
     }
 
-    return(
+    return (
         <div className="columns">
             <div className="column">
                 <Accordion allowZeroExpanded={true}>
@@ -130,8 +192,8 @@ const ItemsRecomendados = (props) => {
                         </AccordionItemHeading>
                         <AccordionItemPanel>
                             {props.recomendacion.items.map((item, index) => {
-                                return <Item item={item} key={item.idItem+index} />
-                            } )}
+                                return <Item item={item} key={item.idItem + index} />
+                            })}
                         </AccordionItemPanel>
                     </AccordionItem>
                 </Accordion>
@@ -143,17 +205,17 @@ const ItemsRecomendados = (props) => {
 const Item = (props) => {
     const [itemInfo, setItemInfo] = useState({})
     const obtenerItem = async () => {
-        try{
-            const itemInfo = await api.get("/obtener-item", { params: { idItem: props.item.idItem }}, {
+        try {
+            const itemInfo = await api.get("/obtener-item", { params: { idItem: props.item.idItem } }, {
                 headers: {
-                        "Content-type": "application/json"
-                    }
+                    "Content-type": "application/json"
+                }
             })
-            if(itemInfo){
+            if (itemInfo) {
                 setItemInfo(itemInfo.data)
             }
         }
-        catch(error){
+        catch (error) {
             console.log(error)
         }
     }
@@ -161,10 +223,10 @@ const Item = (props) => {
         obtenerItem()
     }, [])
 
-    return(
+    return (
         <div className="columns">
             <div className="column">
-                <img className="img-hover" src={itemInfo.pathItem} alt={itemInfo.idItem}/>
+                <img className="img-hover" src={itemInfo.pathItem} alt={itemInfo.idItem} />
             </div>
             <div className="column">
                 <p className="has-text-weight-bold">{itemInfo.nombreItem}</p>

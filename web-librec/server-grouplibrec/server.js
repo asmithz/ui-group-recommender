@@ -710,22 +710,45 @@ app.get("/obtener-recomendaciones-usuario", async (req, res) => {
         const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(idUsuario) })
         if (usuario) {
             const recomendacionesUsuario = usuario.recomendaciones.filter((recomendacion) => {
-                return recomendacion.idSala === idSala;
+                return recomendacion.idSala === idSala
             })
 
             if (recomendacionesUsuario.length > 0) {
-                return res.json(recomendacionesUsuario);
+                return res.json(recomendacionesUsuario)
             } else {
                 return res.json({
                     error: "No recommendations found for the specified idSala.",
-                });
+                })
             }
         }
-
         return res.json({
             error: "User not found.",
         });
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
 
+app.get("/obtener-recomendaciones-grupo", async (req, res) => {
+    const idSala = req.query.idSala
+    try {
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala)})
+        if(sala){
+            if(sala.recomendaciones_grupal.length > 0) {
+                return res.json(sala.recomendaciones_grupal)
+            }
+            else{
+                return res.json({
+                    error: "No recommendations found for the specified idSala.",
+                })
+            }
+        }
+        return res.json({
+            error: "Group not found.",
+        })
     }
     catch (error) {
         console.log(error)
