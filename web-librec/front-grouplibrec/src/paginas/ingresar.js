@@ -3,6 +3,8 @@ import { Formik, Form, Field } from "formik"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPeopleGroup } from "@fortawesome/free-solid-svg-icons"
 
 const socket = io(process.env.REACT_APP_SOCKET_URL)
 
@@ -49,16 +51,13 @@ const Ingresar = () => {
         alignItems: "center",
         justifyItems: "center",
         height: "80vh",
-        marginLeft: "30%",
-        marginRight: "30%",
+        paddingLeft: "15%",
+        marginLeft: "20%",
+        marginRight: "20%",
     }
 
     const tarjetaLoginStyle = {
     }
-
-    useEffect(() => {
-        console.log(idSesion)
-    })
     
     return(
         <div style={tarjetaLoginStyle}>
@@ -109,6 +108,11 @@ const Ingresar = () => {
                     </Formik>
                     <div className="column has-text-centered">
                     ¿No tiene una cuenta? <a onClick={navegarCrearCuenta}>Crear cuenta</a>
+                    </div>
+                </div>
+                <div className="column">
+                    <div style={{ fontSize: "10rem", color: "#09b391"}}>
+                        <FontAwesomeIcon icon={faPeopleGroup} />
                     </div>
                 </div>
             </div>
