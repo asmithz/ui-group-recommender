@@ -5,8 +5,8 @@ import http from "http"
 import cors from "cors"
 import { MongoClient, ObjectId } from "mongodb";
 import child_process from 'child_process'
+import fileUpload from 'express-fileupload'
 import * as fs from "fs"
-
 
 const exec = child_process.exec
 const spawn = child_process.spawn
@@ -19,7 +19,6 @@ const io = new socketServer(server, {
         origin: "*"
     }
 })
-
 
 const server_ip = process.env.SERVER_IP
 const exec_grouplibrec = process.env.DIR_GROUPLIBREC
@@ -34,6 +33,7 @@ const dir_recommendations_rooms = process.env.DIR_RECOMMENDATIONS_ROOMS
 const dir_recommendations_results = process.env.DIR_RECOMMENDATIONS_RESULTS
 const dir_ratings = process.env.DIR_RATINGS
 const dir_movies_names = process.env.DIR_MOVIES_IMAGES
+const dir_icons_users = process.env.DIR_ICONS_USERS
 const movielens_images = process.env.MOVIELENS_IMAGES
 const dir_icons = process.env.DIR_ICONS
 const db_url = process.env.DB_URL
@@ -49,6 +49,7 @@ app.use(cors())
 app.use(express.json())
 app.use(movielens_images, express.static("imagenes-movielens"))
 app.use(dir_icons, express.static("iconos"))
+app.use(fileUpload())
 
 const url = db_url
 const dbName = db_name
@@ -198,26 +199,40 @@ io.on("connection", (socket) => {
 
 //apis
 app.post("/registrar-usuario", async (req, res) => {
-    let usuario = {
-        usuario: req.body.usuario,
-        nombre: req.body.nombre,
-        edad: req.body.edad,
-        educacion: req.body.educacion,
-        password: req.body.password,
-        recomendaciones: [],
-        imagen_usuario: req.body.imagen_usuario,
-        calificaciones: []
+    if (!req.files || !req.files.imagen_usuario) {
+        res.status(400).json({ error: 'No file uploaded' })
+        return
     }
-    try {
-        const client = await MongoClient.connect(url)
-        const db = client.db(dbName)
-        await db.collection("usuarios").insertOne(usuario)
-        client.close()
-    }
-    catch (error) {
-        console.log(error)
-    }
-    return res.json(req.body)
+    const image = req.files.imagen_usuario
+    const uploadDirectory = dir_icons_users
+    const filePath = uploadDirectory + "/" + image.name;
+    image.mv(filePath, async (err) => {
+        if (err) {
+            console.error(err)
+            res.status(500).json({ error: 'Failed to upload file' })
+        } else {
+            let usuario = {
+                usuario: req.body.usuario,
+                nombre: req.body.nombre,
+                edad: req.body.edad,
+                educacion: req.body.educacion,
+                password: req.body.password,
+                recomendaciones: [],
+                imagen_usuario: "http://" + server_ip + ":" + server_port + dir_icons + "/" + image.name,
+                calificaciones: []
+            }
+            try {
+                const client = await MongoClient.connect(url)
+                const db = client.db(dbName)
+                await db.collection("usuarios").insertOne(usuario)
+                client.close()
+            }
+            catch (error) {
+                console.log(error)
+            }
+        }
+        return res.json(req.body)
+    })
 })
 
 app.post("/login-usuario", async (req, res) => {
@@ -735,12 +750,12 @@ app.get("/obtener-recomendaciones-grupo", async (req, res) => {
     try {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
-        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala)})
-        if(sala){
-            if(sala.recomendaciones_grupal.length > 0) {
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala) })
+        if (sala) {
+            if (sala.recomendaciones_grupal.length > 0) {
                 return res.json(sala.recomendaciones_grupal)
             }
-            else{
+            else {
                 return res.json({
                     error: "No recommendations found for the specified idSala.",
                 })

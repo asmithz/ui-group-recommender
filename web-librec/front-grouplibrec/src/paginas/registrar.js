@@ -20,14 +20,15 @@ const Registrar = () => {
     const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpg"]
 
     const registrarUsuario = async (valores) => {
+        // agregar la imagen seleccionada al json
+        valores.imagen_usuario = seleccionImagen
         try {
-            // agregar la imagen seleccionada al json
-            valores.imagen_usuario = seleccionImagen
-            console.log(valores)
-            //const resp = await api.post("/registrar-usuario", valores)
-            //if (resp) {
-            //    navigate("/ingresar", { replace: true })
-            //}
+            const resp = await api.post("/registrar-usuario", valores, {
+                headers: {"Content-Type": "multipart/form-data"}
+            })
+            if (resp) {
+                navigate("/ingresar", { replace: true })
+            }
         }
         catch (error) {
             console.log(error)
@@ -41,7 +42,6 @@ const Registrar = () => {
         }
 
         const selectedFile = e.target.files[0]
-        console.log(selectedFile)
         const fileType = selectedFile.type
 
         if (!ACCEPTED_IMAGE_TYPES.includes(fileType)) {
@@ -106,7 +106,7 @@ const Registrar = () => {
                     initialValues={{
                         usuario: "",
                         nombre: "",
-                        imagen_usuario: "",
+                        imagen_usuario: seleccionImagen,
                         edad: "",
                         educacion: "",
                         password: "",
@@ -161,7 +161,7 @@ const Registrar = () => {
                                 <div className="column">
                                     <div className="file has-name is-fullwidth">
                                         <label className="file-label">
-                                            <input className="file-input" type="file" onChange={onSelectFile} />
+                                            <Field className="file-input" type="file" onChange={onSelectFile} name="imagen_usuario" />
                                             <span className="file-cta">
                                                 <span className="file-icon">
                                                     <FontAwesomeIcon icon={faUpload} />
@@ -206,7 +206,6 @@ const Registrar = () => {
             </div>
         </div>
     )
-
 }
 
 export default Registrar
