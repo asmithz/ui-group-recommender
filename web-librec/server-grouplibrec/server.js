@@ -64,7 +64,7 @@ io.on("connection", (socket) => {
         try {
             const client = await MongoClient.connect(url)
             const db = client.db(dbName)
-            const sesion = await db.collection("sesiones").insertOne({ "id_sesion": socket.id, "id_usuario": usuarioId })
+            await db.collection("sesiones").insertOne({ "id_sesion": socket.id, "id_usuario": usuarioId })
         }
         catch (error) {
             console.log(error)
@@ -78,26 +78,35 @@ io.on("connection", (socket) => {
             const sesion_usuario = await db.collection("sesiones").findOne({ id_sesion: idSesion })
             if (sesion_usuario) {
                 const user = await db.collection("usuarios").findOne({ _id: new ObjectId(sesion_usuario.id_usuario) })
-                socket.join(idGrupo)
-                io.in(idGrupo).emit("update-grupo")
-                const userEnGrupo = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo), usuarios_activos: { $elemMatch: user } })
-                // si no esta en el grupo agregarlo
-                if (!userEnGrupo) {
-                    await db.collection("salas").updateOne(
-                        { _id: new ObjectId(idGrupo) },
-                        { $addToSet: { usuarios_activos: user } }
-                    )
-                    await db.collection("salas").updateOne(
-                        { _id: new ObjectId(idGrupo) },
-                        {
-                            $addToSet: {
-                                recomendaciones_stack: {
-                                    id_usuario: sesion_usuario.id_usuario,
-                                    items: []
+                if (user) {
+                    socket.join(idGrupo)
+                    io.in(idGrupo).emit("update-grupo")
+                    const userGrupo = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo), usuarios_activos: { $elemMatch: { _id: new ObjectId(user._id) } } })
+                    // si no esta en el grupo agregarlo
+                    if (!userGrupo) {
+                        await db.collection("salas").updateOne(
+                            { _id: new ObjectId(idGrupo) },
+                            { $addToSet: { usuarios_activos: user } }
+                        )
+                        await db.collection("salas").updateOne(
+                            { _id: new ObjectId(idGrupo) },
+                            {
+                                $addToSet: {
+                                    recomendaciones_stack: {
+                                        id_usuario: sesion_usuario.id_usuario,
+                                        items: []
+                                    }
                                 }
                             }
-                        }
-                    )
+                        )
+                        await db.collection("usuarios").updateOne(
+                            { _id: user._id },
+                            {
+                                $set: { idSalaActiva: idGrupo }
+                            }
+                        )
+                        console.log("entrar" + idGrupo)
+                    }
                 }
             }
         }
@@ -119,8 +128,16 @@ io.on("connection", (socket) => {
             const sesion_usuario = await db.collection("sesiones").findOne({ id_sesion: idSesion })
             if (sesion_usuario) {
                 const user = await db.collection("usuarios").findOne({ _id: new ObjectId(sesion_usuario.id_usuario) })
-                const userGrupo = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo), usuarios_activos: { $elemMatch: user } })
+                const userGrupo = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo), usuarios_activos: { $elemMatch: { _id: new ObjectId(user._id) } } })
+                console.log(userGrupo)
                 if (userGrupo) {
+                    console.log("salir" + idGrupo)
+                    await db.collection("usuarios").updateOne(
+                        { _id: new ObjectId(sesion_usuario.id_usuario) },
+                        {
+                            $set: { idSalaActiva: "" }
+                        }
+                    )
                     await db.collection("salas").updateOne(
                         { _id: userGrupo._id },
                         {
@@ -141,41 +158,39 @@ io.on("connection", (socket) => {
     // si se desconecta el usuario
     socket.on("disconnect", async () => {
         try {
-            //manejar si es lider eliminar el grupo? si se desconecta sacarlo de usuarios_activos
-            //io.emit("usuario-desconectado", socket.id)
-            //const salaId = null
-            //const salas_creadas = io.of("/").adapter.rooms
-            ////console.log(salas_creadas)
-            //for(const [idSala, socket_sala_id] of salas_creadas){
-            //    if(socket_sala_id.has(socket.id)){
-            //        socket.leave(idSala)
-            //        salaId = idSala
-            //        console.log("ha salido de la sala "+salaId)
-            //    }
-            //}
-            //
-            //
-            //
-            //
-            //const client = await MongoClient.connect(url)
-            //const db = client.db(dbName)
-            //const usuarioSesion = await db.collection("sesiones").findOne({ id_sesion: socket.id })
-            //if(usuarioSesion){
-            //    const usuarioId = usuarioSesion.id_usuario
-            //    const sacarUsuarioGrupo = await db.collection("salas").updateOne(
-            //        { _id: salaId  }, 
-            //        { $pull: 
-            //            { usuarios_activos: { _id: new ObjectId(usuarioId) } }
-            //        }
-            //    )
-            //    console.log(usuarioId)
-            //}
+            const salas_creadas = io.of("/").adapter.rooms
+            for (const [idSala, socket_sala_id] of salas_creadas) {
+                if (socket_sala_id.has(socket.id)) {
+                    socket.leave(idSala)
+                }
+            }
+            const client = await MongoClient.connect(url)
+            const db = client.db(dbName)
+            const sesion_usuario = await db.collection("sesiones").findOne({ id_sesion: socket.id })
+            if (sesion_usuario) {
+                const user = await db.collection("usuarios").findOne({ _id: new ObjectId(sesion_usuario.id_usuario) })
+                if (user) {
+                    const idGrupo = user.idSalaActiva
+                    const userGrupo = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo), usuarios_activos: { $elemMatch: { _id: new ObjectId(user._id) } } })
+                    console.log("salir" + idGrupo)
+                    if (userGrupo) {
+                        await db.collection("salas").updateOne(
+                            { _id: userGrupo._id },
+                            {
+                                $pull:
+                                    { usuarios_activos: { _id: new ObjectId(user._id) } }
+                            }
+                        )
+                        await db.collection("usuarios").updateOne(
+                            { _id: new ObjectId(sesion_usuario.id_usuario) },
+                            {
+                                $set: { idSalaActiva: "" }
+                            }
+                        )
+                    }
+                }
+            }
 
-            //await db.collection("salas").deleteOne({ _id: new ObjectId(idGrupo) })
-            // eliminar sesion del usuario desconectado 
-            //await db.collection("sesiones").deleteOne({ id_sesion: socket.id })
-            //client.close()
-            console.log("desconectado " + socket.id)
         }
         catch (error) {
             console.log(error)
@@ -219,7 +234,8 @@ app.post("/registrar-usuario", async (req, res) => {
                 password: req.body.password,
                 recomendaciones: [],
                 imagen_usuario: "http://" + server_ip + ":" + server_port + dir_icons + "/" + image.name,
-                calificaciones: []
+                calificaciones: [],
+                idSalaActiva: ""
             }
             try {
                 const client = await MongoClient.connect(url)
