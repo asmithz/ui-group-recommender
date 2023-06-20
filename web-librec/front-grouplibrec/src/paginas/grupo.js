@@ -136,25 +136,6 @@ const Grupo = () => {
         setEmitirSignal(emitirSignal + 1)
     }
 
-    // arreglar
-    //useEffect(() => {
-    //    socket.on("usuario-desconectado", async (id) => {
-    //        try {
-    //            const newUsuariosSesion = { ...usuariosSesion }
-    //            console.log(newUsuariosSesion)
-    //            delete newUsuariosSesion[String(id)]
-    //            console.log(newUsuariosSesion)
-    //            setUsuariosSesion(newUsuariosSesion)
-    //                    await api.delete("/eliminar-fichero", {
-    //                    id_sesion: id
-    //                })
-    //            }
-    //            catch (error) {
-    //                console.log(error)
-    //            }
-    //        })
-    //    }, [socket])
-
     // obtener recomendaciones grupales tiempo real
     socket.on("mostrar-grupo-recomendaciones", async (recomendacion_grupo) => {
         setRecomendacionesGrupales(recomendacion_grupo)

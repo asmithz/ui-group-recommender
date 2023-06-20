@@ -105,7 +105,6 @@ io.on("connection", (socket) => {
                                 $set: { idSalaActiva: idGrupo }
                             }
                         )
-                        console.log("entrar" + idGrupo)
                     }
                 }
             }
@@ -129,9 +128,7 @@ io.on("connection", (socket) => {
             if (sesion_usuario) {
                 const user = await db.collection("usuarios").findOne({ _id: new ObjectId(sesion_usuario.id_usuario) })
                 const userGrupo = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo), usuarios_activos: { $elemMatch: { _id: new ObjectId(user._id) } } })
-                console.log(userGrupo)
                 if (userGrupo) {
-                    console.log("salir" + idGrupo)
                     await db.collection("usuarios").updateOne(
                         { _id: new ObjectId(sesion_usuario.id_usuario) },
                         {
@@ -154,7 +151,6 @@ io.on("connection", (socket) => {
         }
     })
 
-
     // si se desconecta el usuario
     socket.on("disconnect", async () => {
         try {
@@ -172,7 +168,6 @@ io.on("connection", (socket) => {
                 if (user) {
                     const idGrupo = user.idSalaActiva
                     const userGrupo = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo), usuarios_activos: { $elemMatch: { _id: new ObjectId(user._id) } } })
-                    console.log("salir" + idGrupo)
                     if (userGrupo) {
                         await db.collection("salas").updateOne(
                             { _id: userGrupo._id },
@@ -521,7 +516,7 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
             }
             const userData = directorioDataUsuario + "/user_data"
 
-            // crear y/o reiniciar dataset del grupo
+            // crear y/o reiniciar dataset del usuario
             fs.copyFileSync(dir_recommendations_dataset_users, userData)
 
             // añadir calificaciones de usuario al dataset
@@ -637,9 +632,10 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
             fs.copyFileSync(dir_recommendations_dataset_users, usersDataGroup)
 
             // añadir calificaciones de usuarios al dataset
-            sala.usuarios_activos.forEach((usuario) => {
+            sala.usuarios_activos.forEach(async (usuario) => {
                 groupUsers.push(usuario._id.toString())
-                usuario.calificaciones.forEach((calificacion) => {
+                const user = await db.collection("usuarios").findOne({ _id: new ObjectId(usuario._id.toString())})
+                user.calificaciones.forEach((calificacion) => {
                     var idItem = calificacion.id_item
                     var linea = calificacion.linea
                     fs.appendFileSync(usersDataGroup, linea)
