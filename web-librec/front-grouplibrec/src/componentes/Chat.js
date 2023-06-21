@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCrown, faPaperPlane } from "@fortawesome/free-solid-svg-icons"
 import { useDrop } from "react-dnd"
+import { useDrag } from "react-dnd"
 import "../css/StyleItemHover.css"
 
 const Chat = (props) => {
@@ -170,6 +171,16 @@ const Mensaje = (props) => {
         return timeString
     }
 
+    const [{isDragging}, drag] = useDrag(() => ({
+        type: "item",
+        item: {
+            id: props.mensaje.idItem
+        },
+        collect: (monitor) => ({
+            isDragging: !!monitor.isDragging(),
+        })
+    }))
+
     return (
         <div style={{ display: "flex", justifyContent: props.justifyContent }}>
             <div style={props.style}>
@@ -194,6 +205,7 @@ const Mensaje = (props) => {
                         <>
                         <br></br>
                             <img
+                                ref={drag}
                                 className="rounded object-cover img-hover"
                                 src={props.mensaje.pathItem}
                                 alt={props.mensaje.idItem}

@@ -28,7 +28,7 @@ const TarjetaRecomendaciones = (props) => {
                                 <div className="columns">
                                     <div className="column is-four-fifths">
                                         <p className="is-size-4">
-                                            Recomendaciones de la sala
+                                            Recomendaciones para todos
                                         </p>
                                     </div>
                                     <div className="column has-text-right">
