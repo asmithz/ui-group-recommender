@@ -7,7 +7,7 @@ const TarjetaRecomendaciones = (props) => {
     return (
         <div className="columns">
             <div className="column">
-                <div className="box" style={{ height: 320 }}>
+                <div className="box" style={{ height: 660 }}>
                     <div className="columns">
                         <div className="column">
                             {
@@ -15,11 +15,11 @@ const TarjetaRecomendaciones = (props) => {
                                 <div className="columns">
                                     <div className="column is-four-fifths">
                                         <p className="is-size-4">
-                                            Sus recomendaciones
+                                            Your recommendations
                                         </p>
                                     </div>
                                     <div className="column has-text-right">
-                                        <PanelHistorialRecomendaciones idUsuario={props.idUsuario} idGrupo={props.idGrupo} tipo="individual"/>
+                                        <PanelHistorialRecomendaciones socket={props.socket} enviarAlStack={props.enviarAlStack} idUsuario={props.idUsuario} idGrupo={props.idGrupo} tipo="individual" />
                                     </div>
                                 </div>
                             }
@@ -28,21 +28,21 @@ const TarjetaRecomendaciones = (props) => {
                                 <div className="columns">
                                     <div className="column is-four-fifths">
                                         <p className="is-size-4">
-                                            Recomendaciones para todos
+                                            Recommendations for everyone
                                         </p>
                                     </div>
                                     <div className="column has-text-right">
-                                        <PanelHistorialRecomendaciones idUsuario={props.idUsuario} idGrupo={props.idGrupo} tipo="grupal"/>
+                                        <PanelHistorialRecomendaciones socket={props.socket} enviarAlStack={props.enviarAlStack} idUsuario={props.idUsuario} idGrupo={props.idGrupo} tipo="grupal" />
                                     </div>
                                 </div>
                             }
                         </div>
                     </div>
-                    <div className="columns">
+                    <div className="columns" style={{ overflowY: "scroll" , height: 500}} >
                         {
                             !props.cargando &&
-                            <div className="column" >
-                                <ListaItems recomendaciones={props.recomendaciones} tipo={props.tipoRecomendacion} />
+                            <div className="column">
+                                <ListaItems recomendaciones={props.recomendaciones} socket={props.socket} tipo={props.tipoRecomendacion} enviarAlStack={props.enviarAlStack} idGrupo={props.idGrupo} idUsuario={props.idUsuario} />
                             </div>
                         }
                         {

@@ -1,6 +1,8 @@
 **/node_modules/
 **/.env
 **/iconos/
+**/imagenes-movielens/
+**/imagenes-lastfm/
 /.cache
 /.config
 /.local
@@ -25,3 +27,6 @@ group-movielens.properties
 group-movielensCopy.properties
 instalar_docker.sh
 /.nvm
+/.dotnet
+/.nvm
+/data

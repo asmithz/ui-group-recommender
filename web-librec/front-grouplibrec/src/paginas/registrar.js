@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
-import { Formik, Form, Field } from "formik"
+import { Formik, Form, Field, replace } from "formik"
 import axios from "axios"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faUpload } from "@fortawesome/free-solid-svg-icons"
@@ -28,6 +28,7 @@ const Registrar = () => {
             })
             if (resp) {
                 navigate("/ingresar", { replace: true })
+                //navigate("/test-personalidad", { replace: true })
             }
         }
         catch (error) {
@@ -100,7 +101,7 @@ const Registrar = () => {
         <div style={registrarStyle}>
             <div>
                 <div>
-                    <p className="is-size-1 has-text-centered">Registre su usuario </p>
+                    <p className="is-size-1 has-text-centered">Register</p>
                 </div>
                 <Formik
                     initialValues={{
@@ -118,7 +119,7 @@ const Registrar = () => {
                             <div className="column">
                                 {/* Nombre Usuario*/}
                                 <div className="field">
-                                    <label className="label">Nombre de usuario</label>
+                                    <label className="label">You new user name</label>
                                 </div>
                                 <div className="field">
                                     <Field placeholder="Ingrese su nombre de usuario" className="input is-rounded" type="text" name="usuario" />
@@ -127,7 +128,7 @@ const Registrar = () => {
                             <div className="column">
                                 {/* Nombre */}
                                 <div className="field">
-                                    <label className="label">Nombre y apellido</label>
+                                    <label className="label">Your full name</label>
                                 </div>
                                 <div className="field">
                                     <Field placeholder="Ingrese su nombre" className="input is-rounded" type="text" name="nombre" />
@@ -138,7 +139,7 @@ const Registrar = () => {
                             <div className="column">
                                 {/* Edad */}
                                 <div className="field">
-                                    <label className="label">Edad</label>
+                                    <label className="label">How old are you?</label>
                                 </div>
                                 <div className="field">
                                     <Field placeholder="Ingrese su edad" className="input is-rounded" type="text" name="edad" />
@@ -147,7 +148,7 @@ const Registrar = () => {
                             <div className="column">
                                 {/* Trabajo */}
                                 <div className="field">
-                                    <label className="label">A qué se dedica</label>
+                                    <label className="label">What's your education/profession?</label>
                                 </div>
                                 <div className="field">
                                     <Field placeholder="Ingrese profesión o estado educativo" className="input is-rounded" type="text" name="educacion" />
@@ -156,7 +157,7 @@ const Registrar = () => {
                         </div>
                         {/* Avatar */}
                         <div className="field">
-                            <label className="label">Seleccione su avatar de usuario</label>
+                            <label className="label">Add your avatar</label>
                             <div className="columns">
                                 <div className="column">
                                     <div className="file has-name is-fullwidth">
@@ -167,7 +168,7 @@ const Registrar = () => {
                                                     <FontAwesomeIcon icon={faUpload} />
                                                 </span>
                                                 <span className="file-label">
-                                                    Suba su avatar…
+                                                    Upload your avatar…
                                                 </span>
                                             </span>
                                             {
@@ -192,14 +193,14 @@ const Registrar = () => {
                         </div>
                         {/* Contraseña */}
                         <div className="field">
-                            <label className="label">Contraseña</label>
+                            <label className="label">Password</label>
                         </div>
                         <div className="field">
                             <Field placeholder="Ingrese una contraseña" className="input is-rounded" type="password" name="password" />
                         </div>
                         {/* Boton */}
                         <div className="field has-text-centered">
-                            <button className="button is-primary is-rounded pl-6 pr-6" type="submit">Registrar</button>
+                            <button className="button is-primary is-rounded pl-6 pr-6" type="submit">Register</button>
                         </div>
                     </Form>
                 </Formik>

@@ -4,7 +4,7 @@ import { Rating } from "react-simple-star-rating"
 import Lottie from "lottie-react"
 import checkMark from "../animations/check-mark.json"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faArrowRight, faForward, faStar } from "@fortawesome/free-solid-svg-icons"
+import { faArrowRight, faForward, faStar, faMusic, faHeadphonesSimple  } from "@fortawesome/free-solid-svg-icons"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
@@ -15,6 +15,12 @@ const Calificar = (props) => {
     const [imagen, setImagenPelicula] = useState("")
     const [nombrePelicula, setNombrePelicula] = useState("")
     const [tipoPelicula, setTipoPelicula] = useState("")
+    const [urlItem, setUrlItem] = useState("")
+    const [idAutor, setIdAutor] = useState("")
+    const [nombreAutor, setNombreAutor] = useState("")
+    const [urlAutor, setUrlAutor] = useState("")
+    const [originAutor, setOriginAutor] = useState("")
+    const [continentAutor, setContinentAutor] = useState("")
     const [puntuacion, setPuntuacion] = useState(1)
     const [calificar, setCalificar] = useState(0)
     const [peliculaCalificada, setPeliculaCalificada] = useState(false)
@@ -38,6 +44,12 @@ const Calificar = (props) => {
                 setImagenPelicula(pelicula.data.imagen)
                 setNombrePelicula(pelicula.data.nombre_pelicula)
                 setTipoPelicula(pelicula.data.tipo_pelicula)
+                setUrlItem(pelicula.data.url_item)
+                setIdAutor(pelicula.data.id_autor)
+                setNombreAutor(pelicula.data.nombre_autor)
+                setUrlAutor(pelicula.data.url_autor)
+                setOriginAutor(pelicula.data.origin_autor)
+                setContinentAutor(pelicula.data.continent_autor)
             }
         }
         mostrarPelicula()
@@ -86,26 +98,36 @@ const Calificar = (props) => {
                 <div className={props.estado ? "modal is-active" : "modal"}>
                     <div className={props.estado ? "modal-background" : ""} onClick={() => props.cambiarEstado(false)}></div>
                     <div className="modal-content" style={styleModal}>
-                            <p className="modal-card-title">Califique las películas que haya visto</p>
+                            <p className="modal-card-title"><span className="has-text-weight-bold">{nombrePelicula}</span> - {nombreAutor}</p>
                             <br/>
                             <div className="columns">
                                 <div className="column">
-                                    <img src={imagen} alt={idPelicula} style={{ height: 500, width: 380, borderRadius: "10px" }} />
+                                    <img src={imagen} alt={idPelicula} style={{ height: 300, width: 400, borderRadius: "10px" }} />
                                 </div>
                                 <div className="column">
                                     <div className="columns">
                                         <div className="column">
-                                            <p>Titulo: {nombrePelicula}</p>
+                                            <p>Genre: {tipoPelicula}</p>
                                         </div>
                                     </div>
                                     <div className="columns">
                                         <div className="column">
-                                            <p>Género: {tipoPelicula}</p>
+                                            <p>Origin: {originAutor} - {continentAutor}</p>
                                         </div>
                                     </div>
                                     <div className="columns">
                                         <div className="column">
-                                            <Rating
+                                            <a href={urlItem} target="_blank"><FontAwesomeIcon icon={faMusic}/> Click to listen <FontAwesomeIcon icon={faMusic} /> </a>
+                                        </div>
+                                    </div>
+                                    <div className="columns">
+                                        <div className="column">
+                                            <a href={urlAutor} target="_blank"><FontAwesomeIcon icon={faHeadphonesSimple} style={{color: "#e1092a",}} /> View more from the artist <FontAwesomeIcon icon={faHeadphonesSimple} style={{color: "#e1092a",}} /> </a>
+                                        </div>
+                                    </div>
+                                    <div className="columns">
+                                        <div className="column">
+                                            Rate: <Rating
                                                 onClick={puntuacionPelicula}
                                                 initialValue={puntuacion}
                                             />

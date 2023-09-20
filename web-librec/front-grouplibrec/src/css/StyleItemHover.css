@@ -1,7 +1,21 @@
 .img-hover {
-    transition: transform 0.2s ease
+    transition: transform 0.2s ease;
+    cursor: pointer;
 }
 
 .img-hover:hover {
-    transform: scale(1.1)
+    transform: scale(1.15);
+}
+
+.styleTooltip {
+    background-color: #919191;
+    border-radius: 30px;
+    transition: all 0.3s ease-in-out;
+}
+
+.styleTooltipCheckItem {
+    background-color: #919191;
+    border-radius: 30px;
+    height: 300px;
+    transition: all 0.3s ease-in-out;
 }

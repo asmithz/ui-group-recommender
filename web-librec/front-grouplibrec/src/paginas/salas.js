@@ -60,7 +60,7 @@ const Salas = () => {
                         <div className="container">
                             <div className="columns">
                                 <div className="column">
-                                    <p className="is-size-3 has-text-centered">Salas disponibles</p>
+                                    <p className="is-size-3 has-text-centered">Available rooms</p>
                                 </div>
                             </div>
                         </div>
@@ -69,12 +69,12 @@ const Salas = () => {
                                 <table className="table is-rounded">
                                     <thead>
                                         <tr>
-                                            <th style={{ width: "160px" }}>Nombre de la sala</th>
-                                            <th style={{ width: "100px" }}>Líder</th>
-                                            <th style={{ width: "50px" }}>Usuarios</th>
-                                            <th style={{ width: "300px" }}>Descripción</th>
-                                            <th className="has-text-centered">Ver detalles</th>
-                                            <th className="has-text-centered">Entrar</th>
+                                            <th style={{ width: "160px" }}>Room name</th>
+                                            <th style={{ width: "100px" }}>Leader</th>
+                                            <th style={{ width: "50px" }}>Users</th>
+                                            <th style={{ width: "300px" }}>Description</th>
+                                            <th className="has-text-centered">View more</th>
+                                            <th className="has-text-centered">Enter</th>
                                         </tr>
                                     </thead>
                                     <tbody>

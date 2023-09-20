@@ -27,7 +27,12 @@ const Ingresar = () => {
                 sessionStorage.setItem("id_sesion", idSesion)
                 sessionStorage.setItem("id_usuario", resp.data.usuario_id)
                 socket.emit("generar-sesion", idSesion, resp.data.usuario_id)
-                navigate("/salas", { replace: true })
+                if (resp.data.test === "si"){
+                    navigate("/test-personalidad", { replace: true })
+                }
+                else{
+                    navigate("/salas", { replace: true })
+                }
             }
             else{
                 window.alert("Usuario o contraseña equivocada")
@@ -63,7 +68,7 @@ const Ingresar = () => {
         <div style={tarjetaLoginStyle}>
             <div className="columns" style={loginStyle}>
                 <div className="column">
-                    <p className="is-size-1 has-text-centered">Ingresar</p>
+                    <p className="is-size-1 has-text-centered">Log in</p>
                     <Formik
                         initialValues={{
                             usuario: "",
@@ -85,21 +90,21 @@ const Ingresar = () => {
                         props => (
                         <Form>
                             <div className="field">
-                                <label className="has-text-weight-bold">Usuario</label>
+                                <label className="has-text-weight-bold">User</label>
                             </div>
                             <div className="field">
                                 {props.errors.usuario && <p className="help is-danger">{props.errors.usuario}</p>}
                                 <Field placeholder="Ingrese su usuario" className={props.errors.usuario ? "input is-danger is-rounded" : "input is-rounded"} type="text" name="usuario" />
                             </div>
                             <div className="field">
-                                <label className="has-text-weight-bold">Contraseña</label>
+                                <label className="has-text-weight-bold">Password</label>
                             </div>
                             <div className="field">
                                 {props.errors.password && <p className="help is-danger">{props.errors.password}</p>}
                                 <Field placeholder="Ingrese su contraseña" className={props.errors.password ? "input is-danger is-rounded" : "input is-rounded"} type="password" name="password" />
                             </div>
                             <div className="field has-text-centered">
-                                <button className="button is-primary is-rounded pl-6 pr-6" type="submit">Entrar</button>
+                                <button className="button is-primary is-rounded pl-6 pr-6" type="submit">Log in</button>
                             </div>
                         </Form>
                         )
@@ -107,7 +112,7 @@ const Ingresar = () => {
 
                     </Formik>
                     <div className="column has-text-centered">
-                    ¿No tiene una cuenta? <a onClick={navegarCrearCuenta}>Crear cuenta</a>
+                    No account? <a onClick={navegarCrearCuenta}>Create account</a>
                     </div>
                 </div>
                 <div className="column">

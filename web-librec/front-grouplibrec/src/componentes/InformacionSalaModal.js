@@ -11,17 +11,17 @@ const InformacionSalaModal = (props) => {
                     <div className={props.estado ? "modal-background" : ""} onClick={() => props.cambiarEstado(false)}></div>
                     <div className="modal-content" style={styleModal}>
                         <section>
-                            <p className="is-size-4">Nombre Sala: <span className="is-size-5">{props.salaInfo.titulo}</span></p>
+                            <p className="is-size-4">Room name: <span className="is-size-5">{props.salaInfo.titulo}</span></p>
                         </section>
                         <section>
-                            <p className="is-size-4">Lider: <span className="is-size-5">{props.salaInfo.lider}</span></p>
+                            <p className="is-size-4">Creator: <span className="is-size-5">{props.salaInfo.lider}</span></p>
                         </section>
                         <section>
-                            <p className="is-size-4">Descripción: </p>
+                            <p className="is-size-4">Description: </p>
                             <span className="is-size-5">{props.salaInfo.descripcion}</span>
                         </section>
                         <section>
-                            <p className="is-size-4">Usuarios Activos: </p>
+                            <p className="is-size-4">Active Users: </p>
                             {
                                 props.salaInfo.usuarios_activos.length > 0 ?
                                     props.salaInfo.usuarios_activos.map((usuarioActivo, usuarioActivoIndex) => {

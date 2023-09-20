@@ -2,9 +2,8 @@ import { Formik, Form, Field } from "formik"
 import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCrown, faPaperPlane } from "@fortawesome/free-solid-svg-icons"
-import { useDrop } from "react-dnd"
-import { useDrag } from "react-dnd"
 import "../css/StyleItemHover.css"
+import ItemModal from "./ItemModal"
 
 const Chat = (props) => {
     const idGrupo = props.idGrupo
@@ -12,18 +11,8 @@ const Chat = (props) => {
     const [chatGrupo, setChatGrupo] = useState([])
     const [emitirMensaje, setEmitirMensaje] = useState(0)
 
-    const [{ isOver }, drop] = useDrop(() => ({
-        accept: "item",
-        drop: (item) => {
-            enviarMensaje(item.id, "item")
-        },
-        collect: (monitor) => ({
-            isOver: !!monitor.isOver()
-        })
-    }))
-
     const chatStyle = {
-        height: "220px",
+        height: "500px",
         opacity: 1,
         backgroundColor: "#ffffff",
         transparent: 0,
@@ -42,6 +31,11 @@ const Chat = (props) => {
         maxWidth: "400px",
     }
 
+    const styleBoxChat = {
+        height: "660px",
+        position: "relative"
+    }
+
     useEffect(() => {
         obtenerChatGrupo()
     }, [])
@@ -53,7 +47,7 @@ const Chat = (props) => {
                     "Content-type": "application/json"
                 }
             })
-            if(Array.isArray(resp_chat.data)){
+            if (Array.isArray(resp_chat.data)) {
                 setChatGrupo([...resp_chat.data])
             }
         }
@@ -67,6 +61,12 @@ const Chat = (props) => {
             obtenerChatGrupo()
         })
     }, [emitirMensaje])
+
+    useEffect(() => {
+        props.socket.on("chat-desplegar-mensajes", () => {
+            obtenerChatGrupo()
+        })
+    }, [])
 
 
     const enviarMensaje = async (mensaje, tipo) => {
@@ -110,9 +110,9 @@ const Chat = (props) => {
                 {
                     chat.map((mensaje) => (
                         mensaje.id_usuario === usuarioId ? (
-                            <Mensaje style={mensajeStyleEmisor} tipo="emisor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} />
+                            <Mensaje style={mensajeStyleEmisor} tipo="emisor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} idUsuario={usuarioId} enviarAlStack={props.enviarAlStack} />
                         ) : (
-                            <Mensaje style={mensajeStyleReceptor} tipo="receptor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} />
+                            <Mensaje style={mensajeStyleReceptor} tipo="receptor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} idUsuario={usuarioId} enviarAlStack={props.enviarAlStack}/>
                         )
                     ))
                 }
@@ -121,16 +121,23 @@ const Chat = (props) => {
     }
 
     return (
-        <div className="box" style={props.styleChat}>
-            <div ref={drop} className="columns is-centered is-flex-direction-column is-vcentered">
-                <div className="column is-full">
+        <div className="box" style={styleBoxChat}>
+            <div className="columns">
+                <div className="column">
+                    <h1>
+                        <p className="is-size-4">Chat room</p>
+                    </h1>
+                </div>
+            </div>
+            <div className="columns">
+                <div className="column">
                     <div style={chatStyle}>
                         {mostrarMensajes(chatGrupo)}
                     </div>
                 </div>
             </div>
-            <div className="columns">
-                <div className="column" style={{ height: "100%" }}>
+            <div className="columns" style={{ position: "absolute", bottom: 0, paddingBottom: "20px" }}>
+                <div className="column">
                     <Formik
                         initialValues={{
                             id_usuario: "",
@@ -142,7 +149,7 @@ const Chat = (props) => {
                         }}>
                         <Form>
                             <div className="columns">
-                                <div className="column is-four-fifths">
+                                <div className="column is-full">
                                     <div className="field">
                                         <Field className="input" placeholder="Ingrese un mensaje" name="texto" />
                                     </div>
@@ -170,52 +177,92 @@ const Mensaje = (props) => {
         timeString = timeString.replace(/( AM| PM)$/, '')
         return timeString
     }
+    const [estadoItem, setEstadoItem] = useState(false)
 
-    const [{isDragging}, drag] = useDrag(() => ({
-        type: "item",
-        item: {
-            id: props.mensaje.idItem
-        },
-        collect: (monitor) => ({
-            isDragging: !!monitor.isDragging(),
-        })
-    }))
+    const chatEnviarAlStack = (idItem) => {
+        props.enviarAlStack(idItem)
+        setEstadoItem(false)
+    }
 
     return (
-        <div style={{ display: "flex", justifyContent: props.justifyContent }}>
-            <div style={props.style}>
-                <p style={{ paddingLeft: "10px", paddingRight: "10px" }}>
-                    <span className="has-text-weight-bold" style={{ marginRight: "5px" }}>{convertirTiempo(props.mensaje.timestamp)}</span>
-                    <span className="has-text-weight-bold" style={{ marginRight: "5px" }}>
-                        [
+        <>
+            <div style={{ display: "flex", justifyContent: props.justifyContent }}>
+                <div style={props.style}>
+                    <p style={{ paddingLeft: "10px", paddingRight: "10px", paddingTop: "2px", paddingBottom: "2px" }}>
+                        <span className="has-text-weight-bold" style={{ marginRight: "5px" }}>{convertirTiempo(props.mensaje.timestamp)}</span>
                         {
-                            props.mensaje.usuario === props.liderGrupo.usuario_lider &&
-                            <span><FontAwesomeIcon icon={faCrown} style={{ color: "#efe815" }} /></span>
+                            props.mensaje.tipo_mensaje === "texto" &&
+                            <span className="has-text-weight-bold" style={{ marginRight: "5px" }}>
+                                [
+                                {
+                                    props.mensaje.usuario === props.liderGrupo.usuario_lider &&
+                                    <span><FontAwesomeIcon icon={faCrown} style={{ color: "#efe815" }} /></span>
+                                }
+                                {
+                                    props.mensaje.usuario
+                                }
+                                ] :</span>
                         }
                         {
-                            props.mensaje.usuario
+                            props.mensaje.tipo_mensaje === "texto" &&
+                            <span>{props.mensaje.texto}</span>
                         }
-                        ] :</span>
-                    {
-                        props.mensaje.tipo_mensaje === "texto" &&
-                        <span>{props.mensaje.texto}</span>
-                    }
-                    {
-                        props.mensaje.tipo_mensaje === "item" &&
-                        <>
-                        <br></br>
-                            <img
-                                ref={drag}
-                                className="rounded object-cover img-hover"
-                                src={props.mensaje.pathItem}
-                                alt={props.mensaje.idItem}
-                                style={{ width: 90, height: 150, borderRadius: "8%" }}
-                            />
-                        </>
-                    }
-                </p>
+                        {
+                            props.mensaje.tipo_mensaje === "rec_usuario" &&
+                            (
+                                <a onClick={() => setEstadoItem(true)} style={{ color: "#0969b3"}}>
+                                    {props.mensaje.usuarioDestinoID === props.idUsuario ? (
+                                        <span>
+                                            User <span className="has-text-weight-bold">{props.mensaje.usuario}</span> recommended you <span className="has-text-weight-bold">{props.mensaje.item.nombreItem}</span> -{" "}
+                                            <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span>
+                                        </span>
+                                    ) : (
+                                        <span>
+                                            You recommended <span className="has-text-weight-bold">{props.mensaje.item.nombreItem}</span> -{" "}
+                                            <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span> to <span className="has-text-weight-bold">{props.mensaje.usuarioDestino}</span>
+                                        </span>
+                                    )}
+                                </a>
+                            )
+                        }
+                        {
+                            props.mensaje.tipo_mensaje === "rec_grupal" &&
+                            <a onClick={() => setEstadoItem(true)} style={{ color: "#09b391"}}>
+                                <span>User <span className="has-text-weight-bold">{props.mensaje.usuario}</span> recommends <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span></span>
+                            </a>
+                        }
+                        {
+                            props.mensaje.tipo_mensaje === "enviar_favoritos" &&
+                            <a onClick={() => setEstadoItem(true)} style={{ color: "#b30925"}}>
+                                <span>User <span className="has-text-weight-bold">{props.mensaje.usuario}</span> added <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span> to favorites.</span>
+                            </a>
+                        }
+                        {
+                            props.mensaje.tipo_mensaje === "eliminar_favoritos" &&
+                            <a onClick={() => setEstadoItem(true)} style={{ color: "#b30925"}}>
+                                <span>User <span className="has-text-weight-bold">{props.mensaje.usuario}</span> removed <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span> from favorites.</span>
+                            </a>
+                        }
+                        {
+                            props.mensaje.tipo_mensaje === "item" &&
+                            <>
+                                <br></br>
+                                <img
+                                    className="rounded object-cover img-hover"
+                                    src={props.mensaje.pathItem}
+                                    alt={props.mensaje.idItem}
+                                    style={{ width: 90, height: 150, borderRadius: "8%" }}
+                                />
+                            </>
+                        }
+                    </p>
+                </div>
             </div>
-        </div>
+            {
+                props.mensaje.item &&
+                <ItemModal item={props.mensaje.item} estado={estadoItem} cambiarEstado={setEstadoItem} enviarAlStack={chatEnviarAlStack} chat={true} idUsuario={props.idUsuario}/>
+            }
+        </>
     )
 
 }

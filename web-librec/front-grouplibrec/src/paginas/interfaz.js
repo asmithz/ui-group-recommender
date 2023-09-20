@@ -266,7 +266,7 @@ const Interfaz = () => {
                             <div className="box" style={{ height: 320 }}>
                                 <div className="columns">
                                     <div className="column">
-                                        <p className="is-size-4">Recomendaciones individuales</p>
+                                        <p className="is-size-4">Individual Recommendations</p>
                                     </div>
                                 </div>
                                 <div className="columns">
@@ -283,7 +283,7 @@ const Interfaz = () => {
                                             </HorizontalScroll>
                                             {
                                                 recomendacionesIndividuales.length === 0 &&
-                                                <p className="is-size-3">No hay recomendaciones aún</p>
+                                                <p className="is-size-3">No recommendations yet</p>
                                             }
 
                                         </div>
@@ -309,7 +309,7 @@ const Interfaz = () => {
                             <div className="box" style={{ height: 320 }}>
                                 <div className="columns">
                                     <div className="column">
-                                        <p className="is-size-4">Recomendaciones del grupo</p>
+                                        <p className="is-size-4">Room recommendations</p>
                                     </div>
                                 </div>
                                 <div className="columns">
@@ -327,7 +327,7 @@ const Interfaz = () => {
                                                 </HorizontalScroll>
                                                 {
                                                     recomendacionesGrupales.length === 0 &&
-                                                    <p className="is-size-3">No hay recomendaciones aún</p>
+                                                    <p className="is-size-3">No recommendations yet</p>
                                                 }
                                             </div>
                                         </div>
@@ -359,7 +359,7 @@ const Interfaz = () => {
 	      <div className="columns">
 		<div className="column">
 		  <div className="box" style={styleStackRecomendaciones}>
-		    <p className="is-size-4">Mis recomendaciones guardadas</p>
+		    <p className="is-size-4">My saved recommendations</p>
 		  </div>
 		</div>
 	      </div>
@@ -368,10 +368,10 @@ const Interfaz = () => {
             {/* Botones importantes */}
             <div className="columns">
                 <div className="column">
-                    <button className="button is-info is-light is-large" onClick={activarCalificaciones}>Calificar items</button>
+                    <button className="button is-info is-light is-large" onClick={activarCalificaciones}>Rate items</button>
                 </div>
                 <div className="column">
-                    <button className="button is-primary is-light is-large" onClick={iniciarRecomendacion}>Ejecutar Recomendación</button>
+                    <button className="button is-primary is-light is-large" onClick={iniciarRecomendacion}>Recommend</button>
                 </div>
             </div>
             <Calificar activo={calificaciones} cerrar={setCalificaciones} idUsuario={usuarioSesion.numero_usuario} />

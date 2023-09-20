@@ -60,7 +60,7 @@ const NuevaSalaModal = (props) => {
                     <div className={props.estado ? "modal-background" : ""} onClick={() => props.cambiarEstado(false)}></div>
                     <div className="modal-content" style={styleModal}>
                         <section>
-                            <p className="is-size-4 has-text-centered">Crear una sala</p>
+                            <p className="is-size-4 has-text-centered">Create a room</p>
                             <Formik
                                 initialValues={{
                                     id_sala: props.idSesion,
@@ -85,13 +85,13 @@ const NuevaSalaModal = (props) => {
                                     props => (
                                         <Form>
                                             <div className="field">
-                                                <label className="label">Nombre de la sala</label>
+                                                <label className="label">Room name</label>
                                                 {props.errors.titulo && <p className="help is-danger">{props.errors.titulo}</p>}
                                                 <Field className={props.errors.titulo ? "input is-danger" : "input"} type="text" name="titulo" />
                                             </div>
                                             <div className="field">
                                                 <div className="control">
-                                                    <label className="label">Descripción de la sala</label>
+                                                    <label className="label">Room description</label>
                                                     {props.errors.descripcion && <p className="help is-danger">{props.errors.descripcion}</p>}
                                                     <Field className={props.errors.descripcion ? "textarea is-danger" : "textarea"} name="descripcion" as="textarea" />
                                                 </div>

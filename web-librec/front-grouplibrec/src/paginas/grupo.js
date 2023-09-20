@@ -6,10 +6,9 @@ import Calificar from "./calificar"
 import Chat from "../componentes/Chat.js"
 import TarjetaRecomendaciones from "../componentes/TarjetaRecomendaciones"
 import TarjetaUsuario from "../componentes/TarjetaUsuario"
-import { useDrop } from "react-dnd"
-import ListaItems from "../componentes/ListaItems"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faArrowRightFromBracket ,faPeopleGroup, faStar, faUser } from "@fortawesome/free-solid-svg-icons"
+import { faArrowRightFromBracket, faPeopleGroup, faStar, faUser, faFlagCheckered } from "@fortawesome/free-solid-svg-icons"
+import PanelFavoritos from "../componentes/PanelFavoritos"
 
 const socket = io(process.env.REACT_APP_SOCKET_URL)
 
@@ -34,9 +33,6 @@ const Grupo = () => {
     const [liderGrupo, setLiderGrupo] = useState({ id_lider: null, usuario_lider: null })
     const [stackUsuario, setStackUsuario] = useState([])
 
-    const styleChat = {
-        height: "320px"
-    }
 
     const styleStackRecomendaciones = {
         height: "320px"
@@ -190,57 +186,74 @@ const Grupo = () => {
             idItem: idItem
         }
         try {
-            await api.post("/enviar-al-stack", itemStack, {
+            const resp = await api.post("/enviar-a-favoritos", itemStack, {
                 headers: {
                     "Content-type": "application/json"
                 }
             })
-            obtenerStackUsuario(idGrupo, idUsuario)
+            if (resp.data.respuesta === "agregado") {
+                const tiempo_actual = Date.now()
+                let info = {
+                    "idGrupo": idGrupo,
+                    "id_usuario": idUsuario,
+                    "texto": "Enviar a favoritos",
+                    "timestamp": tiempo_actual,
+                    "tipo_mensaje": "enviar_favoritos",
+                    "itemId": idItem
+                }
+
+                const mensaje_add_favoritos = await api.post("/enviar-mensaje-chat", (info), {
+                    headers: {
+                        "Content-type": "application/json"
+                    }
+                })
+
+                if (mensaje_add_favoritos) {
+                    socket.emit("enviar-a-favoritos", (idGrupo))
+                    socket.emit("chat-enviar-mensaje", idGrupo)
+                }
+            }
+            else if (resp.data.respuesta === "no_agregado") {
+                window.alert(`Room's favorites must not exceed ${resp.data.maxFavoritos} items.`)
+            }
+            //obtenerStackUsuario(idGrupo, idUsuario)
         }
         catch (error) {
             console.log(error)
         }
     }
 
-    const obtenerStackUsuario = async (idGrupo, idUsuario) => {
+    const verificarCalificacionesFavoritos = async (e) => {
         try {
-            const itemsStack = await api.get("/obtener-stack-usuario", { params: { idGrupo, idUsuario } }, {
+            const verificar = await api.get("/verificar-calificaciones-favoritos", {
+                params: { idGrupo, idUsuario },
                 headers: {
                     "Content-type": "application/json"
                 }
-            })
-            setStackUsuario(itemsStack.data.items)
-        }
-        catch (error) {
-            console.log(error)
+            });
+
+            if (verificar.data.respuesta === "stop") {
+                window.alert(`The room must have exactly ${verificar.data.maxFavoritos} favorites. Also, remember to rate all of them.`)
+            } else {
+                // Condition is met, navigate to the specified URL
+                navigate(`/sala-espera/${idGrupo}`);
+            }
+        } catch (error) {
+            console.log(error);
         }
     }
-
-    const [{ isOver }, drop] = useDrop(() => ({
-        accept: "item",
-        drop: (item) => {
-            enviarAlStack(item.id)
-        },
-        collect: (monitor) => ({
-            isOver: !!monitor.isOver()
-        })
-    }))
-
-    useEffect(() => {
-        obtenerStackUsuario(idGrupo, idUsuario)
-    }, [])
 
     return (
         <div style={stylePagina}>
             <div className="columns">
                 <div className="column">
-                    <p className="is-size-1 has-text-centered">Sala de {salaGrupo.lider}</p>
+                    <p className="is-size-1 has-text-centered">{salaGrupo.lider}'s room</p>
                 </div>
             </div>
             <div className="columns">
                 {/* Usuarios */}
                 <div className="column is-one-fifth">
-                    <p className="is-size-1 has-text-centered">Conectados</p>
+                    <p className="is-size-1 has-text-centered">Connected</p>
                     <div className="box">
                         <TarjetaUsuario usuario={usuarioSesion} liderGrupo={liderGrupo} />
                     </div>
@@ -257,26 +270,19 @@ const Grupo = () => {
                     }
                 </div>
                 {/* Recomendaciones */}
-                <div className="column is-half">
+                <div className="column">
                     {/* Recomendaciones individuales */}
-                    <TarjetaRecomendaciones idUsuario={idUsuario} idGrupo={idGrupo} tipoRecomendacion="individual" recomendaciones={recomendacionesIndividuales} cargando={cargandoIndividual} />
+                    <TarjetaRecomendaciones socket={socket} idUsuario={idUsuario} idGrupo={idGrupo} tipoRecomendacion="individual" recomendaciones={recomendacionesIndividuales} cargando={cargandoIndividual} enviarAlStack={enviarAlStack} />
+                </div>
+                <div className="column">
                     {/* Recomendaciones grupales */}
-                    <TarjetaRecomendaciones idUsuario={idUsuario} idGrupo={idGrupo} tipoRecomendacion="grupal" recomendaciones={recomendacionesGrupales} cargando={cargandoGrupo} />
+                    <TarjetaRecomendaciones socket={socket} idUsuario={idUsuario} idGrupo={idGrupo} tipoRecomendacion="grupal" recomendaciones={recomendacionesGrupales} cargando={cargandoGrupo} enviarAlStack={enviarAlStack} />
                 </div>
                 <div className="column">
                     { /* Chat Grupal */}
                     <div className="columns">
                         <div className="column">
-                            <Chat socket={socket} api={api} idGrupo={idGrupo} styleChat={styleChat} liderGrupo={liderGrupo} />
-                        </div>
-                    </div>
-                    { /* Stack Recomendaciones */}
-                    <div ref={drop} className="columns">
-                        <div className="column">
-                            <div className="box" style={styleStackRecomendaciones}>
-                                <p className="is-size-4">Mis favoritos</p>
-                                <ListaItems recomendaciones={stackUsuario} tipo="stack" />
-                            </div>
+                            <Chat socket={socket} api={api} idGrupo={idGrupo} liderGrupo={liderGrupo} enviarAlStack={enviarAlStack} />
                         </div>
                     </div>
                 </div>
@@ -288,19 +294,19 @@ const Grupo = () => {
                         <FontAwesomeIcon icon={faStar} />
                     </button>
                 </div>
-                { /* Recomendación Grupal solo líder */
-                    liderGrupo.id_lider === idUsuario &&
-                    <div className="column">
-                        <button className="button is-primary is-large is-rounded" onClick={ejecutarRecomendacionGrupo}>
-                            <FontAwesomeIcon icon={faPeopleGroup}/>
-                        </button>
-                    </div>
-                }
                 <div className="column">
                     <button className="button is-primary is-large is-rounded" onClick={ejecutarRecomendacionIndividual}>
                         <FontAwesomeIcon icon={faUser} />
                     </button>
                 </div>
+                { /* Recomendación Grupal solo líder */
+                    liderGrupo.id_lider === idUsuario &&
+                    <div className="column">
+                        <button className="button is-primary is-large is-rounded" onClick={ejecutarRecomendacionGrupo}>
+                            <FontAwesomeIcon icon={faPeopleGroup} />
+                        </button>
+                    </div>
+                }
                 <div className="column">
                     <Link to="/salas">
                         <button className="button is-warning is-large is-right is-rounded" onClick={salirGrupo}>
@@ -310,6 +316,16 @@ const Grupo = () => {
                 </div>
             </div>
             <Calificar estado={calificacionesEstado} cambiarEstado={setCalificacionesEstado} idUsuario={idUsuario} />
+            <div className="columns has-text-centered">
+                <div className="column">
+                    <PanelFavoritos socket={socket} idUsuario={idUsuario} idGrupo={idGrupo} />
+                </div>
+                <div className="column">
+                    <button className="button is-primary is-large is-rounded is-light" onClick={verificarCalificacionesFavoritos}>
+                        <FontAwesomeIcon icon={faFlagCheckered} style={{ color: "#358e33", }} />
+                    </button>
+                </div>
+            </div>
         </div>
     )
 }
