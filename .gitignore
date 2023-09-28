@@ -10,6 +10,8 @@
 /.npm
 /.pool
 /.ssh
+/.docker
+/.nvm
 /.vscode-server
 /recomendaciones
 /java
@@ -26,7 +28,6 @@
 group-movielens.properties
 group-movielensCopy.properties
 instalar_docker.sh
-/.nvm
 /.dotnet
 /.nvm
 /data

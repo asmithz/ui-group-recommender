@@ -7,7 +7,6 @@ import { MongoClient, ObjectId } from "mongodb";
 import child_process from 'child_process'
 import fileUpload from 'express-fileupload'
 import * as fs from "fs"
-import exp from 'constants'
 
 const exec = child_process.exec
 const spawn = child_process.spawn
@@ -225,6 +224,10 @@ io.on("connection", (socket) => {
         catch (error) {
             console.log(error)
         }
+    })
+    // cambiar de pagina y mostrar item final
+    socket.on("solicitar-pagina-final", (idSala) => {
+        io.in(idSala + "espera").emit("mostrar-pagina-final")
     })
 
     // recomendaciones
@@ -1271,9 +1274,9 @@ app.post("/calificar-item", async (req, res) => {
         let id_usuario = String(rating_usuario.id_usuario)
         let id_item = String(rating_usuario.id_item)
         let rating_item = String(rating_usuario.rating)
-        let numb = Math.floor(Math.random() * 978300760) + 1
+        //let numb = Math.floor(Math.random() * 978300760) + 1
         //let linea = id_usuario + "::" + id_item + "::" + rating_item + "::" + String(numb) + "\n"
-        let linea = id_usuario + "," + id_item + "," + rating_item + "," + String(numb) + "\n"
+        let linea = id_usuario + "," + id_item + "," + rating_item + "," + String(500) + "\n"
 
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
@@ -1864,6 +1867,27 @@ app.delete("/eliminar-fichero", async (req, res) => {
                 estado: "no existe o ya fue eliminado"
             })
         }
+    }
+})
+
+app.delete("/vaciar-sala-espera", async (req, res) => {
+    try{
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = { _id: new ObjectId(req.query.idSala)}
+        const update = {
+            $set: { sala_espera: [] }
+        }
+        await db.collection('salas').updateOne(sala, update)
+        return res.json({
+            status: "sala vaciada"
+        })
+    }
+    catch(error){
+        console.log(error)
+        return res.json({
+            status: "sala no vaciada"
+        })
     }
 })
 

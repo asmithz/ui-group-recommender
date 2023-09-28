@@ -10,6 +10,7 @@ import { HTML5Backend } from "react-dnd-html5-backend"
 import { DndProvider } from "react-dnd"
 import TestPersonalidad from "./paginas/test_personalidad"
 import TestPerfilUsuario from "./paginas/test_perfil"
+import EncuestaFinal from "./paginas/encuesta_final"
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route exact path="/registrar" element={<Registrar />}></Route>
           <Route exact path="/grupo/:id" element={<Grupo />}></Route>
           <Route exact path="/sala-espera/:id" element={<SalaEspera />}></Route>
+          <Route exact path="/encuesta-final/:id" element={<EncuestaFinal />}></Route>
           <Route exact path="/test-personalidad" element={<TestPersonalidad />}></Route>
           <Route exact path="/test-perfil" element={<TestPerfilUsuario />}></Route>
         </Routes>

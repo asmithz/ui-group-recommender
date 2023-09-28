@@ -62,10 +62,6 @@ const SalaEspera = () => {
         }
     }, [])
 
-    useEffect(() => {
-        console.log(usuariosSalaEspera)
-    }, [usuariosSalaEspera])
-
     // obtener usuarios en la sala de espera
     useEffect(() => {
         socket.on("update-sala-espera", async () => {
@@ -102,6 +98,25 @@ const SalaEspera = () => {
         }
     }, [idSala, idSesion])
 
+    const cambiarPaginaEncuesta = () => {
+        if (idSala && idSesion){
+            socket.emit("solicitar-pagina-final", (idSala))
+        }
+    }
+
+    useEffect(() => {
+        socket.on("mostrar-pagina-final", () => {
+            const result = usuariosSalaEspera.every(obj1 => usuariosSala.some(obj2 => obj2._id === obj1._id));
+            if (result) {
+                navigate(`/encuesta-final/${idSala}`)
+            }
+            else{
+                window.alert("Error")
+            }
+        })
+    }, [])
+
+
     return (
         <div className="container mt-6" style={stylePagina}>
             <div className="columns">
@@ -135,7 +150,7 @@ const SalaEspera = () => {
                                 style={
                                     usuariosSalaEspera.some(usuario_esperando => usuario_esperando._id === usuario._id)
                                         ? styleBoxUser
-                                        : {} 
+                                        : {}
                                 }
                             >
                                 <div className="columns">
@@ -154,6 +169,12 @@ const SalaEspera = () => {
                         )
                     }
                 })
+            }
+            {
+                liderGrupo.id_lider === idUsuario &&
+                <div className="has-text-centered">
+                    <button className="button is-rounded is-primary" onClick={cambiarPaginaEncuesta}>Consensus</button>
+                </div>
             }
         </div>
     )
