@@ -26,19 +26,6 @@ const TarjetaItem = (props) => {
         borderRadius: "8%"
     }
 
-    const styleTooltip = {
-        backgroundColor: "#919191",
-        borderRadius: "10px",
-        transition: "all 0.3s ease-in-out"
-    }
-
-    const styleTooltipCheckItem = {
-        backgroundColor: "#919191",
-        borderRadius: "10px",
-        height: "300px",
-        transition: "all 0.3s ease-in-out"
-    }
-
     const styleButtonItem = {
         borderRadius: "50%",
         marginRight: "10px",
@@ -111,7 +98,7 @@ const TarjetaItem = (props) => {
             }
             {
                 props.tipo === "stack" &&
-                <div className="columns">
+                <div className="columns is-flex-grow-1" style={{maxWidth: 460, minWidth: 460}}>
                     <div className="column is-one-third" id="clickable">
                         <img
                             className="rounded object-cover img-hover"
