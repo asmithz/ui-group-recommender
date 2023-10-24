@@ -71,24 +71,19 @@ io.on("connection", (socket) => {
     socket.emit("sesion-usuario", (socket.id))
     // Genera la sesion del usuario cuando ingresa: su socket.id y id.usuario
     socket.on("generar-sesion", async (usuarioId) => {
-        const client = new MongoClient(url)
         try {
-            await client.connect()
+            const client = await MongoClient.connect(url)
             const db = client.db(dbName)
             await db.collection("sesiones").insertOne({ "id_sesion": socket.id, "id_usuario": usuarioId })
         }
         catch (error) {
             console.log(error)
         }
-        finally{
-            await client.close()
-        }
     })
     // entrar sala
     socket.on("entrar-sala", async (idGrupo, idSesion) => {
-        const client = new MongoClient(url)
         try {
-            await client.connect()
+            const client = await MongoClient.connect(url)
             const db = client.db(dbName)
             const sesion_usuario = await db.collection("sesiones").findOne({ id_sesion: idSesion })
             if (sesion_usuario) {
@@ -127,13 +122,9 @@ io.on("connection", (socket) => {
         catch (error) {
             console.log(error)
         }
-        finally {
-            await client.close()
-        }
     })
     // salir sala
     socket.on("salir-sala", async (idGrupo, idSesion) => {
-        const client = new MongoClient(url)
         try {
             const salas_creadas = io.of("/").adapter.rooms
             for (const [idSala, socket_sala_id] of salas_creadas) {
@@ -141,7 +132,7 @@ io.on("connection", (socket) => {
                     socket.leave(idSala)
                 }
             }
-            await client.connect()
+            const client = await MongoClient.connect(url)
             const db = client.db(dbName)
             const sesion_usuario = await db.collection("sesiones").findOne({ id_sesion: idSesion })
             if (sesion_usuario) {
@@ -168,16 +159,12 @@ io.on("connection", (socket) => {
         catch (error) {
             console.log(error)
         }
-        finally {
-            await client.close()
-        }
     })
 
     // entrar sala espera
     socket.on("entrar-sala-espera", async (idSala, idSesion) => {
-        const client = new MongoClient(url)
         try {
-            await client.connect()
+            const client = await MongoClient.connect(url)
             const db = client.db(dbName)
             const sesion_usuario = await db.collection("sesiones").findOne({ id_sesion: idSesion })
             if (sesion_usuario) {
@@ -199,14 +186,10 @@ io.on("connection", (socket) => {
         catch (error) {
             console.log(error)
         }
-        finally {
-            await client.close()
-        }
     })
 
     // si se desconecta el usuario
     socket.on("disconnect", async () => {
-        const client = new MongoClient(url)
         try {
             const salas_creadas = io.of("/").adapter.rooms
             for (const [idSala, socket_sala_id] of salas_creadas) {
@@ -214,7 +197,7 @@ io.on("connection", (socket) => {
                     socket.leave(idSala)
                 }
             }
-            await client.connect()
+            const client = await MongoClient.connect(url)
             const db = client.db(dbName)
             const sesion_usuario = await db.collection("sesiones").findOne({ id_sesion: socket.id })
             if (sesion_usuario) {
@@ -244,9 +227,6 @@ io.on("connection", (socket) => {
         catch (error) {
             console.log(error)
         }
-        finally {
-            await client.close()
-        }
     })
     // cambiar de pagina y mostrar item final
     socket.on("solicitar-pagina-final", (idSala) => {
@@ -274,9 +254,8 @@ io.on("connection", (socket) => {
         socket.join(idGrupo + "favoritos")
     })
     socket.on("eliminar-favorito-grupo", async (idGrupo, idItem) => {
-        const client = new MongoClient(url)
         try {
-            await client.connect()
+            const client = await MongoClient.connect(url)
             const db = client.db(dbName)
             await db.collection("salas").updateOne(
                 {
@@ -290,13 +269,11 @@ io.on("connection", (socket) => {
                     }
                 }
             )
+            client.close()
             io.in(idGrupo + "favoritos").emit("obtener-favoritos")
         }
         catch (error) {
             console.log(error)
-        }
-        finally{
-            await client.close()
         }
     })
 
@@ -327,17 +304,14 @@ app.post("/registrar-usuario", async (req, res) => {
                 calificaciones: [],
                 idSalaActiva: ""
             }
-            const client = new MongoClient(url)
             try {
-                await client.connect()
+                const client = await MongoClient.connect(url)
                 const db = client.db(dbName)
                 await db.collection("usuarios").insertOne(usuario)
+                client.close()
             }
             catch (error) {
                 console.log(error)
-            }
-            finally{
-                await client.close()
             }
         }
         return res.json(req.body)
@@ -345,11 +319,11 @@ app.post("/registrar-usuario", async (req, res) => {
 })
 
 app.get("/obtener-sesion-usuario", async(req, res) => {
-    const client = new MongoClient(url);
     try{
-        await client.connect()
+        const client = await MongoClient.connect(url);
         const db = client.db(dbName);
         const usuario_sesion = await db.collection("sesiones").findOne({ "id_usuario": req.query.idUsuario });
+        client.close()
         if (usuario_sesion){
             return res.json({
                 "idSesion": usuario_sesion.id_sesion
@@ -360,17 +334,14 @@ app.get("/obtener-sesion-usuario", async(req, res) => {
     catch(error){
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.post("/login-usuario", async (req, res) => {
-    const client = new MongoClient(url);
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url);
         const db = client.db(dbName);
         const usuario = await db.collection("usuarios").findOne({ "usuario": req.body.usuario });
+        client.close();
         let test
         if (usuario) {
             if (usuario.password === req.body.password) {
@@ -391,18 +362,15 @@ app.post("/login-usuario", async (req, res) => {
     catch (error) {
         return res.json(error)
     }
-    finally{
-        await client.close()
-    }
     return res.json("no se encontro el usuario o contraseña equivocada")
 })
 
 app.post("/login", async (req, res) => {
-    const client = new MongoClient(url);
     try {
         var n_usuario = 6041
         let n_usuarios = []
-        await client.connect()
+
+        const client = await MongoClient.connect(url);
         const db = client.db(dbName);
         const usuarios = await db.collection("sala").find({}).toArray();
         usuarios.forEach(async (documento) => {
@@ -421,12 +389,10 @@ app.post("/login", async (req, res) => {
             }
             n_usuario++
         }
+        client.close();
     }
     catch (error) {
         console.log(error)
-    }
-    finally {
-        await client.close()
     }
     return res.json(req.body)
 })
@@ -446,46 +412,40 @@ app.post("/crear-sala", async (req, res) => {
         recomendaciones_favoritos: [],
         sala_espera: []
     }
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         await db.collection("salas").insertOne(sala)
+        client.close()
         return res.json("ok")
     }
     catch (error) {
         return res.json("not ok")
     }
-    finally{
-        await client.close()
-    }
 })
 
 // Obtener salas
 app.get("/obtener-salas", async (req, res) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const salas = await db.collection("salas").find({}).toArray()
+        client.close()
         return res.json(salas)
     }
     catch (error) {
         console.log(error)
         return res.json("error")
     }
-    finally{
-        await client.close()
-    }
 })
 
 // Check if a document exists in a collection
 app.get("/check-usuario", async (req, res) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const usuario = await db.collection("sala").findOne({ _id: req.body.id_sesion })
+        client.close()
         if (usuario) {
             return res.json({
                 "existe": true
@@ -498,18 +458,15 @@ app.get("/check-usuario", async (req, res) => {
     } catch (error) {
         console.log(error);
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.get("/obtener-sala", async (req, res) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
         const idGrupo = req.query.idGrupo
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo) })
+        client.close()
         if (sala) {
             return res.json(sala)
         }
@@ -518,19 +475,16 @@ app.get("/obtener-sala", async (req, res) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 // Obtener un usuario segun id
 app.get("/obtener-usuario", async (req, res) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
         const id_usuario = req.query.idUsuario
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(id_usuario) })
+        client.close()
         if (usuario) {
             return res.json(usuario)
         }
@@ -538,39 +492,33 @@ app.get("/obtener-usuario", async (req, res) => {
     } catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 // Retrieve all documents from a collection
 app.get("/obtener-usuarios", async (req, res) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const usuarios = await db.collection("sala").find({}).toArray()
         let resp = {}
         usuarios.forEach((doc) => {
             resp[String(doc._id)] = doc
         });
+        client.close()
         return res.json(resp)
     } catch (error) {
         console.log(error)
-    }
-    finally{
-        await client.close()
     }
 });
 
 // Obtener usuarios del grupo
 app.get("/obtener-usuarios-grupo", async (req, res) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
         const idSala = req.query.idGrupo
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala) })
+        client.close()
         if (sala) {
             return res.json(sala.usuarios_activos)
         }
@@ -580,19 +528,16 @@ app.get("/obtener-usuarios-grupo", async (req, res) => {
         console.log(error)
         return res.json(null)
     }
-    finally{
-        await client.close()
-    }
 })
 
 // Obtener chat sala
 app.get("/obtener-chat-grupo", async (req, res) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
         const idSala = req.query.idGrupo
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala) })
+        client.close()
         if (sala) {
             return res.json(sala.chat)
         }
@@ -602,17 +547,13 @@ app.get("/obtener-chat-grupo", async (req, res) => {
         console.log(error)
         return res.json(null)
     }
-    finally{
-        await client.close()
-    }
 })
 
 // Enviar mensaje chat
 app.post("/enviar-mensaje-chat", async (req, res) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
         const idSala = req.body.idGrupo
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const n_usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(req.body.id_usuario) })
         if (n_usuario) {
@@ -731,6 +672,7 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
                 { _id: new ObjectId(idSala) },
                 { $push: { chat: info_mensaje } }
             )
+            client.close()
             if (nuevo_mensaje) {
                 return res.json("mensaje enviado")
             }
@@ -741,17 +683,13 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
         console.log(error)
         return res.json(null)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.get("/ejecutar-recomendacion-individual", async (req, res) => {
     const idUsuario = req.query.idUsuario
     const idGrupo = req.query.idGrupo
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(idUsuario) })
         if (usuario) {
@@ -872,6 +810,7 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
                             }
                         }
                     )
+                    client.close()
                     return res.json(items_ordenados)
                 }
                 else {
@@ -883,16 +822,12 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
     const idSala = req.query.idGrupo
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala) })
         const groupUsers = []
@@ -1023,6 +958,7 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
                             }
                         }
                     )
+                    client.close()
                     return res.json(items_ordenados)
                 }
                 else {
@@ -1034,19 +970,16 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.get("/obtener-recomendaciones-usuario", async (req, res) => {
     const idUsuario = req.query.idUsuario
     const idSala = req.query.idSala
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(idUsuario) })
+        client.close()
         if (usuario) {
             const recomendacionesUsuario = usuario.recomendaciones.filter((recomendacion) => {
                 return recomendacion.idSala === idSala
@@ -1067,18 +1000,15 @@ app.get("/obtener-recomendaciones-usuario", async (req, res) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.get("/obtener-recomendaciones-grupo", async (req, res) => {
     const idSala = req.query.idSala
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala) })
+        client.close()
         if (sala) {
             if (sala.recomendaciones_grupal.length > 0) {
                 return res.json(sala.recomendaciones_grupal)
@@ -1095,9 +1025,6 @@ app.get("/obtener-recomendaciones-grupo", async (req, res) => {
     }
     catch (error) {
         console.log(error)
-    }
-    finally{
-        await client.close()
     }
 
 })
@@ -1244,9 +1171,8 @@ app.get("/obtener-item-no-calificado", async (req, res) => {
     let originAutor
     let continentAutor
     let splitType = ","
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(id_usuario) })
 
@@ -1320,6 +1246,7 @@ app.get("/obtener-item-no-calificado", async (req, res) => {
         else {
             path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
         }
+        client.close()
         return res.json({
             id_pelicula: idItem,
             nombre_pelicula: nombreItem,
@@ -1336,9 +1263,6 @@ app.get("/obtener-item-no-calificado", async (req, res) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 
 })
 
@@ -1353,6 +1277,7 @@ app.post("/calificar", (req, res) => {
     let linea = id_usuario + "," + id_pelicula + "," + rating_pelicula + "," + String(numb) + "\n"
     try {
         fs.appendFileSync(dir_ratings + "/" + String(id_usuario), linea, "utf-8")
+        client.close()
         return res.json({
             estado: "agregado"
         })
@@ -1363,7 +1288,6 @@ app.post("/calificar", (req, res) => {
 })
 
 app.post("/calificar-item", async (req, res) => {
-    const client = new MongoClient(url)
     try {
         //fs.appendFileSync(ratingsUsuariosDir+"/"+String(id_usuario), linea, "utf-8")
         //escribir en el archivo las calificaciones
@@ -1375,7 +1299,7 @@ app.post("/calificar-item", async (req, res) => {
         //let linea = id_usuario + "::" + id_item + "::" + rating_item + "::" + String(numb) + "\n"
         let linea = id_usuario + "," + id_item + "," + rating_item + "," + String(500) + "\n"
 
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
 
         const item_calificado = {
@@ -1428,6 +1352,7 @@ app.post("/calificar-item", async (req, res) => {
         //    }
         //)
 
+        client.close()
         return res.json({
             estado: "agregado"
         })
@@ -1435,18 +1360,14 @@ app.post("/calificar-item", async (req, res) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 
 app.get("/obtener-item-calificacion", async (req, res) => {
-    const client = new MongoClient(url)
     try {
         let idUsuario = req.query.idUsuario
         let idItem = String(req.query.idItem)
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
 
         const user = await db.collection("usuarios").findOne(
@@ -1464,12 +1385,10 @@ app.get("/obtener-item-calificacion", async (req, res) => {
                 })
             }
         }
+        client.close();
     }
     catch (error) {
         console.log(error);
-    }
-    finally{
-        await client.close()
     }
 })
 
@@ -1477,9 +1396,8 @@ app.post("/enviar-al-stack", async (req, res) => {
     const idGrupo = req.body.idGrupo
     const idUsuario = req.body.idUsuario
     const idItem = req.body.idItem
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const item = await db.collection("tracks").findOne({ track_id: parseInt(idItem) })
         let idTrack = item.track_id
@@ -1519,6 +1437,7 @@ app.post("/enviar-al-stack", async (req, res) => {
                 }
             }
         )
+        client.close()
         return res.json({
             resp: "agregado"
         })
@@ -1529,18 +1448,14 @@ app.post("/enviar-al-stack", async (req, res) => {
             resp: "error"
         })
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.delete("/eliminar-del-stack", async (req, resp) => {
     const idGrupo = req.body.idGrupo
     const idUsuario = req.body.idUsuario
     const idItem = req.body.idItem
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         await db.collection("salas").updateOne(
             {
@@ -1559,6 +1474,7 @@ app.delete("/eliminar-del-stack", async (req, resp) => {
             { _id: new ObjectId(idGrupo) }
         )
         const usuarioStack = sala.recomendaciones_stack.find(obj => obj.id_usuario === idUsuario)
+        client.close()
         if (usuarioStack) {
             return resp.json({
                 items: usuarioStack.items
@@ -1572,18 +1488,14 @@ app.delete("/eliminar-del-stack", async (req, resp) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.delete("/eliminar-de-favoritos", async (req, resp) => {
     const idGrupo = req.body.idGrupo
     const idUsuario = req.body.idUsuario
     const idItem = req.body.idItem
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         await db.collection("salas").updateOne(
             {
@@ -1601,6 +1513,7 @@ app.delete("/eliminar-de-favoritos", async (req, resp) => {
             { _id: new ObjectId(idGrupo) }
         )
         const salaFavoritos = sala.recomendaciones_favoritos
+        client.close()
         if (salaFavoritos) {
             return resp.json({
                 items: salaFavoritos.items
@@ -1614,18 +1527,14 @@ app.delete("/eliminar-de-favoritos", async (req, resp) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.post("/enviar-a-favoritos", async (req, res) => {
     const idGrupo = req.body.idGrupo
     const idUsuario = req.body.idUsuario
     const idItem = req.body.idItem
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const item = await db.collection("tracks").findOne({ track_id: parseInt(idItem) })
         let idTrack = item.track_id
@@ -1669,11 +1578,13 @@ app.post("/enviar-a-favoritos", async (req, res) => {
                         }
                     }
                 )
+                client.close()
                 return res.json({
                     respuesta: "agregado"
                 })
             }
             else {
+                client.close()
                 return res.json({
                     respuesta: "no_agregado",
                     maxFavoritos: maxFavoritos
@@ -1690,15 +1601,11 @@ app.post("/enviar-a-favoritos", async (req, res) => {
             resp: "error"
         })
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne(
             { _id: new ObjectId(req.query.idGrupo) }
@@ -1706,6 +1613,7 @@ app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
         const usuario = await db.collection("usuarios").findOne(
             { _id: new ObjectId(req.query.idUsuario) }
         )
+        client.close()
         const verificar = {
             todos_calificados: false,
             cantidad_calificados: false
@@ -1772,20 +1680,17 @@ app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.get("/obtener-favoritos-sala", async (req, resp) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne(
             { _id: new ObjectId(req.query.idGrupo) }
         )
         const favoritosSala = sala.recomendaciones_favoritos
+        client.close()
         if (favoritosSala) {
             return resp.json({
                 items: favoritosSala
@@ -1801,21 +1706,18 @@ app.get("/obtener-favoritos-sala", async (req, resp) => {
             items: "error"
         })
     }
-    finally{
-        await client.close()
-    }
 })
 
 
 app.get("/obtener-stack-usuario", async (req, resp) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne(
             { _id: new ObjectId(req.query.idGrupo) }
         )
         const usuarioStack = sala.recomendaciones_stack.find(obj => obj.id_usuario === req.query.idUsuario)
+        client.close()
         if (usuarioStack) {
             return resp.json({
                 items: usuarioStack.items
@@ -1831,18 +1733,15 @@ app.get("/obtener-stack-usuario", async (req, resp) => {
             items: "error"
         })
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.get("/obtener-test-personalidad", async (req, resp) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const preguntas = await db.collection("FFM_Test").find({}).toArray()
         if (preguntas) {
+            client.close()
             return resp.json({
                 preguntas: preguntas
             })
@@ -1851,17 +1750,13 @@ app.get("/obtener-test-personalidad", async (req, resp) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.post("/generar-personalidad", async (req, resp) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
         const respuestas = req.body.respuestas
         const idUsuario = req.body.idUsuario
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         let extraversion = 0
         let empatia = 0
@@ -1894,6 +1789,7 @@ app.post("/generar-personalidad", async (req, resp) => {
             experiencia: experiencia
         }
         await db.collection("personalidades").insertOne(personalidad)
+        client.close()
         return resp.json({
             ok: "si"
         })
@@ -1901,18 +1797,14 @@ app.post("/generar-personalidad", async (req, resp) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.post("/generar-perfil", async (req, res) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
         let gustos = req.body.categories
         const idUsuario = req.body.idUsuario
         //const idUsuario = "64bdbbd13f30efcf1bde4e33"
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         //const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(idUsuario) })
 
@@ -1982,6 +1874,7 @@ app.post("/generar-perfil", async (req, res) => {
         }
         //var perfil = fs.readFileSync("/home/asmith/recomendaciones/profiles", "utf-8")
         //console.log(gustos, idUsuario)
+        client.close()
         return res.json({
             ok: "ok"
         })
@@ -1989,17 +1882,13 @@ app.post("/generar-perfil", async (req, res) => {
     catch (error) {
         console.log(error)
     }
-    finally{
-        await client.close()
-    }
 })
 
 app.delete("/eliminar-fichero", async (req, res) => {
     let usuario_idSesion = req.body?.id_sesion
-    const client = new MongoClient(url);
     if (usuario_idSesion !== undefined) {
         try {
-            await client.connect()
+            const client = await MongoClient.connect(url);
             const db = client.db(dbName);
             const usuario = await db.collection("sala").doc(usuario_idSesion).get()
             const usuario_numero = usuario?.data()?.numero_usuario
@@ -2015,16 +1904,12 @@ app.delete("/eliminar-fichero", async (req, res) => {
                 estado: "no existe o ya fue eliminado"
             })
         }
-        finally{
-            await client.close()
-        }
     }
 })
 
 app.delete("/vaciar-sala-espera", async (req, res) => {
-    const client = new MongoClient(url)
     try {
-        await client.connect()
+        const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = { _id: new ObjectId(req.query.idSala) }
         const update = {
@@ -2040,9 +1925,6 @@ app.delete("/vaciar-sala-espera", async (req, res) => {
         return res.json({
             status: "sala no vaciada"
         })
-    }
-    finally{
-        await client.close()
     }
 })
 
