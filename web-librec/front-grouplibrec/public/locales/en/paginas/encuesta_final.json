@@ -1,0 +1,14 @@
+{
+    "main":{
+        "title": "The room's recommended item is",
+        "item": {
+            "genre": "Genre",
+            "origin": "Origin",
+            "clickToListen": "Click to listen",
+            "viewMore": "View more from this artist"
+        },
+        "questionnarie": {
+            "title": "Experience and Feedback Questionnarie"
+        }
+    }
+}

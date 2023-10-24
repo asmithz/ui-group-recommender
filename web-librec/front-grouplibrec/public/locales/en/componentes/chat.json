@@ -1,0 +1,32 @@
+{
+    "main":{
+        "title": "Chat room",
+        "user": {
+            "userRecommend": {
+                "user": "User ",
+                "recommends": "recommended you "
+            },
+            "recommendUser": {
+                "youRecommend": "You recommend ",
+                "to": "to "
+            }
+        },
+        "group": {
+            "userRecommend": {
+                "user": "User ",
+                "recommends": "recommends "
+            },
+            "addedFavorites": {
+                "user": "User ",
+                "added": "added ",
+                "toFavorites": "to favorites"
+            },
+            "removedFavorites": {
+                "user": "User ",
+                "removed": "removed ",
+                "toFavorites": "from favorites"
+            }
+        },
+        "input": "Type a message"
+    }
+}

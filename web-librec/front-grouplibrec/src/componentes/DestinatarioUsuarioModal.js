@@ -2,12 +2,15 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faMusic, faHeadphonesSimple, faThumbsUp, faPeopleGroup } from "@fortawesome/free-solid-svg-icons"
+import { useTranslation } from "react-i18next"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 })
 
 const DestinatarioUsuarioModal = (props) => {
+    const { t, i18n } = useTranslation("componentes/destinatario_usuario_modal")
+
     const [usuariosSesion, setUsuariosSesion] = useState([])
     const [emitirMensaje, setEmitirMensaje] = useState(0)
     const idItem = props.item.idItem
@@ -94,7 +97,7 @@ const DestinatarioUsuarioModal = (props) => {
                     <div className={props.estado ? "modal-background" : ""} onClick={() => props.cambiarEstado(false)}></div>
                     <div className="modal-content" style={styleModal}>
                         <div className="block">
-                            <p className="modal-card-title"><span className="has-text-weight-bold">Who do you want to recommend this song to?</span></p>
+                            <p className="modal-card-title"><span className="has-text-weight-bold">{t('main.title')}</span></p>
                         </div>
                         <div className="block">
                             <p className="modal-card-title"><span className="has-text-weight-bold">{nombreItem}</span> - {nombreAutor}</p>
@@ -106,22 +109,22 @@ const DestinatarioUsuarioModal = (props) => {
                                 <div className="column">
                                     <div className="columns">
                                         <div className="column">
-                                            <p>Genre: {tipoItem}</p>
+                                            <p>{t('main.item.genre')}: {tipoItem}</p>
                                         </div>
                                     </div>
                                     <div className="columns">
                                         <div className="column">
-                                            <p>Origin: {originAutor} - {continentAutor}</p>
+                                            <p>{t('main.item.origin')}: {originAutor} - {continentAutor}</p>
                                         </div>
                                     </div>
                                     <div className="columns">
                                         <div className="column">
-                                            <a href={urlItem} target="_blank"><FontAwesomeIcon icon={faMusic} /> Click to listen <FontAwesomeIcon icon={faMusic} /> </a>
+                                            <a href={urlItem} target="_blank"><FontAwesomeIcon icon={faMusic} /> {t('main.item.clickToListen')} <FontAwesomeIcon icon={faMusic} /> </a>
                                         </div>
                                     </div>
                                     <div className="columns">
                                         <div className="column">
-                                            <a href={urlAutor} target="_blank"><FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> View more from the artist <FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> </a>
+                                            <a href={urlAutor} target="_blank"><FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> {t('main.item.viewMore')} <FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> </a>
                                         </div>
                                     </div>
                                 </div>
@@ -135,12 +138,12 @@ const DestinatarioUsuarioModal = (props) => {
                                             <FontAwesomeIcon icon={faPeopleGroup} style={{ height: 60, color: "#09b391" }} />
                                         </div>
                                         <div className="column">
-                                            <p className="has-text-weight-bold">Everyone</p>
+                                            <p className="has-text-weight-bold"> {t('main.recommendTo.everyone')} </p>
                                         </div>
                                         <div className="column">
                                             <button className="button is-rounded is-primary is-light" onClick={() => recomendarItem(props.item, "rec_grupal", props.idGrupo, 0)}>
                                                 <p>
-                                                    <span>Recommend  </span>
+                                                    <span>{t('main.recommendTo.button.everyone')}  </span>
                                                     <FontAwesomeIcon icon={faThumbsUp} />
                                                 </p>
                                             </button>
@@ -164,7 +167,7 @@ const DestinatarioUsuarioModal = (props) => {
                                                         <div className="column">
                                                             <button className="button is-rounded is-info is-light" onClick={() => recomendarItem(props.item, "rec_usuario", usuarioSala._id, usuarioSala.usuario)}>
                                                                 <p>
-                                                                    <span>Recommend  </span>
+                                                                    <span>{t('main.recommendTo.button.user')}   </span>
                                                                     <FontAwesomeIcon icon={faThumbsUp} />
                                                                 </p>
                                                             </button>

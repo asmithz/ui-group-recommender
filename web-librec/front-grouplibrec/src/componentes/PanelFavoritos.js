@@ -6,6 +6,7 @@ import axios from "axios"
 import ListaItems from "./ListaItems"
 import "../css/PanelFavoritos.css"
 import io from "socket.io-client"
+import { useTranslation } from "react-i18next"
 
 const socket = io(process.env.REACT_APP_SOCKET_URL)
 
@@ -14,9 +15,11 @@ const api = axios.create({
 })
 
 const PanelFavoritos = (props) => {
+    const { t, i18n } = useTranslation("componentes/panel_favoritos")
+
     const idGrupo = props.idGrupo
     const idUsuario = props.idUsuario
-    const [stackUsuario, setStackUsuario] = useState({})
+    //const [stackUsuario, setStackUsuario] = useState({})
     const [panelFavoritos, setPanelFavoritos] = useState(false)
     const [stackFavoritos, setStackFavoritos] = useState({})
     const [favoritoEliminado, setFavoritoEliminado] = useState(0)
@@ -131,7 +134,7 @@ const PanelFavoritos = (props) => {
             >
                 <div className="columns">
                     <div className="column">
-                        <p className="is-size-4">Room's favorites</p>
+                        <p className="is-size-4">{t('main.title')}</p>
                     </div>
                     <div className="column has-text-right">
                         <button className="button is-danger is-light is-rounded" onClick={() => setPanelFavoritos(false)}>

@@ -1,0 +1,11 @@
+{
+    "main": {
+        "item":{
+            "genre": "Genre",
+            "origin": "Origin",
+            "clickToListen": "Click to listen",
+            "viewMore": "View more from this artist",
+            "rate": "Rate"
+        }
+    }
+}

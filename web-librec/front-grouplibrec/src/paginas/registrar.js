@@ -4,12 +4,15 @@ import { Formik, Form, Field, replace } from "formik"
 import axios from "axios"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faUpload } from "@fortawesome/free-solid-svg-icons"
+import { useTranslation } from "react-i18next"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 })
 
 const Registrar = () => {
+    const { t, i18n } = useTranslation("paginas/registrar")
+
     const navigate = useNavigate()
     const [imagenUsuario, setImagen] = useState()
     const [nombreImagen, setNombreImagen] = useState("")
@@ -47,7 +50,7 @@ const Registrar = () => {
 
         if (!ACCEPTED_IMAGE_TYPES.includes(fileType)) {
             // Handle the case when the file type is not accepted
-            alert('Solo se aceptan imagenes JPG y PNG.');
+            alert(`${t('main.alert.avatarType')}`);
             return;
         }
 
@@ -101,7 +104,7 @@ const Registrar = () => {
         <div style={registrarStyle}>
             <div>
                 <div>
-                    <p className="is-size-1 has-text-centered">Register</p>
+                    <p className="is-size-1 has-text-centered">{t('main.register.title')}</p>
                 </div>
                 <Formik
                     initialValues={{
@@ -119,19 +122,19 @@ const Registrar = () => {
                             <div className="column">
                                 {/* Nombre Usuario*/}
                                 <div className="field">
-                                    <label className="label">You new user name</label>
+                                    <label className="label">{t('main.register.usernameTitle')}</label>
                                 </div>
                                 <div className="field">
-                                    <Field placeholder="Ingrese su nombre de usuario" className="input is-rounded" type="text" name="usuario" />
+                                    <Field placeholder={t('main.register.usernamePlaceHolder')} className="input is-rounded" type="text" name="usuario" />
                                 </div>
                             </div>
                             <div className="column">
                                 {/* Nombre */}
                                 <div className="field">
-                                    <label className="label">Your full name</label>
+                                    <label className="label">{t('main.register.nameTitle')}</label>
                                 </div>
                                 <div className="field">
-                                    <Field placeholder="Ingrese su nombre" className="input is-rounded" type="text" name="nombre" />
+                                    <Field placeholder={t('main.register.namePlaceHolder')} className="input is-rounded" type="text" name="nombre" />
                                 </div>
                             </div>
                         </div>
@@ -139,25 +142,25 @@ const Registrar = () => {
                             <div className="column">
                                 {/* Edad */}
                                 <div className="field">
-                                    <label className="label">How old are you?</label>
+                                    <label className="label">{t('main.register.yearsoldTitle')}</label>
                                 </div>
                                 <div className="field">
-                                    <Field placeholder="Ingrese su edad" className="input is-rounded" type="text" name="edad" />
+                                    <Field placeholder={t('main.register.yearsoldPlaceHolder')} className="input is-rounded" type="text" name="edad" />
                                 </div>
                             </div>
                             <div className="column">
                                 {/* Trabajo */}
                                 <div className="field">
-                                    <label className="label">What's your education/profession?</label>
+                                    <label className="label">{t('main.register.educationTitle')}</label>
                                 </div>
                                 <div className="field">
-                                    <Field placeholder="Ingrese profesión o estado educativo" className="input is-rounded" type="text" name="educacion" />
+                                    <Field placeholder={t('main.register.educationPlaceHolder')} className="input is-rounded" type="text" name="educacion" />
                                 </div>
                             </div>
                         </div>
                         {/* Avatar */}
                         <div className="field">
-                            <label className="label">Add your avatar</label>
+                            <label className="label">{t('main.register.avatarTitle')}</label>
                             <div className="columns">
                                 <div className="column">
                                     <div className="file has-name is-fullwidth">
@@ -168,7 +171,7 @@ const Registrar = () => {
                                                     <FontAwesomeIcon icon={faUpload} />
                                                 </span>
                                                 <span className="file-label">
-                                                    Upload your avatar…
+                                                    {t('main.register.avatarUpload')}
                                                 </span>
                                             </span>
                                             {
@@ -193,14 +196,14 @@ const Registrar = () => {
                         </div>
                         {/* Contraseña */}
                         <div className="field">
-                            <label className="label">Password</label>
+                            <label className="label">{t('main.register.passwordTitle')}</label>
                         </div>
                         <div className="field">
-                            <Field placeholder="Ingrese una contraseña" className="input is-rounded" type="password" name="password" />
+                            <Field placeholder={t('main.register.passwordPlaceHolder')} className="input is-rounded" type="password" name="password" />
                         </div>
                         {/* Boton */}
                         <div className="field has-text-centered">
-                            <button className="button is-primary is-rounded pl-6 pr-6" type="submit">Register</button>
+                            <button className="button is-primary is-rounded pl-6 pr-6" type="submit">{t('main.register.button')}</button>
                         </div>
                     </Form>
                 </Formik>

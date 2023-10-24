@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
+import { useTranslation } from "react-i18next"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 })
 
 const TestPersonalidad = () => {
+    const { t, i18n } = useTranslation("paginas/test_personalidad")
     //const [extroversion, setExtroversion] = useState(0)
     //const [emotional, setEmotional] = useState(0)
     //const [agreeableness, setAgreeableness] = useState(0)
@@ -79,27 +81,25 @@ const TestPersonalidad = () => {
         <div className="container" style={{ maxWidth: "800px" }}>
             <div className="columns">
                 <div className="column">
-                    <p className="is-size-1 has-text-centered">Personality test</p>
+                    <p className="is-size-1 has-text-centered">{t('main.title')}</p>
                 </div>
             </div>
             <div className="box">
                 <div className="columns">
                     <div className="column">
                         <div className="block">
-                            <p className="is-size-4 has-text-centered has-text-justified">Instructions</p>
+                            <p className="is-size-4 has-text-centered has-text-justified">{t('main.subtitle')}</p>
                             <p className="is-size-6 has-text-centered has-text-justified">
-                                The purpose of the Big Five personality test is to provide an objective description
-                                of an individual's personality traits in relation to these five dimensions:
-                                <span className="has-text-weight-bold"> Extraversion</span>, <span className="has-text-weight-bold"> Empathy</span>, <span className="has-text-weight-bold"> Neuroticism</span>, <span className="has-text-weight-bold"> Conscientiousness</span> and <span className="has-text-weight-bold"> Openness to Experience</span> .
-                                Describe yourself honestly and as you generally are now, not as you wish to be in the future.
-                                Indicate for each statement if you are:
+                                {t('main.instructions1')}
+                                <span className="has-text-weight-bold"> {t('main.dimensionExtraversion')}</span>, <span className="has-text-weight-bold"> {t('main.dimensionEmpathy')}</span>, <span className="has-text-weight-bold"> {t('main.dimensionNeuroticism')}</span>, <span className="has-text-weight-bold"> {t('main.dimensionConscientiousness')}</span> {t('main.and')} <span className="has-text-weight-bold"> {t('main.dimensionExperience')}</span>. 
+                                {t('main.instructions2')}
                             </p>
                             <br />
-                            <p>1. Strongly Disagree</p>
-                            <p>2. Disagree</p>
-                            <p>3. Neutral</p>
-                            <p>4. Agree</p>
-                            <p>5. Strongly Agree</p>
+                            <p>1. {t('main.agreement.strongDisagree')}</p>
+                            <p>2. {t('main.agreement.disagree')}</p>
+                            <p>3. {t('main.agreement.neutral')}</p>
+                            <p>4. {t('main.agreement.agree')}</p>
+                            <p>5. {t('main.agreement.strongAgree')}</p>
                         </div>
                         <div className="block">
                             <p className="is-size-4 has-text-centered has-text-justified">Questionnaire</p>
@@ -152,7 +152,9 @@ const TestPersonalidad = () => {
                                 </div>
                             })
                         }
-                        <button onClick={handleRetrieveValues}>Retrieve Values</button>
+                        <div className="has-text-centered">
+                            <button className="button is-primary is-rounded" onClick={handleRetrieveValues}>{t('main.button')}</button>
+                        </div>
                     </div>
                 </div>
             </div>

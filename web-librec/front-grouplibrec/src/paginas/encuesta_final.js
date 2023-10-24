@@ -3,6 +3,7 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faMusic, faHeadphonesSimple } from "@fortawesome/free-solid-svg-icons"
+import { useTranslation } from "react-i18next"
 
 const api_consensus = axios.create({
     baseURL: process.env.REACT_APP_API_CONSENSUS_URL
@@ -13,6 +14,8 @@ const api = axios.create({
 })
 
 const EncuestaFinal = () => {
+    const { t, i18n } = useTranslation("paginas/encuesta_final")
+
     const idSala = useParams().id
     const [consensoItems, setConsensoItems] = useState({})
     const [finalItem, setFinalItem] = useState({})
@@ -46,7 +49,7 @@ const EncuestaFinal = () => {
 
     return (
         <div className="container mt-6 has-text-centered">
-            <p className="is-size-1" style={{paddingBottom: 20}}>The room's recommended item is:</p>
+            <p className="is-size-1" style={{paddingBottom: 20}}>{t('main.title')}:</p>
             <div className="box" style={{paddingBottom: 50, paddingTop: 50, paddingLeft: 100, paddingRight: 100}}> 
                 <p className="is-size-3" style={{paddingBottom: 20}}><span>{finalItem.nombreItem}</span> - <span>{finalItem.nombre_autor}</span></p>
                 <div className="columns">
@@ -56,28 +59,28 @@ const EncuestaFinal = () => {
                     <div className="column" style={{paddingTop: 40}}>
                         <div className="columns">
                             <div className="column">
-                                <p className="is-size-4">Genre: {finalItem.tipoItem}</p>
+                                <p className="is-size-4">{t('main.item.genre')}: {finalItem.tipoItem}</p>
                             </div>
                         </div>
                         <div className="columns">
                             <div className="column">
-                                <p className="is-size-4">Origin: {finalItem.origin_autor} - {finalItem.continent_autor}</p>
+                                <p className="is-size-4">{t('main.item.origin')}: {finalItem.origin_autor} - {finalItem.continent_autor}</p>
                             </div>
                         </div>
                         <div className="columns">
                             <div className="column">
-                                <a className="is-size-4" href={finalItem.url_item} target="_blank"><FontAwesomeIcon icon={faMusic} /> Click to listen <FontAwesomeIcon icon={faMusic} /> </a>
+                                <a className="is-size-4" href={finalItem.url_item} target="_blank"><FontAwesomeIcon icon={faMusic} /> {t('main.item.clickToListen')} <FontAwesomeIcon icon={faMusic} /> </a>
                             </div>
                         </div>
                         <div className="columns">
                             <div className="column">
-                                <a className="is-size-4" href={finalItem.url_autor} target="_blank"><FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> View more from the artist <FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> </a>
+                                <a className="is-size-4" href={finalItem.url_autor} target="_blank"><FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> {t('main.item.viewMore')} <FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <p className="is-size-1">Experience and Feedback Questionnarie</p>
+            <p className="is-size-1">{t('main.questionnarie.title')}</p>
         </div>
     )
 }

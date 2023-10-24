@@ -1,0 +1,15 @@
+{
+    "main":{
+        "title": "GroupLibrec",
+        "roomsTitle": "Available rooms",
+        "table": {
+            "roomName": "Room name",
+            "leaderName": "Leader",
+            "availableUsers": "Users",
+            "description": "Description",
+            "more": "View more",
+            "enter": "Enter"
+        },
+        "createRoom": "Create room"
+    }
+}

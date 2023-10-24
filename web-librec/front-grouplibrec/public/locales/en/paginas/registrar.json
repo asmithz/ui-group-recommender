@@ -1,0 +1,25 @@
+{
+    "main":{
+        "register":{
+            "title": "Register",
+            "usernameTitle": "Your new username",
+            "usernamePlaceHolder": "Username",
+            "passwordTitle": "Create your password",
+            "passwordPlaceHolder": "Password",
+            "nameTitle": "Your full name",
+            "namePlaceHolder": "Full name",
+            "yearsoldTitle": "How old are you?",
+            "yearsoldPlaceHolder": "Your age",
+            "educationTitle": "What's your education/profession?",
+            "educationPlaceHolder": "...",
+            "avatarTitle": "Add your avatar",
+            "avatarUpload": "Upload your avatar",
+            "button": "Register"
+        },
+        "alert": {
+            "avatarSize": "Image dimensions exceeded, max size is 300x300",
+            "avatarType": "Only JPG and PNG are accepted"
+        }
+
+    }
+}

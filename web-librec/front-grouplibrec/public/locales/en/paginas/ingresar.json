@@ -1,0 +1,21 @@
+{
+    "main":{
+        "login": {
+            "title": "Log in",
+            "userTitle": "User",
+            "passwordTitle": "Password",
+            "userError": "Username missing",
+            "passwordError": "Password missing",
+            "userPlaceHolder": "your username",
+            "passwordPlaceHolder": "your password",
+            "button": "Log in"
+        },
+        "alert": {
+            "userpassError": "User or password incorrect"
+        },
+        "footer": {
+            "noAccount": "No account?",
+            "createAccountLink": "Create account"
+        }
+    }
+}

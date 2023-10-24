@@ -3,12 +3,15 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons"
 import { Formik, Form, Field } from "formik"
 import { useEffect, useState } from "react"
 import axios from "axios"
+import { useTranslation } from "react-i18next" 
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 })
 
 const NuevaSalaModal = (props) => {
+    const { t, i18n } = useTranslation("componentes/nueva_sala_modal")
+
     const [usuarioLider, setUsuarioLider] = useState(null)
 
     useEffect(() => {
@@ -60,7 +63,7 @@ const NuevaSalaModal = (props) => {
                     <div className={props.estado ? "modal-background" : ""} onClick={() => props.cambiarEstado(false)}></div>
                     <div className="modal-content" style={styleModal}>
                         <section>
-                            <p className="is-size-4 has-text-centered">Create a room</p>
+                            <p className="is-size-4 has-text-centered">{t('main.title')}</p>
                             <Formik
                                 initialValues={{
                                     id_sala: props.idSesion,
@@ -74,10 +77,10 @@ const NuevaSalaModal = (props) => {
                                 validate={datos => {
                                     const error = {}
                                     if (!datos.titulo) {
-                                        error.titulo = "Debe indicar título"
+                                        error.titulo = `${t('main.alert.roomName')}`
                                     }
                                     if (!datos.descripcion) {
-                                        error.descripcion = "Debe indicar descripción"
+                                        error.descripcion = `${t('main.alert.description')}`
                                     }
                                     return error
                                 }}>
@@ -85,13 +88,13 @@ const NuevaSalaModal = (props) => {
                                     props => (
                                         <Form>
                                             <div className="field">
-                                                <label className="label">Room name</label>
+                                                <label className="label">{t('main.roomTitleName')}</label>
                                                 {props.errors.titulo && <p className="help is-danger">{props.errors.titulo}</p>}
                                                 <Field className={props.errors.titulo ? "input is-danger" : "input"} type="text" name="titulo" />
                                             </div>
                                             <div className="field">
                                                 <div className="control">
-                                                    <label className="label">Room description</label>
+                                                    <label className="label">{t('main.roomTitleDescription')}</label>
                                                     {props.errors.descripcion && <p className="help is-danger">{props.errors.descripcion}</p>}
                                                     <Field className={props.errors.descripcion ? "textarea is-danger" : "textarea"} name="descripcion" as="textarea" />
                                                 </div>

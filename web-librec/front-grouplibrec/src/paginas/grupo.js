@@ -9,6 +9,7 @@ import TarjetaUsuario from "../componentes/TarjetaUsuario"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faArrowRightFromBracket, faPeopleGroup, faStar, faUser, faFlagCheckered } from "@fortawesome/free-solid-svg-icons"
 import PanelFavoritos from "../componentes/PanelFavoritos"
+import { useTranslation } from "react-i18next"
 
 const socket = io(process.env.REACT_APP_SOCKET_URL)
 
@@ -17,6 +18,8 @@ const api = axios.create({
 })
 
 const Grupo = () => {
+    const { t, i18n } = useTranslation("paginas/grupo")
+
     const idGrupo = useParams().id
     const navigate = useNavigate()
     const [idUsuario, setIdUsuario] = useState(sessionStorage.getItem("id_usuario"))
@@ -32,7 +35,6 @@ const Grupo = () => {
     const [salaGrupo, setSalaGrupo] = useState({})
     const [liderGrupo, setLiderGrupo] = useState({ id_lider: null, usuario_lider: null })
     const [stackUsuario, setStackUsuario] = useState([])
-
 
     const styleStackRecomendaciones = {
         height: "320px"
@@ -121,11 +123,9 @@ const Grupo = () => {
 
     // señal cuando alguien se une al grupo
     useEffect(() => {
-        if (idGrupo && idSesion) {
             socket.emit("entrar-sala", idGrupo, idSesion)
             setEmitirSignal(emitirSignal + 1)
-        }
-    }, [idGrupo, idSesion])
+    }, [])
 
     const salirGrupo = () => {
         socket.emit("salir-sala", idGrupo, idSesion)
@@ -214,7 +214,7 @@ const Grupo = () => {
                 }
             }
             else if (resp.data.respuesta === "no_agregado") {
-                window.alert(`Room's favorites must not exceed ${resp.data.maxFavoritos} items.`)
+                window.alert(`${t('main.alert.maxFavorites', { max: resp.data.maxFavoritos})}`)
             }
             //obtenerStackUsuario(idGrupo, idUsuario)
         }
@@ -233,7 +233,7 @@ const Grupo = () => {
             });
 
             if (verificar.data.respuesta === "stop") {
-                window.alert(`The room must have exactly ${verificar.data.maxFavoritos} favorites. Also, remember to rate all of them.`)
+                window.alert(`${t('main.alert.consensus', { max: verificar.data.maxFavoritos})}`)
             } else {
                 // Condition is met, navigate to the specified URL
                 navigate(`/sala-espera/${idGrupo}`);
@@ -247,13 +247,13 @@ const Grupo = () => {
         <div style={stylePagina}>
             <div className="columns">
                 <div className="column">
-                    <p className="is-size-1 has-text-centered">{salaGrupo.lider}'s room</p>
+                    <p className="is-size-1 has-text-centered">{t('main.roomName', { leaderName: salaGrupo.lider })}</p>
                 </div>
             </div>
             <div className="columns">
                 {/* Usuarios */}
                 <div className="column is-one-fifth">
-                    <p className="is-size-1 has-text-centered">Connected</p>
+                    <p className="is-size-1 has-text-centered">{t('main.users.connected')}</p>
                     <div className="box">
                         <TarjetaUsuario usuario={usuarioSesion} liderGrupo={liderGrupo} />
                     </div>

@@ -1,0 +1,12 @@
+{
+    "main":{
+        "roomName": "{{leaderName}}'s room",
+        "users": {
+            "connected": "Connected"
+        },
+        "alert": {
+            "maxFavorites": "Room's favorites must not exceed {{max}} items.",
+            "consensus": "The room must have exactly {{max}} favorites. Also, remember to rate all of them."
+        }
+    }
+}

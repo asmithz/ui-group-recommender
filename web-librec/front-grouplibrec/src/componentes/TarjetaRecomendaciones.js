@@ -2,8 +2,11 @@ import Lottie from "lottie-react"
 import loadingRecommendation from "../animations/loading-recommendation.json"
 import ListaItems from "./ListaItems"
 import PanelHistorialRecomendaciones from "./PanelHistorialRecomendaciones"
+import { useTranslation } from "react-i18next"
 
 const TarjetaRecomendaciones = (props) => {
+    const { t, i18n } = useTranslation("componentes/tarjeta_recomendaciones")
+
     return (
         <div className="columns">
             <div className="column">
@@ -15,7 +18,7 @@ const TarjetaRecomendaciones = (props) => {
                                 <div className="columns">
                                     <div className="column is-four-fifths">
                                         <p className="is-size-4">
-                                            Your recommendations
+                                            {t('main.individual.title')}
                                         </p>
                                     </div>
                                     <div className="column has-text-right">
@@ -28,7 +31,7 @@ const TarjetaRecomendaciones = (props) => {
                                 <div className="columns">
                                     <div className="column is-four-fifths">
                                         <p className="is-size-4">
-                                            Recommendations for everyone
+                                            {t('main.group.title')}
                                         </p>
                                     </div>
                                     <div className="column has-text-right">

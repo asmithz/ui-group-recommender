@@ -3,12 +3,15 @@ import { faHeart, faMusic, faHeadphonesSimple, faTrophy } from "@fortawesome/fre
 import { Rating } from "react-simple-star-rating"
 import { useEffect, useState } from "react"
 import axios from "axios"
+import { useTranslation } from "react-i18next"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 })
 
 const ItemModal = (props) => {
+    const { t, i18n } = useTranslation("componentes/item_modal")
+
     const idItem = props.item.idItem
     const nombreItem = props.item.nombreItem
     const nombreAutor = props.item.nombre_autor
@@ -39,7 +42,7 @@ const ItemModal = (props) => {
                     id_item: idItem,
                     rating: valor
                 }
-               await api.post("/calificar-item", calificacion, {
+                await api.post("/calificar-item", calificacion, {
                     headers: {
                         "Content-type": "application/json"
                     }
@@ -93,27 +96,27 @@ const ItemModal = (props) => {
                             <div className="column">
                                 <div className="columns">
                                     <div className="column">
-                                        <p>Genre: {tipoItem}</p>
+                                        <p>{t('main.item.genre')}: {tipoItem}</p>
                                     </div>
                                 </div>
                                 <div className="columns">
                                     <div className="column">
-                                        <p>Origin: {originAutor} - {continentAutor}</p>
+                                        <p>{t('main.item.origin')}: {originAutor} - {continentAutor}</p>
                                     </div>
                                 </div>
                                 <div className="columns">
                                     <div className="column">
-                                        <a href={urlItem} target="_blank"><FontAwesomeIcon icon={faMusic} /> Click to listen <FontAwesomeIcon icon={faMusic} /> </a>
+                                        <a href={urlItem} target="_blank"><FontAwesomeIcon icon={faMusic} /> {t('main.item.clickToListen')} <FontAwesomeIcon icon={faMusic} /> </a>
                                     </div>
                                 </div>
                                 <div className="columns">
                                     <div className="column">
-                                        <a href={urlAutor} target="_blank"><FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> View more from the artist <FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> </a>
+                                        <a href={urlAutor} target="_blank"><FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> {t('main.item.viewMore')} <FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> </a>
                                     </div>
                                 </div>
                                 <div className="columns">
                                     <div className="column">
-                                        Rate: <Rating
+                                        {t('main.item.rate')}: <Rating
                                             onClick={puntuacionItem}
                                             initialValue={puntuacion}
                                         />

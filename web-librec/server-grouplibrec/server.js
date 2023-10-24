@@ -64,10 +64,13 @@ const maxFavoritos = 10
 // socket
 // cuando los usuarios se conectan
 io.on("connection", (socket) => {
+    socket.on("connect_error", (err) => {
+        console.log(`connect_error due to ${err.message}`);
+    })
     // Se envia un socket.id a la interfaz login
     socket.emit("sesion-usuario", (socket.id))
     // Genera la sesion del usuario cuando ingresa: su socket.id y id.usuario
-    socket.on("generar-sesion", async (idSesion, usuarioId) => {
+    socket.on("generar-sesion", async (usuarioId) => {
         try {
             const client = await MongoClient.connect(url)
             const db = client.db(dbName)
@@ -315,11 +318,30 @@ app.post("/registrar-usuario", async (req, res) => {
     })
 })
 
+app.get("/obtener-sesion-usuario", async(req, res) => {
+    try{
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+        const usuario_sesion = await db.collection("sesiones").findOne({ "id_usuario": req.query.idUsuario });
+        client.close()
+        if (usuario_sesion){
+            return res.json({
+                "idSesion": usuario_sesion.id_sesion
+            })
+        }
+        return res.json({ error: "usuario sin sesion"})
+    }
+    catch(error){
+        console.log(error)
+    }
+})
+
 app.post("/login-usuario", async (req, res) => {
     try {
         const client = await MongoClient.connect(url);
         const db = client.db(dbName);
         const usuario = await db.collection("usuarios").findOne({ "usuario": req.body.usuario });
+        client.close();
         let test
         if (usuario) {
             if (usuario.password === req.body.password) {
@@ -1599,15 +1621,31 @@ app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
         }
         if (sala && usuario) {
             // array con id's de los favoritos
-            const favoritos_sala = sala.recomendaciones_favoritos.map(favorito => favorito.idItem)
+            const favoritos_sala = sala.recomendaciones_favoritos.map(favorito => favorito)
+            
             const no_calificados = []
 
+            favoritos_sala.forEach(itemFavorito => {
+                const checkItem = usuario.calificaciones.find(itemCalificado => itemCalificado.id_item === itemFavorito.idItem);
+                if (!checkItem || checkItem.rating === undefined) {
+                    no_calificados.push(itemFavorito.idItem);
+                }
+                else{
+                    console.log(itemFavorito.idItem)
+                }
+            })
+            console.log(no_calificados)
+
+            /*
             // obtener los calificados del usuario
             favoritos_sala.forEach(itemFavorito => {
                 if (!usuario.calificaciones.some(itemCalificado => itemCalificado.id_item === itemFavorito)) {
-                    no_calificados.push(itemFavorito)
+                    if (!itemFavorito.rating){
+                        no_calificados.push(itemFavorito)
+                    }
                 }
             })
+            */
 
             if (no_calificados.length === 0) {
                 console.log("ninguno por calificar")
@@ -1871,10 +1909,10 @@ app.delete("/eliminar-fichero", async (req, res) => {
 })
 
 app.delete("/vaciar-sala-espera", async (req, res) => {
-    try{
+    try {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
-        const sala = { _id: new ObjectId(req.query.idSala)}
+        const sala = { _id: new ObjectId(req.query.idSala) }
         const update = {
             $set: { sala_espera: [] }
         }
@@ -1883,7 +1921,7 @@ app.delete("/vaciar-sala-espera", async (req, res) => {
             status: "sala vaciada"
         })
     }
-    catch(error){
+    catch (error) {
         console.log(error)
         return res.json({
             status: "sala no vaciada"

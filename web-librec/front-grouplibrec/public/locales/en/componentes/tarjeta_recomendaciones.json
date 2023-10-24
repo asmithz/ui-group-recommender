@@ -1,0 +1,10 @@
+{
+    "main":{
+        "individual": {
+            "title": "Your recommendations"
+        },
+        "group": {
+            "title": "Recommendations for everyone"
+        }
+    }
+}

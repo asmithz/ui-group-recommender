@@ -1,0 +1,11 @@
+{
+    "main":{
+        "title": "Create a room",
+        "roomTitleName": "Room name",
+        "roomTitleDescription": "Room description",
+        "alert": {
+            "roomName": "Room must have a name",
+            "description": "Room must have a description"
+        }
+    }
+}

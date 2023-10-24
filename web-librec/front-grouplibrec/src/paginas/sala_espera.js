@@ -5,6 +5,7 @@ import { useState, useEffect } from "react"
 import TarjetaUsuario from "../componentes/TarjetaUsuario"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCrown } from "@fortawesome/free-solid-svg-icons"
+import { useTranslation } from "react-i18next"
 
 const socket = io(process.env.REACT_APP_SOCKET_URL)
 
@@ -13,6 +14,8 @@ const api = axios.create({
 })
 
 const SalaEspera = () => {
+    const { t, i18n } = useTranslation("paginas/sala_espera")
+
     const idSala = useParams().id
     const navigate = useNavigate()
     const [usuarioSesion, setUsuarioSesion] = useState({})
@@ -121,11 +124,11 @@ const SalaEspera = () => {
         <div className="container mt-6" style={stylePagina}>
             <div className="columns">
                 <div className="column">
-                    <p className="is-size-1 has-text-centered">Waiting room</p>
+                    <p className="is-size-1 has-text-centered">{t('main.title')}</p>
                 </div>
             </div>
             {/* Usuarios */}
-            <p className="is-size-3 has-text-centered">Users ready: {usuariosSalaEspera.length}/{usuariosSala.length}</p>
+            <p className="is-size-3 has-text-centered">{t('main.usersReady', { waiting: usuariosSalaEspera.length, total: usuariosSala.length })}</p>
             <div className="box" style={styleBoxUser}>
                 <div className="columns">
                     <div className="column is-one-quarter" style={{ display: "flex", alignItems: "center" }}>
@@ -173,7 +176,7 @@ const SalaEspera = () => {
             {
                 liderGrupo.id_lider === idUsuario &&
                 <div className="has-text-centered">
-                    <button className="button is-rounded is-primary" onClick={cambiarPaginaEncuesta}>Consensus</button>
+                    <button className="button is-rounded is-primary" onClick={cambiarPaginaEncuesta}>{t('main.button')}</button>
                 </div>
             }
         </div>

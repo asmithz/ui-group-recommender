@@ -4,8 +4,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCrown, faPaperPlane } from "@fortawesome/free-solid-svg-icons"
 import "../css/StyleItemHover.css"
 import ItemModal from "./ItemModal"
+import { useTranslation } from "react-i18next"
 
 const Chat = (props) => {
+    const { t, i18n } = useTranslation("componentes/chat")
+
     const idGrupo = props.idGrupo
     const usuarioId = sessionStorage.getItem("id_usuario")
     const [chatGrupo, setChatGrupo] = useState([])
@@ -110,9 +113,9 @@ const Chat = (props) => {
                 {
                     chat.map((mensaje) => (
                         mensaje.id_usuario === usuarioId ? (
-                            <Mensaje style={mensajeStyleEmisor} tipo="emisor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} idUsuario={usuarioId} enviarAlStack={props.enviarAlStack} />
+                            <Mensaje t={t} style={mensajeStyleEmisor} tipo="emisor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} idUsuario={usuarioId} enviarAlStack={props.enviarAlStack} />
                         ) : (
-                            <Mensaje style={mensajeStyleReceptor} tipo="receptor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} idUsuario={usuarioId} enviarAlStack={props.enviarAlStack}/>
+                            <Mensaje t={t} style={mensajeStyleReceptor} tipo="receptor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} idUsuario={usuarioId} enviarAlStack={props.enviarAlStack}/>
                         )
                     ))
                 }
@@ -125,7 +128,7 @@ const Chat = (props) => {
             <div className="columns">
                 <div className="column">
                     <h1>
-                        <p className="is-size-4">Chat room</p>
+                        <p className="is-size-4">{t('main.title')}</p>
                     </h1>
                 </div>
             </div>
@@ -151,7 +154,7 @@ const Chat = (props) => {
                             <div className="columns">
                                 <div className="column is-full">
                                     <div className="field">
-                                        <Field className="input" placeholder="Ingrese un mensaje" name="texto" />
+                                        <Field className="input" placeholder={t('main.input')} name="texto" />
                                     </div>
                                 </div>
                                 <div className="column">
@@ -213,13 +216,13 @@ const Mensaje = (props) => {
                                 <a onClick={() => setEstadoItem(true)} style={{ color: "#0969b3"}}>
                                     {props.mensaje.usuarioDestinoID === props.idUsuario ? (
                                         <span>
-                                            User <span className="has-text-weight-bold">{props.mensaje.usuario}</span> recommended you <span className="has-text-weight-bold">{props.mensaje.item.nombreItem}</span> -{" "}
+                                            {props.t('main.user.userRecommend.user')} <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {props.t('main.user.userRecommend.recommends')}  <span className="has-text-weight-bold">{props.mensaje.item.nombreItem}</span> -{" "}
                                             <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span>
                                         </span>
                                     ) : (
                                         <span>
-                                            You recommended <span className="has-text-weight-bold">{props.mensaje.item.nombreItem}</span> -{" "}
-                                            <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span> to <span className="has-text-weight-bold">{props.mensaje.usuarioDestino}</span>
+                                            {props.t('main.user.recommendUser.youRecommend')} <span className="has-text-weight-bold">{props.mensaje.item.nombreItem}</span> -{" "}
+                                            <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span> {props.t('main.user.recommendUser.to')} <span className="has-text-weight-bold">{props.mensaje.usuarioDestino}</span>
                                         </span>
                                     )}
                                 </a>
@@ -228,19 +231,19 @@ const Mensaje = (props) => {
                         {
                             props.mensaje.tipo_mensaje === "rec_grupal" &&
                             <a onClick={() => setEstadoItem(true)} style={{ color: "#09b391"}}>
-                                <span>User <span className="has-text-weight-bold">{props.mensaje.usuario}</span> recommends <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span></span>
+                                <span>{props.t('main.group.userRecommend.user')} <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {props.t('main.group.userRecommend.recommends')} <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span></span>
                             </a>
                         }
                         {
                             props.mensaje.tipo_mensaje === "enviar_favoritos" &&
                             <a onClick={() => setEstadoItem(true)} style={{ color: "#b30925"}}>
-                                <span>User <span className="has-text-weight-bold">{props.mensaje.usuario}</span> added <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span> to favorites.</span>
+                                <span>{props.t('main.group.addedFavorites.user')} <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {props.t('main.group.addedFavorites.added')} <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span> {props.t('main.group.addedFavorites.toFavorites')}</span>
                             </a>
                         }
                         {
                             props.mensaje.tipo_mensaje === "eliminar_favoritos" &&
                             <a onClick={() => setEstadoItem(true)} style={{ color: "#b30925"}}>
-                                <span>User <span className="has-text-weight-bold">{props.mensaje.usuario}</span> removed <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span> from favorites.</span>
+                                <span>{props.t('main.group.removedFavorites.user')}  <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {props.t('main.group.removedFavorites.removed')} <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span>  {props.t('main.group.removedFavorites.toFavorites')} </span>
                             </a>
                         }
                         {

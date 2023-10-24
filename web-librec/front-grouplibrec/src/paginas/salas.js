@@ -5,12 +5,15 @@ import NuevaSalaModal from "../componentes/NuevaSalaModal"
 import InformacionSalaModal from "../componentes/InformacionSalaModal"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faDoorOpen, faInfo, faArrowsRotate } from "@fortawesome/free-solid-svg-icons"
+import { useTranslation } from "react-i18next"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 })
 
 const Salas = () => {
+    const { t, i18n } = useTranslation("paginas/salas")
+
     const [salas, setSalas] = useState([])
     const idSesion = sessionStorage.getItem("id_sesion") !== null //booleano
     const idUsuario = sessionStorage.getItem("id_usuario")
@@ -53,14 +56,14 @@ const Salas = () => {
                         <div className="container">
                             <div className="columns">
                                 <div className="column">
-                                    <p className="is-size-1 has-text-centered">GroupLibrec</p>
+                                    <p className="is-size-1 has-text-centered">{t('main.title')}</p>
                                 </div>
                             </div>
                         </div>
                         <div className="container">
                             <div className="columns">
                                 <div className="column">
-                                    <p className="is-size-3 has-text-centered">Available rooms</p>
+                                    <p className="is-size-3 has-text-centered">{t('main.roomsTitle')}</p>
                                 </div>
                             </div>
                         </div>
@@ -69,12 +72,12 @@ const Salas = () => {
                                 <table className="table is-rounded">
                                     <thead>
                                         <tr>
-                                            <th style={{ width: "160px" }}>Room name</th>
-                                            <th style={{ width: "100px" }}>Leader</th>
-                                            <th style={{ width: "50px" }}>Users</th>
-                                            <th style={{ width: "300px" }}>Description</th>
-                                            <th className="has-text-centered">View more</th>
-                                            <th className="has-text-centered">Enter</th>
+                                            <th style={{ width: "160px" }}>{t('main.table.roomName')}</th>
+                                            <th style={{ width: "100px" }}>{t('main.table.leaderName')}</th>
+                                            <th style={{ width: "50px" }}>{t('main.table.availableUsers')}</th>
+                                            <th style={{ width: "300px" }}>{t('main.table.description')}</th>
+                                            <th className="has-text-centered">{t('main.table.more')}</th>
+                                            <th className="has-text-centered">{t('main.table.enter')}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -112,7 +115,7 @@ const Salas = () => {
                                     <button className="button is-warning is-light is-rounded" onClick={obtenerSalas}>
                                         <FontAwesomeIcon icon={faArrowsRotate} />
                                     </button>
-                                    <button className="button is-primary is-light is-rounded" onClick={() => setModalSala(true)}>Crear sala</button>
+                                    <button className="button is-primary is-light is-rounded" onClick={() => setModalSala(true)}>{t('main.createRoom')}</button>
                                 </div>
                             </div>
                         </div>

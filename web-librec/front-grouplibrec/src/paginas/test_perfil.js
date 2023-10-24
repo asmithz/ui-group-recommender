@@ -1,17 +1,17 @@
-//import HEAVY_METAL from "../images/heavy_metal.jpg"
-//import ELECTRONIC from "../images/electronic.jpg"
-
 import { faMusic, faHeadphonesSimple, faArrowRight } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 })
 
 const TestPerfilUsuario = () => {
+    const { t, i18n } = useTranslation("paginas/test_perfil")
+
     const idUsuario = sessionStorage.getItem("id_usuario")
     const navigate = useNavigate()
     const [categories, setCategories] = useState({
@@ -64,14 +64,14 @@ const TestPerfilUsuario = () => {
         <div className="container mt-6" style={{ maxWidth: "500px" }}>
             <div className="columns">
                 <div className="column">
-                    <p className="is-size-3 has-text-centered">How about your music taste?</p>
+                    <p className="is-size-3 has-text-centered">{t('main.title')}</p>
                 </div>
             </div>
             <div className="columns">
                 <div className="column">
                     <div className="box">
                         <div className="block">
-                            <p className="is-size-4"><FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> Select your prefered genres: </p>
+                            <p className="is-size-4"><FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> {t('main.subtitle')} </p>
                         </div>
                         <div className="columns">
                             <div className="column">
@@ -330,238 +330,11 @@ const TestPerfilUsuario = () => {
                             */}
                         </div>
                         <div className="block has-text-centered">
-                            <button className="button rounded" onClick={generarPerfil}>Continue </button>
+                            <button className="button is-rounded is-primary" onClick={generarPerfil}>{t('main.button')} </button>
                         </div>
                     </div>
                 </div>
             </div>
-            {/*
-            <div className="columns">
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={HEAVY_METAL} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Metal</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={ELECTRONIC} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Electronic/dance</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="columns">
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={HEAVY_METAL} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Metal</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={ELECTRONIC} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Electronic/dance</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="columns">
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={HEAVY_METAL} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Metal</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={ELECTRONIC} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Electronic/dance</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="columns">
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={HEAVY_METAL} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Metal</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={ELECTRONIC} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Electronic/dance</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="columns">
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={HEAVY_METAL} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Metal</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={ELECTRONIC} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Electronic/dance</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="columns">
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={HEAVY_METAL} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Metal</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={ELECTRONIC} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Electronic/dance</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="columns">
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={HEAVY_METAL} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Metal</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={ELECTRONIC} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Electronic/dance</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div className="columns">
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={HEAVY_METAL} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Metal</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div className="column">
-                    <div className="box has-text-centered">
-                        <div className="block">
-                            <img src={ELECTRONIC} style={{ height: 200 }} />
-                        </div>
-                        <div className="block">
-                            <p className="is-size-3">Electronic/dance</p>
-                            <label class="checkbox">
-                                <input type="checkbox" />
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            */}
-
         </div>
     )
 }

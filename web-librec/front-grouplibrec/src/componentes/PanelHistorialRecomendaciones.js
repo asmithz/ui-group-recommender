@@ -15,12 +15,16 @@ import {
     AccordionItemPanel
 } from "react-accessible-accordion"
 import DestinatarioUsuarioModal from "./DestinatarioUsuarioModal"
+import { useTranslation } from "react-i18next"
+import { t } from "i18next"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
 })
 
 const PanelHistorialRecomendaciones = (props) => {
+    const { t, i18n } = useTranslation("componentes/panel_historial_recomendados")
+
     const [itemsIndividual, setItemsIndividual] = useState([])
     const [itemsGrupal, setItemsGrupal] = useState([])
     const [panelIndividual, setPanelIndividual] = useState(false)
@@ -62,9 +66,7 @@ const PanelHistorialRecomendaciones = (props) => {
                         "Content-type": "application/json"
                     }
                 })
-            console.log(items)
             if (items) {
-                console.log(items)
                 setItemsGrupal(items.data)
             }
         }
@@ -101,14 +103,14 @@ const PanelHistorialRecomendaciones = (props) => {
                             <div className="column">
                                 <div>
                                     <p className="is-size-4 mb-5">
-                                        Your recommendations history
+                                        {t('main.individual.title')}
                                     </p>
                                     <div className="columns">
                                         <div className="column">
                                             {
                                                 itemsIndividual.length > 0 &&
                                                 itemsIndividual.map((recomendacion, index) => {
-                                                    return <ItemsRecomendados socket={props.socket} recomendacion={recomendacion} key={index} index={index} idUsuario={props.idUsuario} idGrupo={props.idGrupo} enviarAlStack={props.enviarAlStack} />
+                                                    return <ItemsRecomendados t={t} socket={props.socket} recomendacion={recomendacion} key={index} index={index} idUsuario={props.idUsuario} idGrupo={props.idGrupo} enviarAlStack={props.enviarAlStack} />
                                                 })}
                                         </div>
                                     </div>
@@ -142,14 +144,14 @@ const PanelHistorialRecomendaciones = (props) => {
                             <div className="column">
                                 <div>
                                     <p className="is-size-4 mb-5">
-                                        Room recommendations history
+                                        {t('main.group.title')}
                                     </p>
                                     <div className="columns">
                                         <div className="column">
                                             {
                                                 itemsGrupal.length > 0 &&
                                                 itemsGrupal.map((recomendacion, index) => {
-                                                    return <ItemsRecomendados recomendacion={recomendacion} key={index} index={index} idUsuario={props.idUsuario} idGrupo={props.idGrupo} enviarAlStack={props.enviarAlStack}  />
+                                                    return <ItemsRecomendados t={t} recomendacion={recomendacion} key={index} index={index} idUsuario={props.idUsuario} idGrupo={props.idGrupo} enviarAlStack={props.enviarAlStack}  />
                                                 })}
                                         </div>
                                     </div>
@@ -191,7 +193,7 @@ const ItemsRecomendados = (props) => {
                         <AccordionItem>
                             <AccordionItemHeading>
                                 <AccordionItemButton>
-                                    Recommendation made at {convertirTiempo(props.recomendacion.time)}
+                                    {props.t('main.recommendationDateTime', { dateTime: convertirTiempo(props.recomendacion.time) })}
                                 </AccordionItemButton>
                             </AccordionItemHeading>
                             <AccordionItemPanel>

@@ -11,10 +11,10 @@ import { DndProvider } from "react-dnd"
 import TestPersonalidad from "./paginas/test_personalidad"
 import TestPerfilUsuario from "./paginas/test_perfil"
 import EncuestaFinal from "./paginas/encuesta_final"
+import { Suspense } from "react"
 
 function App() {
   return (
-    <DndProvider backend={HTML5Backend}>
       <BrowserRouter>
         <Routes>
           <Route exact path="/ingresar" element={<Ingresar />}></Route>
@@ -29,8 +29,15 @@ function App() {
           <Route exact path="/test-perfil" element={<TestPerfilUsuario />}></Route>
         </Routes>
       </BrowserRouter>
-    </DndProvider>
   );
 }
 
-export default App;
+export default function WrappedApp() {
+  return(
+    <Suspense fallback="Loading...">
+      <App/>
+    </Suspense>
+  )
+}
+
+//export default App;

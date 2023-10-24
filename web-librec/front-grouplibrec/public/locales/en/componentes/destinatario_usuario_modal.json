@@ -1,0 +1,18 @@
+{
+    "main": {
+        "title": "Who do you want to recommend this song to?",
+        "item":{
+            "genre": "Genre",
+            "origin": "Origin",
+            "clickToListen": "Click to listen",
+            "viewMore": "View more from this artist"
+        },
+        "recommendTo": {
+            "everyone": "Everyone",
+            "button": {
+                "everyone": "Recommend",
+                "user": "Recommend"
+            }
+        }
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "main":{
+        "title": "Personality Test",
+        "subtitle": "Instructions",
+        "instructions1": "The purpose of the Big Five personality test is to provide an objective description of an individual's personality traits in relation to these five dimensions:",
+        "dimensionExtraversion": "Extraversion",
+        "dimensionEmpathy": "Empathy",
+        "dimensionNeuroticism": "Neuroticism",
+        "dimensionConscientiousness": "Conscientiousness",
+        "dimensionExperience": "Openness to Experience",
+        "and": "and",
+        "instructions2": " Describe yourself honestly and as you generally are now, not as you wish to be in the future. Indicate for each statement if you are:",
+        "agreement": {
+            "strongDisagree": "Strongly Disagree",
+            "disagree": "Disagree",
+            "neutral": "Neutral",
+            "agree": "Agree",
+            "strongAgree": "Strongly Agree"
+        },
+        "questionnaireTitle": "Questionnaire",
+        "button": "Continue"
+    }
+}

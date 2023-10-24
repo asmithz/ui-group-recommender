@@ -1,0 +1,11 @@
+{
+    "main": {
+        "individual":{
+            "title": "Your recommendations history"
+        },
+        "group":{
+            "title": "Room recommendations history"
+        },
+        "recommendationDateTime": "Recommendation made at {{dateTime}}"
+    }
+}
