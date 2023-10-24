@@ -6,12 +6,11 @@ import Registrar from "./paginas/registrar"
 import Ingresar from "./paginas/ingresar"
 import Grupo from "./paginas/grupo"
 import SalaEspera from "./paginas/sala_espera"
-import { HTML5Backend } from "react-dnd-html5-backend"
-import { DndProvider } from "react-dnd"
 import TestPersonalidad from "./paginas/test_personalidad"
 import TestPerfilUsuario from "./paginas/test_perfil"
 import EncuestaFinal from "./paginas/encuesta_final"
 import { Suspense } from "react"
+import ChangeLanguage from "./componentes/ChangeLanguage" 
 
 function App() {
   return (
@@ -36,6 +35,7 @@ export default function WrappedApp() {
   return(
     <Suspense fallback="Loading...">
       <App/>
+      <ChangeLanguage />
     </Suspense>
   )
 }

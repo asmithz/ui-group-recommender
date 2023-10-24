@@ -1,0 +1,21 @@
+{
+    "main":{
+        "login": {
+            "title": "Iniciar sesión",
+            "userTitle": "Usuario",
+            "passwordTitle": "Contraseña",
+            "userError": "Ingrese usuario",
+            "passwordError": "Ingrese contraseña",
+            "userPlaceHolder": "Su usuario",
+            "passwordPlaceHolder": "Su contraseña",
+            "button": "Iniciar sesión"
+        },
+        "alert": {
+            "userpassError": "Usuario o contraseña incorrecto(s)"
+        },
+        "footer": {
+            "noAccount": "¿Sin cuenta?",
+            "createAccountLink": "Crear cuenta"
+        }
+    }
+}

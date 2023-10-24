@@ -1,0 +1,14 @@
+{
+    "main":{
+        "title": "La canción recomendada para la sala es",
+        "item": {
+            "genre": "Género",
+            "origin": "Origen",
+            "clickToListen": "Click para escuchar",
+            "viewMore": "Ver más de este artista"
+        },
+        "questionnarie": {
+            "title": "Cuestionario sobre experiencia y feedback"
+        }
+    }
+}

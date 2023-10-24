@@ -1,0 +1,11 @@
+{
+    "main": {
+        "item":{
+            "genre": "Género",
+            "origin": "Origen",
+            "clickToListen": "Click para escuchar",
+            "viewMore": "Ver más de este artista",
+            "rate": "Calificar"
+        }
+    }
+}

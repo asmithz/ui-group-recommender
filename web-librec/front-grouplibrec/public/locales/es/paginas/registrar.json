@@ -1,0 +1,25 @@
+{
+    "main":{
+        "register":{
+            "title": "Registrar",
+            "usernameTitle": "Su nuevo nombre de usuario",
+            "usernamePlaceHolder": "Usuario",
+            "passwordTitle": "Su contraseña",
+            "passwordPlaceHolder": "Contraseña",
+            "nameTitle": "Nombre y apellido",
+            "namePlaceHolder": "Su nombre",
+            "yearsoldTitle": "¿Cuál es su edad?",
+            "yearsoldPlaceHolder": "Su edad",
+            "educationTitle": "¿Cuál es su educación/profesión?",
+            "educationPlaceHolder": "...",
+            "avatarTitle": "Agregue su avatar",
+            "avatarUpload": "Suba su avatar",
+            "button": "Registrar"
+        },
+        "alert": {
+            "avatarSize": "Dimensiones de la imagen exedidas, tamaño máximo es 300x300",
+            "avatarType": "Solo formatos JPG y PNG son aceptados"
+        }
+
+    }
+}

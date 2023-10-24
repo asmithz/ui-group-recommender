@@ -1,0 +1,12 @@
+{
+    "main":{
+        "roomName": "Sala de {{leaderName}}",
+        "users": {
+            "connected": "Conectados"
+        },
+        "alert": {
+            "maxFavorites": "Los favoritos de la sala no deben exeder de {{max}} canciones.",
+            "consensus": "La sala debe tener como máximo {{max}} favoritos. Recuerde calificarlos todos."
+        }
+    }
+}

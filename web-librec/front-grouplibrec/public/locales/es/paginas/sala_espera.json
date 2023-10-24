@@ -1,0 +1,8 @@
+{
+    "main":{
+        "title": "Sala de espera",
+        "usersReady": "Usuarios listos: {{waiting}}/{{total}}",
+        "button": "Consenso"
+
+    }
+}

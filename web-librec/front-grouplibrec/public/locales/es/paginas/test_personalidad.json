@@ -1,0 +1,23 @@
+{
+    "main":{
+        "title": "Test de personalidad",
+        "subtitle": "Instrucciones",
+        "instructions1": "El propósito del test de personalidad Big Five es proporcionar una descripción objetiva de los rasgos de personalidad de un individuo según estas cinco dimensiones:",
+        "dimensionExtraversion": "Extraversion",
+        "dimensionEmpathy": "Empatía",
+        "dimensionNeuroticism": "Neuroticismo",
+        "dimensionConscientiousness": "Conciencia",
+        "dimensionExperience": "Experiencia",
+        "and": "y",
+        "instructions2": "Descríbete a ti mismo honestamente y como eres en general ahora, no como deseas ser en el futuro. Indique para cada afirmación si esta:",
+        "agreement": {
+            "strongDisagree": "Muy en desacuerdo",
+            "disagree": "En desacuerdo",
+            "neutral": "Neutro",
+            "agree": "De acuerdo",
+            "strongAgree": "Muy de acuerdo"
+        },
+        "questionnaireTitle": "Cuestionario",
+        "button": "Continuar"
+    }
+}

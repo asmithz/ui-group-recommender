@@ -1,0 +1,8 @@
+{
+    "main": {
+        "roomName": "Nombre de la sala",
+        "creator": "Creador",
+        "description": "Descripción",
+        "activeUsers": "Usuarios activos"
+    }
+}

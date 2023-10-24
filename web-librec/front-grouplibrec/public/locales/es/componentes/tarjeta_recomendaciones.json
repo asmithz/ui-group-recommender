@@ -1,0 +1,10 @@
+{
+    "main":{
+        "individual": {
+            "title": "Sus recomendaciones"
+        },
+        "group": {
+            "title": "Recomendaciones para todos"
+        }
+    }
+}

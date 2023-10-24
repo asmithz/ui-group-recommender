@@ -1,0 +1,32 @@
+{
+    "main":{
+        "title": "Sala chat",
+        "user": {
+            "userRecommend": {
+                "user": "El usuario ",
+                "recommends": "te recomendó "
+            },
+            "recommendUser": {
+                "youRecommend": "Recomendaste ",
+                "to": "a "
+            }
+        },
+        "group": {
+            "userRecommend": {
+                "user": "El usuario ",
+                "recommends": "recomienda "
+            },
+            "addedFavorites": {
+                "user": "El usuario ",
+                "added": "añadió ",
+                "toFavorites": "a favoritos"
+            },
+            "removedFavorites": {
+                "user": "El usuario ",
+                "removed": "quitó ",
+                "toFavorites": "de favoritos"
+            }
+        },
+        "input": "Escriba un mensaje"
+    }
+}

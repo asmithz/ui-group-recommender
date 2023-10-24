@@ -1,0 +1,11 @@
+{
+    "main":{
+        "title": "Crear una sala",
+        "roomTitleName": "Nombre sala",
+        "roomTitleDescription": "Descripción sala",
+        "alert": {
+            "roomName": "La sala debe tener un nombre",
+            "description": "La sala debe tener una descripción"
+        }
+    }
+}
