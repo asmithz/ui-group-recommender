@@ -16,7 +16,6 @@ import {
 } from "react-accessible-accordion"
 import DestinatarioUsuarioModal from "./DestinatarioUsuarioModal"
 import { useTranslation } from "react-i18next"
-import { t } from "i18next"
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL
@@ -25,6 +24,7 @@ const api = axios.create({
 const PanelHistorialRecomendaciones = (props) => {
     const { t, i18n } = useTranslation("componentes/panel_historial_recomendados")
 
+    const idGrupo = props.idGrupo
     const [itemsIndividual, setItemsIndividual] = useState([])
     const [itemsGrupal, setItemsGrupal] = useState([])
     const [panelIndividual, setPanelIndividual] = useState(false)
@@ -280,7 +280,7 @@ const Item = (props) => {
                     </div>
                 </div>
             </div>
-            <ItemModal cambiarEstado={setModalEstado} estado={modalEstado} item={itemInfo} historial={true} idUsuario={props.idUsuario} />
+            <ItemModal abierto="historial" cambiarEstado={setModalEstado} estado={modalEstado} item={itemInfo} historial={true} idUsuario={props.idUsuario} idGrupo={props.idGrupo}/>
             <DestinatarioUsuarioModal socket={props.socket} cambiarEstado={setDestinoEstado} item={itemInfo} estado={destinoEstado} historial={true} idGrupo={props.idGrupo} idUsuario={props.idUsuario} />
         </>
     )

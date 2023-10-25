@@ -140,7 +140,7 @@ const TarjetaItem = (props) => {
             }
             {
                 modalEstado &&
-                <ItemModal cambiarEstado={setModalEstado} estado={modalEstado} item={props.item} historial={false} enviarAlStack={props.enviarAlStack} idGrupo={props.idGrupo} idUsuario={props.idUsuario} />
+                <ItemModal tipo={props.abierto} cambiarEstado={setModalEstado} estado={modalEstado} item={props.item} historial={false} enviarAlStack={props.enviarAlStack} idGrupo={props.idGrupo} idUsuario={props.idUsuario} />
             }
             <DestinatarioUsuarioModal socket={props.socket} cambiarEstado={setDestinoEstado} item={props.item} estado={destinoEstado} idGrupo={props.idGrupo} idUsuario={props.idUsuario} />
         </>

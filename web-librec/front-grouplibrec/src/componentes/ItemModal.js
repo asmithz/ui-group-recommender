@@ -12,6 +12,7 @@ const api = axios.create({
 const ItemModal = (props) => {
     const { t, i18n } = useTranslation("componentes/item_modal")
 
+    const idGrupo = props.idGrupo
     const idItem = props.item.idItem
     const nombreItem = props.item.nombreItem
     const nombreAutor = props.item.nombre_autor
@@ -74,9 +75,53 @@ const ItemModal = (props) => {
             console.log(error)
         }
     }
+
+    const eventoVisto = async () => {
+        let info = {
+                idSala: idGrupo,
+                idUsuario: idUsuario,
+                evento: "vistos"
+        }
+        try {
+            if (idUsuario && idItem) {
+                const enviar_evento = await api.post("/evento-usuario", (info), {
+                    headers: {
+                        "Content-type": "application/json"
+                    }
+                })
+                console.log(enviar_evento.data)
+            }
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+    const eventoEscuchado = async () => {
+        let info = {
+                idSala: idGrupo,
+                idUsuario: idUsuario,
+                evento: "escuchados"
+        }
+        try {
+            if (idUsuario && idItem) {
+                const enviar_evento = await api.post("/evento-usuario", (info), {
+                    headers: {
+                        "Content-type": "application/json"
+                    }
+                })
+                console.log(enviar_evento.data)
+            }
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         if (props.estado) {
             obtenerItem()
+            eventoVisto()
         }
     }, [props.estado])
 
@@ -106,7 +151,7 @@ const ItemModal = (props) => {
                                 </div>
                                 <div className="columns">
                                     <div className="column">
-                                        <a href={urlItem} target="_blank"><FontAwesomeIcon icon={faMusic} /> {t('main.item.clickToListen')} <FontAwesomeIcon icon={faMusic} /> </a>
+                                        <a href={urlItem} onClick={eventoEscuchado} target="_blank"><FontAwesomeIcon icon={faMusic} /> {t('main.item.clickToListen')} <FontAwesomeIcon icon={faMusic} /> </a>
                                     </div>
                                 </div>
                                 <div className="columns">

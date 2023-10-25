@@ -113,9 +113,9 @@ const Chat = (props) => {
                 {
                     chat.map((mensaje) => (
                         mensaje.id_usuario === usuarioId ? (
-                            <Mensaje t={t} style={mensajeStyleEmisor} tipo="emisor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} idUsuario={usuarioId} enviarAlStack={props.enviarAlStack} />
+                            <Mensaje t={t} style={mensajeStyleEmisor} tipo="emisor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} idUsuario={usuarioId} enviarAlStack={props.enviarAlStack} idGrupo={idGrupo} />
                         ) : (
-                            <Mensaje t={t} style={mensajeStyleReceptor} tipo="receptor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} idUsuario={usuarioId} enviarAlStack={props.enviarAlStack}/>
+                            <Mensaje t={t} style={mensajeStyleReceptor} tipo="receptor" justifyContent="flex-start" key={mensaje.timestamp + mensaje.usuario} mensaje={mensaje} liderGrupo={props.liderGrupo} idUsuario={usuarioId} enviarAlStack={props.enviarAlStack} idGrupo={idGrupo}/>
                         )
                     ))
                 }
@@ -263,7 +263,7 @@ const Mensaje = (props) => {
             </div>
             {
                 props.mensaje.item &&
-                <ItemModal item={props.mensaje.item} estado={estadoItem} cambiarEstado={setEstadoItem} enviarAlStack={chatEnviarAlStack} chat={true} idUsuario={props.idUsuario}/>
+                <ItemModal abierto="chat" item={props.mensaje.item} estado={estadoItem} cambiarEstado={setEstadoItem} enviarAlStack={chatEnviarAlStack} chat={true} idUsuario={props.idUsuario} idGrupo={props.idGrupo}/>
             }
         </>
     )

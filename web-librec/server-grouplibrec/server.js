@@ -115,6 +115,26 @@ io.on("connection", (socket) => {
                                 $set: { idSalaActiva: idGrupo }
                             }
                         )
+                        // añadir usuario a sala eventos
+                        const userEvento = await db.collection("salas_eventos").findOne({ id_sala: idGrupo, usuarios: { $elemMatch: { id_usuario: sesion_usuario.id_usuario } } })
+                        if (!userEvento) {
+                            await db.collection("salas_eventos").updateOne(
+                                { id_sala: idGrupo },
+                                {
+                                    $addToSet: {
+                                        usuarios: {
+                                            id_usuario: sesion_usuario.id_usuario,
+                                            score: {
+                                                vistos: 0,
+                                                recomendados: 0,
+                                                favoritos: 0,
+                                                escuchados: 0
+                                            }
+                                        }
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -318,20 +338,20 @@ app.post("/registrar-usuario", async (req, res) => {
     })
 })
 
-app.get("/obtener-sesion-usuario", async(req, res) => {
-    try{
+app.get("/obtener-sesion-usuario", async (req, res) => {
+    try {
         const client = await MongoClient.connect(url);
         const db = client.db(dbName);
         const usuario_sesion = await db.collection("sesiones").findOne({ "id_usuario": req.query.idUsuario });
         client.close()
-        if (usuario_sesion){
+        if (usuario_sesion) {
             return res.json({
                 "idSesion": usuario_sesion.id_sesion
             })
         }
-        return res.json({ error: "usuario sin sesion"})
+        return res.json({ error: "usuario sin sesion" })
     }
-    catch(error){
+    catch (error) {
         console.log(error)
     }
 })
@@ -399,7 +419,9 @@ app.post("/login", async (req, res) => {
 
 // Crear sala
 app.post("/crear-sala", async (req, res) => {
+    let idSalaEventos = new ObjectId()
     let sala = {
+        _id: idSalaEventos,
         id_sala: req.body.id_sala,
         titulo: req.body.titulo,
         descripcion: req.body.descripcion,
@@ -410,12 +432,18 @@ app.post("/crear-sala", async (req, res) => {
         recomendaciones_individual: [],
         recomendaciones_stack: [],
         recomendaciones_favoritos: [],
-        sala_espera: []
+        sala_espera: [],
+        sala_eventos_id: idSalaEventos.toString()
+    }
+    let sala_eventos = {
+        id_sala: idSalaEventos.toString(),
+        usuarios: []
     }
     try {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         await db.collection("salas").insertOne(sala)
+        await db.collection("salas_eventos").insertOne(sala_eventos)
         client.close()
         return res.json("ok")
     }
@@ -1621,7 +1649,7 @@ app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
         if (sala && usuario) {
             // array con id's de los favoritos
             const favoritos_sala = sala.recomendaciones_favoritos.map(favorito => favorito)
-            
+
             const no_calificados = []
 
             favoritos_sala.forEach(itemFavorito => {
@@ -1629,7 +1657,7 @@ app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
                 if (!checkItem || checkItem.rating === undefined) {
                     no_calificados.push(itemFavorito.idItem);
                 }
-                else{
+                else {
                     console.log(itemFavorito.idItem)
                 }
             })
@@ -1925,6 +1953,49 @@ app.delete("/vaciar-sala-espera", async (req, res) => {
         return res.json({
             status: "sala no vaciada"
         })
+    }
+})
+
+app.post("/evento-usuario", async (req, res) => {
+    // Extract data from the request body
+    let evento_tipo = req.body.evento; // "vistos", "recomendados", "favoritos", or "escuchados"
+    let idSala = req.body.idSala;
+    let idUsuario = req.body.idUsuario;
+
+    try {
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+
+        // Use $elemMatch to find the specific user within the array
+        const userQuery = { id_sala: idSala, "usuarios.id_usuario": idUsuario };
+
+        // Fetch the current value of score for the user
+        const userEvento = await db.collection("salas_eventos").findOne(userQuery);
+        const currentUserScore = userEvento.usuarios.find(user => user.id_usuario === idUsuario).score[evento_tipo];
+
+        // Calculate the new score value (you can adjust this logic as needed)
+        let newScoreValue = currentUserScore + 1;
+
+        // Build the update object
+        let updateObj = {};
+        updateObj[`usuarios.$.score.${evento_tipo}`] = newScoreValue;
+
+        const result = await db.collection("salas_eventos").updateOne(userQuery, { $set: updateObj });
+
+        client.close();
+        if (result.matchedCount > 0) {
+            // Update successful
+            return res.json({
+                "resp": `Updated ${evento_tipo} for user ${idUsuario} in sala ${idSala}`
+            })
+        } else {
+            return res.json({
+                "resp": `User not found in sala ${idSala}`
+            })
+        }
+
+    } catch (error) {
+        console.error(error);
     }
 })
 

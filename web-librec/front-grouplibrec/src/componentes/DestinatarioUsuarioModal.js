@@ -31,6 +31,11 @@ const DestinatarioUsuarioModal = (props) => {
     const recomendarItem = async (item, tipo, usuarioDestinoID, usuarioDestino) => {
         const tiempo_actual = Date.now()
         let info = {}
+        let eventoRecomendar = {
+            idSala: props.idGrupo,
+            idUsuario: props.idUsuario,
+            evento: "recomendados"
+        }
         if (tipo === "rec_grupal") {
             info = {
                 "idGrupo": props.idGrupo,
@@ -55,12 +60,17 @@ const DestinatarioUsuarioModal = (props) => {
             }
         }
         try {
-            console.log(info)
             await api.post("/enviar-mensaje-chat", (info), {
                 headers: {
                     "Content-type": "application/json"
                 }
             })
+            const enviar_evento = await api.post("/evento-usuario", (eventoRecomendar), {
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+            console.log(enviar_evento.data)
 
             props.socket.emit("chat-enviar-mensaje", props.idGrupo)
             setEmitirMensaje(emitirMensaje + 1)

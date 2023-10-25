@@ -185,6 +185,11 @@ const Grupo = () => {
             idUsuario: idUsuario,
             idItem: idItem
         }
+        const eventoFavoritos = {
+            idSala: idGrupo,
+            idUsuario: idUsuario,
+            evento: "favoritos"
+        }
         try {
             const resp = await api.post("/enviar-a-favoritos", itemStack, {
                 headers: {
@@ -216,6 +221,12 @@ const Grupo = () => {
             else if (resp.data.respuesta === "no_agregado") {
                 window.alert(`${t('main.alert.maxFavorites', { max: resp.data.maxFavoritos})}`)
             }
+            const enviar_evento = await api.post("/evento-usuario", (eventoFavoritos), {
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+            console.log(enviar_evento.data)
             //obtenerStackUsuario(idGrupo, idUsuario)
         }
         catch (error) {
