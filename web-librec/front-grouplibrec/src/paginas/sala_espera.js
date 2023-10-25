@@ -103,6 +103,7 @@ const SalaEspera = () => {
 
     const cambiarPaginaEncuesta = () => {
         if (idSala && idSesion){
+            sessionStorage.setItem("idSala", idSala)
             socket.emit("solicitar-pagina-final", (idSala))
         }
     }

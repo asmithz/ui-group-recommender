@@ -1,14 +1,43 @@
 {
-    "main":{
-        "title": "La canción recomendada para la sala es",
+    "main": {
+        "title": "La canción recomendada es",
         "item": {
             "genre": "Género",
             "origin": "Origen",
             "clickToListen": "Click para escuchar",
             "viewMore": "Ver más de este artista"
         },
-        "questionnarie": {
-            "title": "Cuestionario sobre experiencia y feedback"
-        }
+        "questionnaire": {
+            "title": "Cuestionario sobre experiencia y feedback",
+            "questions": {
+                "collaboration": {
+                    "1": "Según usted, quién fue el usuario más colaborativo dentro de la sala?",
+                    "2": "Según usted, qué usuario ha influenciado más en sus preferencias?",
+                    "3": "Mi amistad con otro usuario en la sala afectaron mis decisiones.",
+                    "4": "Juzgo al usuario que me influenció más según sus interacciones en la sala."
+                },
+                "satisfaction": {
+                    "1": "La interfaz entrega una forma adecuada para que yo exprese mis preferencias.",
+                    "2": "La interfaz de recomendación entrega suficiente información.",
+                    "3": "Me acostumbré rápidamente con el sistema de recomendación.",
+                    "4": "Es fácil para mí informarle al sistema que tanto me gustan los items que se me desplegan.",
+                    "5": "La interfaz me hace saber fácilmente lo que hacen otros miembros todo el tiempo.",
+                    "6": "Las recomendaciones a las que puse más atención se encontraban en: "
+                },
+                "alert": "Debe contestar todas las preguntas"
+            },
+            "options":{
+                "disagreeStrong": "Muy en desacuerdo",
+                "disagree": "Desacuerdo",
+                "neutral": "Neutral",
+                "agree": "De acuerdo",
+                "agreeStrong": "Muy de acuerdo",
+                "favorites": "Favoritos",
+                "system": "Recomendaciones del sistema",
+                "chat": "Chat",
+                "history": "Historial de recomendaciones"
+            }
+        },
+        "button": "Terminar"
     }
 }
