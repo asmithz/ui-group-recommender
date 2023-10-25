@@ -24,9 +24,12 @@
                     "5": "La interfaz me hace saber fácilmente lo que hacen otros miembros todo el tiempo.",
                     "6": "Las recomendaciones a las que puse más atención se encontraban en: "
                 },
+                "item": {
+                    "title": "Según usted, qué calificación le colocaría a este item recomendado?"
+                },
                 "alert": "Debe contestar todas las preguntas"
             },
-            "options":{
+            "options": {
                 "disagreeStrong": "Muy en desacuerdo",
                 "disagree": "Desacuerdo",
                 "neutral": "Neutral",
@@ -35,7 +38,12 @@
                 "favorites": "Favoritos",
                 "system": "Recomendaciones del sistema",
                 "chat": "Chat",
-                "history": "Historial de recomendaciones"
+                "history": "Historial de recomendaciones",
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5"
             }
         },
         "button": "Terminar"

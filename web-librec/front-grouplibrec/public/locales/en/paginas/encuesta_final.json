@@ -1,5 +1,5 @@
 {
-    "main":{
+    "main": {
         "title": "The room's recommended item is",
         "item": {
             "genre": "Genre",
@@ -24,9 +24,12 @@
                     "5": "The interface makes it easy for me to know what other members are doing all the time.",
                     "6": "The recommendations I paid the most attention to were in: "
                 },
+                "item": {
+                    "title": "In your opinion, how would you rate this recommended item?"
+                },
                 "alert": "You must answer all questions"
             },
-            "options":{
+            "options": {
                 "disagreeStrong": "Strongly disagree",
                 "disagree": "Disagree",
                 "neutral": "Neutral",
@@ -35,7 +38,12 @@
                 "favorites": "Favorites",
                 "system": "System recommendations",
                 "chat": "Chat",
-                "history": "Recommendations history"
+                "history": "Recommendations history",
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5"
             }
         },
         "button": "End"
