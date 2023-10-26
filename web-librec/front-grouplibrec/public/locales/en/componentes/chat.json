@@ -1,6 +1,10 @@
 {
     "main":{
         "title": "Chat room",
+        "joinedRoom": {
+            "user": "User ",
+            "joined": "has joined the room!"
+        },
         "user": {
             "userRecommend": {
                 "user": "User ",

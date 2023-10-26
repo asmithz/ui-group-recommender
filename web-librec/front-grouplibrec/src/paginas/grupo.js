@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import io from "socket.io-client"
 import { useNavigate, useParams, Link } from "react-router-dom"
 import axios from "axios"
@@ -35,6 +35,7 @@ const Grupo = () => {
     const [salaGrupo, setSalaGrupo] = useState({})
     const [liderGrupo, setLiderGrupo] = useState({ id_lider: null, usuario_lider: null })
     const [stackUsuario, setStackUsuario] = useState([])
+    const userJoinedRef = useRef(false)
 
     const styleStackRecomendaciones = {
         height: "320px"
@@ -57,6 +58,12 @@ const Grupo = () => {
         else {
             navigate("/ingresar", { replace: true })
         }
+    }, [])
+
+    useEffect(() => {
+        if (userJoinedRef.current) return
+        userJoinedRef.current = true
+        mostrarIngreso()
     }, [])
 
     // obtener usuario 
@@ -121,10 +128,34 @@ const Grupo = () => {
         })
     }, [emitirSignal])
 
+    const mostrarIngreso = async () => {
+        try {
+            const tiempo_actual = Date.now()
+            let info = {
+                "idGrupo": idGrupo,
+                "id_usuario": idUsuario,
+                "texto": "Recomiendo esto",
+                "timestamp": tiempo_actual,
+                "tipo_mensaje": "ingreso_sala",
+            }
+            const enviar_req = await api.post("/enviar-mensaje-chat", (info), {
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+            if (enviar_req) {
+                socket.emit("chat-enviar-mensaje", idGrupo)
+            }
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
     // señal cuando alguien se une al grupo
     useEffect(() => {
-            socket.emit("entrar-sala", idGrupo, idSesion)
-            setEmitirSignal(emitirSignal + 1)
+        socket.emit("entrar-sala", idGrupo, idSesion)
+        setEmitirSignal(emitirSignal + 1)
     }, [])
 
     const salirGrupo = () => {
@@ -219,7 +250,7 @@ const Grupo = () => {
                 }
             }
             else if (resp.data.respuesta === "no_agregado") {
-                window.alert(`${t('main.alert.maxFavorites', { max: resp.data.maxFavoritos})}`)
+                window.alert(`${t('main.alert.maxFavorites', { max: resp.data.maxFavoritos })}`)
             }
             const enviar_evento = await api.post("/evento-usuario", (eventoFavoritos), {
                 headers: {
@@ -244,7 +275,7 @@ const Grupo = () => {
             });
 
             if (verificar.data.respuesta === "stop") {
-                window.alert(`${t('main.alert.consensus', { max: verificar.data.maxFavoritos})}`)
+                window.alert(`${t('main.alert.consensus', { max: verificar.data.maxFavoritos })}`)
             } else {
                 // Condition is met, navigate to the specified URL
                 navigate(`/sala-espera/${idGrupo}`);

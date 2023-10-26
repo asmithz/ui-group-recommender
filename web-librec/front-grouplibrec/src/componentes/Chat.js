@@ -5,6 +5,7 @@ import { faCrown, faPaperPlane } from "@fortawesome/free-solid-svg-icons"
 import "../css/StyleItemHover.css"
 import ItemModal from "./ItemModal"
 import { useTranslation } from "react-i18next"
+import { t } from "i18next"
 
 const Chat = (props) => {
     const { t, i18n } = useTranslation("componentes/chat")
@@ -209,6 +210,12 @@ const Mensaje = (props) => {
                         {
                             props.mensaje.tipo_mensaje === "texto" &&
                             <span>{props.mensaje.texto}</span>
+                        }
+                        {
+                            props.mensaje.tipo_mensaje === "ingreso_sala" &&
+                            <span style={{ color: '#8b09b3'}}>
+                                {t('main.joinedRoom.user')} <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {t('main.joinedRoom.joined')}
+                            </span>
                         }
                         {
                             props.mensaje.tipo_mensaje === "rec_usuario" &&
