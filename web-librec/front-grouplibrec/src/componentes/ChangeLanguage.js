@@ -8,14 +8,14 @@ const ChangeLanguage = () => {
     }
 
     const styleFooter = {
-        textAlign: "center",
-        position: "fixed",
+        padding: "20px",
         bottom: 0,
         width: "100%"
     }
 
     return (
-        <div className="has-text-centered" style={styleFooter}>
+        <footer  style={styleFooter}>
+        <div className="has-text-centered">
             <div onClick={() => cambiarLenguage('en')} style={{display: "inline-block", cursor: "pointer"}}>
 
             <ReactCountryFlag
@@ -41,6 +41,7 @@ const ChangeLanguage = () => {
             />
             </div>
         </div>
+        </footer>
     )
 }
 
