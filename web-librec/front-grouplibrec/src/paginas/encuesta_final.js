@@ -22,9 +22,11 @@ const EncuestaFinal = () => {
     const [finalItem, setFinalItem] = useState({})
     const [usuariosSala, setSala] = useState([])
 
+    const usersInitialValuesForm = {}
+
     const initialValuesForm = {
         question1: "",
-        question2: "",
+        question2: usersInitialValuesForm,
         question3: "",
         question4: "",
         question5: "",
@@ -96,12 +98,12 @@ const EncuestaFinal = () => {
             !values.question7 ||
             !values.question8 ||
             !values.question9 ||
-            !values.question10 
-            ){
+            !values.question10
+        ) {
             window.alert(`${t('main.questionnaire.questions.alert')}`)
-            
+
         }
-        else{
+        else {
             console.log(values)
         }
     }
@@ -153,7 +155,7 @@ const EncuestaFinal = () => {
                         <Form>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">1. {t('main.questionnaire.questions.item.title')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     <label style={radioCheckStyle}>
                                         <Field type="radio" name="question1" value="1" />
                                         <span> {t('main.questionnaire.options.1')}</span>
@@ -178,15 +180,31 @@ const EncuestaFinal = () => {
                             </div>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">2. {t('main.questionnaire.questions.collaboration.1')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     {
                                         Object.values(usuariosSala).map((user, index) => {
                                             if (user._id !== sessionStorage.getItem("id_usuario")) {
+                                                initialValuesForm.question2[user.usuario] = 0
                                                 return (
-                                                    <label style={radioCheckStyle} key={index + "2"}>
-                                                        <Field type="radio" name="question2" value={user.usuario} />
-                                                        <span> {user.usuario}</span>
-                                                    </label>
+                                                    <div key={index + "2"}>
+                                                        <div className="columns">
+                                                            <div className="column has-text-right">
+                                                                <label>{user.usuario}</label>
+                                                            </div>
+                                                            <div className="column has-text-left">
+                                                                <div className="select is-small">
+                                                                    <Field as="select" name={`question2.${user.usuario}`}>
+                                                                        <option value="1">1</option>
+                                                                        <option value="2">2</option>
+                                                                        <option value="3">3</option>
+                                                                        <option value="4">4</option>
+                                                                        <option value="5">5</option>
+                                                                    </Field>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <ErrorMessage name={user} component="div" className="error" />
+                                                    </div>
                                                 )
                                             }
                                         })
@@ -195,7 +213,7 @@ const EncuestaFinal = () => {
                             </div>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">3. {t('main.questionnaire.questions.collaboration.2')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     {
                                         Object.values(usuariosSala).map((user, index) => {
                                             if (user._id !== sessionStorage.getItem("id_usuario")) {
@@ -212,7 +230,7 @@ const EncuestaFinal = () => {
                             </div>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">4. {t('main.questionnaire.questions.collaboration.3')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     <label style={radioCheckStyle}>
                                         <Field type="radio" name="question4" value="1" />
                                         <span> {t('main.questionnaire.options.disagreeStrong')}</span>
@@ -237,7 +255,7 @@ const EncuestaFinal = () => {
                             </div>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">5. {t('main.questionnaire.questions.collaboration.4')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     <label style={radioCheckStyle}>
                                         <Field type="radio" name="question5" value="1" />
                                         <span> {t('main.questionnaire.options.disagreeStrong')}</span>
@@ -262,7 +280,7 @@ const EncuestaFinal = () => {
                             </div>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">6. {t('main.questionnaire.questions.satisfaction.1')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     <label style={radioCheckStyle}>
                                         <Field type="radio" name="question6" value="1" />
                                         <span> {t('main.questionnaire.options.disagreeStrong')}</span>
@@ -287,7 +305,7 @@ const EncuestaFinal = () => {
                             </div>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">7. {t('main.questionnaire.questions.satisfaction.2')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     <label style={radioCheckStyle}>
                                         <Field type="radio" name="question7" value="1" />
                                         <span> {t('main.questionnaire.options.disagreeStrong')}</span>
@@ -312,7 +330,7 @@ const EncuestaFinal = () => {
                             </div>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">8. {t('main.questionnaire.questions.satisfaction.3')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     <label style={radioCheckStyle}>
                                         <Field type="radio" name="question8" value="1" />
                                         <span> {t('main.questionnaire.options.disagreeStrong')}</span>
@@ -337,7 +355,7 @@ const EncuestaFinal = () => {
                             </div>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">9. {t('main.questionnaire.questions.satisfaction.4')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     <label style={radioCheckStyle}>
                                         <Field type="radio" name="question9" value="1" />
                                         <span> {t('main.questionnaire.options.disagreeStrong')}</span>
@@ -362,7 +380,7 @@ const EncuestaFinal = () => {
                             </div>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">10. {t('main.questionnaire.questions.satisfaction.5')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     <label style={radioCheckStyle}>
                                         <Field type="radio" name="question10" value="1" />
                                         <span> {t('main.questionnaire.options.disagreeStrong')}</span>
@@ -387,7 +405,7 @@ const EncuestaFinal = () => {
                             </div>
                             <div style={questionStyle}>
                                 <label className="is-size-4 has-text-weight-bold">11. {t('main.questionnaire.questions.satisfaction.6')}</label>
-                                <div className="is-size-5 has-text-centered options" style={{marginTop: "20px"}}>
+                                <div className="is-size-5 has-text-centered options" style={{ marginTop: "20px" }}>
                                     <label style={radioCheckStyle}>
                                         <Field type="radio" name="question11" value="favoritos" />
                                         <span> {t('main.questionnaire.options.favorites')}</span>
@@ -406,13 +424,13 @@ const EncuestaFinal = () => {
                                     </label>
                                 </div>
                             </div>
-                            <div className="has-text-centered" style={{marginTop: "50px"}}>
+                            <div className="has-text-centered" style={{ marginTop: "50px" }}>
                                 <button className="button is-primary is-rounded" type="submit">{t('main.button')}</button>
                             </div>
                         </Form>
                     </Formik>
                 </div>
-            </div>
+            </div >
         </>
     )
 }

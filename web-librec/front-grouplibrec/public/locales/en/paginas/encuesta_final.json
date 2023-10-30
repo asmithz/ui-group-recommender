@@ -11,7 +11,7 @@
             "title": "Experience and Feedback Questionnarie",
             "questions": {
                 "collaboration": {
-                    "1": "In your opinion, who do you think was the most collaborative user?",
+                    "1": "Rate each user based on how much collaborative they were.",
                     "2": "In your opinion, who has influenced your preferences the most?",
                     "3": "My friendship with another user in the room affected my decisions.",
                     "4": "I judged the user that influenced me the most by his room interactions."

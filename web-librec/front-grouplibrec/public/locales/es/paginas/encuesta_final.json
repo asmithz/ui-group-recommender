@@ -11,7 +11,7 @@
             "title": "Cuestionario sobre experiencia y feedback",
             "questions": {
                 "collaboration": {
-                    "1": "Según usted, quién fue el usuario más colaborativo dentro de la sala?",
+                    "1": "Califique que tan colaborativos fueron los usuarios.",
                     "2": "Según usted, qué usuario ha influenciado más en sus preferencias?",
                     "3": "Mi amistad con otro usuario en la sala afectaron mis decisiones.",
                     "4": "Juzgo al usuario que me influenció más según sus interacciones en la sala."
