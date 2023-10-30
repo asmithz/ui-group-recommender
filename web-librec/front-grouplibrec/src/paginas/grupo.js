@@ -36,6 +36,7 @@ const Grupo = () => {
     const [liderGrupo, setLiderGrupo] = useState({ id_lider: null, usuario_lider: null })
     const [stackUsuario, setStackUsuario] = useState([])
     const userJoinedRef = useRef(false)
+    const obtenerUsuarioRef = useRef(false)
 
     const styleStackRecomendaciones = {
         height: "320px"
@@ -69,6 +70,8 @@ const Grupo = () => {
     // obtener usuario 
     useEffect(() => {
         const obtenerUsuario = async () => {
+            if (obtenerUsuarioRef.current) return
+            obtenerUsuarioRef.current = true
             if (typeof idUsuario === 'string') {
                 try {
                     const usuario = await api.get("/obtener-usuario", { params: { idUsuario } }, {

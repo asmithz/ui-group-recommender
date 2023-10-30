@@ -1,4 +1,6 @@
-import 'dotenv/config'
+//import 'dotenv/config'
+import dotenv from "dotenv"
+import dotenvExpand from "dotenv-expand"
 import express from "express"
 import { Server as socketServer } from "socket.io"
 import http from "http"
@@ -19,6 +21,8 @@ const io = new socketServer(server, {
         origin: "*"
     }
 })
+
+dotenvExpand.expand(dotenv.config())
 
 const server_ip = process.env.SERVER_IP
 const exec_grouplibrec = process.env.DIR_GROUPLIBREC
