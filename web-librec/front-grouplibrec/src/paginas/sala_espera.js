@@ -140,54 +140,56 @@ const SalaEspera = () => {
                 </div>
             </div>
             {/* Usuarios */}
-            <p className="is-size-3 has-text-centered">{t('main.usersReady', { waiting: usuariosSalaEspera.length, total: usuariosSala.length })}</p>
-            <div className="box" style={styleBoxUserReady}>
-                <div className="columns">
-                    <div className="column is-one-quarter" style={{ display: "flex", alignItems: "center" }}>
-                        <img src={usuarioSesion.imagen_usuario} style={{ width: "50px", height: "auto" }} alt="user" />
-                    </div>
-                    <div className="column" style={{ display: "flex", alignItems: "center" }}>
-                        {
-                            usuarioSesion.usuario === liderGrupo.usuario_lider &&
-                            <FontAwesomeIcon icon={faCrown} size="lg" style={{ color: "#efe815" }} />
-                        }
-                        <p className="is-size-5 has-text-weight-bold">{usuarioSesion.usuario}</p>
+            <p className="is-size-3 has-text-centered" style={{ paddingBottom: 10 }}>{t('main.usersReady', { waiting: usuariosSalaEspera.length, total: usuariosSala.length })}</p>
+            <div style={{ paddingLeft: 40, paddingRight: 40 }}>
+                <div className="box" style={styleBoxUserReady}>
+                    <div className="columns">
+                        <div className="column is-one-quarter" style={{ display: "flex", alignItems: "center" }}>
+                            <img src={usuarioSesion.imagen_usuario} style={{ width: "50px", height: "auto" }} alt="user" />
+                        </div>
+                        <div className="column" style={{ display: "flex", alignItems: "center" }}>
+                            {
+                                usuarioSesion.usuario === liderGrupo.usuario_lider &&
+                                <FontAwesomeIcon icon={faCrown} size="lg" style={{ color: "#efe815" }} />
+                            }
+                            <p className="is-size-5 has-text-weight-bold">{usuarioSesion.usuario}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {
-                usuariosSala.map((usuario, index) => {
-                    if (usuario._id !== sessionStorage.getItem("id_usuario")) {
-                        return (
-                            <div
-                                className="box"
-                                key={index + usuario.id_sesion}
-                                style={
-                                    usuariosSalaEspera.some(usuario_esperando => usuario_esperando._id === usuario._id)
-                                        ? styleBoxUserReady
-                                        : styleBoxUserNotReady
-                                }
-                            >
-                                <div className="columns">
-                                    <div className="column is-one-quarter" style={{ display: "flex", alignItems: "center" }}>
-                                        <img src={usuario.imagen_usuario} style={{ width: "50px", height: "auto" }} alt="user" />
-                                    </div>
-                                    <div className="column" style={{ display: "flex", alignItems: "center" }}>
-                                        {
-                                            usuario.usuario === liderGrupo.usuario_lider &&
-                                            <FontAwesomeIcon icon={faCrown} style={{ color: "#efe815" }} />
-                                        }
-                                        <p className="is-size-5 has-text-weight-bold">{usuario.usuario}</p>
+                {
+                    usuariosSala.map((usuario, index) => {
+                        if (usuario._id !== sessionStorage.getItem("id_usuario")) {
+                            return (
+                                <div
+                                    className="box"
+                                    key={index + usuario.id_sesion}
+                                    style={
+                                        usuariosSalaEspera.some(usuario_esperando => usuario_esperando._id === usuario._id)
+                                            ? styleBoxUserReady
+                                            : styleBoxUserNotReady
+                                    }
+                                >
+                                    <div className="columns">
+                                        <div className="column is-one-quarter" style={{ display: "flex", alignItems: "center" }}>
+                                            <img src={usuario.imagen_usuario} style={{ width: "50px", height: "auto" }} alt="user" />
+                                        </div>
+                                        <div className="column" style={{ display: "flex", alignItems: "center" }}>
+                                            {
+                                                usuario.usuario === liderGrupo.usuario_lider &&
+                                                <FontAwesomeIcon icon={faCrown} style={{ color: "#efe815" }} />
+                                            }
+                                            <p className="is-size-5 has-text-weight-bold">{usuario.usuario}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )
-                    }
-                })
-            }
+                            )
+                        }
+                    })
+                }
+            </div>
             {
                 liderGrupo.id_lider === idUsuario &&
-                <div className="has-text-centered">
+                <div className="has-text-centered" style={{ paddingTop: 40 }}>
                     <button className="button is-rounded is-primary" onClick={cambiarPaginaEncuesta}>{t('main.button')}</button>
                 </div>
             }
