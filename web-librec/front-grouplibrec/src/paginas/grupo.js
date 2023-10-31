@@ -81,7 +81,7 @@ const Grupo = () => {
                             "Content-type": "application/json"
                         }
                     })
-                    if (usuario){
+                    if (usuario) {
                         setUsuarioSesion(usuario.data)
                     }
                 }
@@ -170,10 +170,28 @@ const Grupo = () => {
         setEmitirSignal(emitirSignal + 1)
     }, [])
 
-    const salirGrupo = () => {
-        sessionStorage.removeItem("id_sala")
-        socket.emit("salir-sala", idGrupo, idSesion)
-        setEmitirSignal(emitirSignal + 1)
+    const salirGrupo = async () => {
+        const tiempo_actual = Date.now()
+        let info = {
+            "idGrupo": idGrupo,
+            "id_usuario": idUsuario,
+            "texto": "salir sala",
+            "timestamp": tiempo_actual,
+            "tipo_mensaje": "salir_sala",
+        }
+
+        const salir_sala = await api.post("/enviar-mensaje-chat", (info), {
+            headers: {
+                "Content-type": "application/json"
+            }
+        })
+        if (salir_sala) {
+            sessionStorage.removeItem("id_sala")
+            socket.emit("chat-enviar-mensaje", idGrupo)
+            socket.emit("salir-sala", idGrupo, idSesion)
+            setEmitirSignal(emitirSignal + 1)
+
+        }
     }
 
     // obtener recomendaciones grupales tiempo real
@@ -285,9 +303,27 @@ const Grupo = () => {
                 headers: {
                     "Content-type": "application/json"
                 }
-            });
+            })
+            const tiempo_actual = Date.now()
+            let info = {
+                "idGrupo": idGrupo,
+                "id_usuario": idUsuario,
+                "texto": "Entrar sala espera",
+                "timestamp": tiempo_actual,
+                "tipo_mensaje": "sala_espera",
+            }
 
-            if (verificar.data.respuesta === "stop") {
+            const sala_espera = await api.post("/enviar-mensaje-chat", (info), {
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+
+            if(sala_espera){
+                socket.emit("chat-enviar-mensaje", idGrupo)
+            }
+
+            if (verificar.data.respuesta === "stop" && sala_espera) {
                 window.alert(`${t('main.alert.consensus', { max: verificar.data.maxFavoritos })}`)
             } else {
                 // Condition is met, navigate to the specified URL
@@ -300,7 +336,7 @@ const Grupo = () => {
 
     return (
         <div style={stylePagina}>
-            <div className="columns" style={{ border: "1px solid #000", borderRadius: 5}} >
+            <div className="columns" style={{ border: "1px solid #000", borderRadius: 5 }} >
                 <div className="column">
                     <p className="is-size-1 has-text-centered">{t('main.roomName', { leaderName: liderGrupo.usuario_lider })}</p>
                 </div>
@@ -309,14 +345,14 @@ const Grupo = () => {
                 {/* Usuarios */}
                 <div className="column is-one-fifth">
                     <p className="is-size-1 has-text-centered">{t('main.users.connected')}</p>
-                    <div className="box" style={{border: "1px solid #000"}}>
+                    <div className="box" style={{ border: "1px solid #000" }}>
                         <TarjetaUsuario usuario={usuarioSesion} liderGrupo={liderGrupo} />
                     </div>
                     {
                         Object.values(usuariosSesion).map((usuario, index) => {
                             if (usuario._id !== sessionStorage.getItem("id_usuario")) {
                                 return (
-                                    <div className="box" key={index + "" + usuario.id_sesion} style={{border: "1px solid #000"}} >
+                                    <div className="box" key={index + "" + usuario.id_sesion} style={{ border: "1px solid #000" }} >
                                         <TarjetaUsuario usuario={usuario} liderGrupo={liderGrupo} />
                                     </div>
                                 )

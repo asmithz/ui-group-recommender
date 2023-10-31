@@ -5,6 +5,14 @@
             "user": "User ",
             "joined": "has joined the room!"
         },
+        "exitedRoom": {
+            "user": "User ",
+            "exited": "has exited the room!"
+        },
+        "waitingRoom": {
+            "user": "User",
+            "finalize": "has concluded and is now waiting for everyone to finish"
+        },
         "user": {
             "userRecommend": {
                 "user": "User ",

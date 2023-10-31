@@ -241,6 +241,18 @@ const Mensaje = (props) => {
                             </span>
                         }
                         {
+                            props.mensaje.tipo_mensaje === "salir_sala" &&
+                            <span style={{ color: '#8b09b3'}}>
+                                {t('main.exitedRoom.user')} <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {t('main.exitedRoom.exited')}
+                            </span>
+                        }
+                        {
+                            props.mensaje.tipo_mensaje === "sala_espera" &&
+                            <span style={{ color: '#8b09b3'}}>
+                                {t('main.waitingRoom.user')} <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {t('main.waitingRoom.finalize')}
+                            </span>
+                        }
+                        {
                             props.mensaje.tipo_mensaje === "rec_usuario" &&
                             (
                                 <a className="hover-text" onClick={() => setEstadoItem(true)} style={{ color: "#0969b3"}}>

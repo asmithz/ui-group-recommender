@@ -766,6 +766,24 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
                     "tipo_mensaje": "ingreso_sala"
                 }
             }
+            else if (req.body.tipo_mensaje === "salir_sala") {
+                info_mensaje = {
+                    "id_usuario": req.body.id_usuario,
+                    "usuario": n_usuario.usuario,
+                    "texto": req.body.texto,
+                    "timestamp": req.body.timestamp,
+                    "tipo_mensaje": "salir_sala"
+                }
+            }
+            else if (req.body.tipo_mensaje === "sala_espera") {
+                info_mensaje = {
+                    "id_usuario": req.body.id_usuario,
+                    "usuario": n_usuario.usuario,
+                    "texto": req.body.texto,
+                    "timestamp": req.body.timestamp,
+                    "tipo_mensaje": "sala_espera"
+                }
+            }
             else if (req.body.tipo_mensaje === "rec_usuario") {
                 info_mensaje = {
                     "id_usuario": req.body.id_usuario,
