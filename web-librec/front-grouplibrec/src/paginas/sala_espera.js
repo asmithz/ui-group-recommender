@@ -30,8 +30,13 @@ const SalaEspera = () => {
         maxWidth: "500px",
     }
 
-    const styleBoxUser = {
-        backgroundColor: "#a2fab1"
+    const styleBoxUserNotReady = {
+        border: "1px solid #000"
+    }
+
+    const styleBoxUserReady = {
+        backgroundColor: "#a2fab1",
+        border: "1px solid #000"
     }
 
     // obtener usuario 
@@ -136,7 +141,7 @@ const SalaEspera = () => {
             </div>
             {/* Usuarios */}
             <p className="is-size-3 has-text-centered">{t('main.usersReady', { waiting: usuariosSalaEspera.length, total: usuariosSala.length })}</p>
-            <div className="box" style={styleBoxUser}>
+            <div className="box" style={styleBoxUserReady}>
                 <div className="columns">
                     <div className="column is-one-quarter" style={{ display: "flex", alignItems: "center" }}>
                         <img src={usuarioSesion.imagen_usuario} style={{ width: "50px", height: "auto" }} alt="user" />
@@ -144,7 +149,7 @@ const SalaEspera = () => {
                     <div className="column" style={{ display: "flex", alignItems: "center" }}>
                         {
                             usuarioSesion.usuario === liderGrupo.usuario_lider &&
-                            <FontAwesomeIcon icon={faCrown} style={{ color: "#efe815" }} />
+                            <FontAwesomeIcon icon={faCrown} size="lg" style={{ color: "#efe815" }} />
                         }
                         <p className="is-size-5 has-text-weight-bold">{usuarioSesion.usuario}</p>
                     </div>
@@ -159,8 +164,8 @@ const SalaEspera = () => {
                                 key={index + usuario.id_sesion}
                                 style={
                                     usuariosSalaEspera.some(usuario_esperando => usuario_esperando._id === usuario._id)
-                                        ? styleBoxUser
-                                        : {}
+                                        ? styleBoxUserReady
+                                        : styleBoxUserNotReady
                                 }
                             >
                                 <div className="columns">

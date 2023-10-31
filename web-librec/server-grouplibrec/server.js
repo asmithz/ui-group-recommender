@@ -612,6 +612,25 @@ app.get("/obtener-usuario", async (req, res) => {
     }
 })
 
+// Obtener nombre usuario
+app.get("/obtener-usuario-nombre", async (req, res) => {
+    try {
+        const id_usuario = req.query.idUsuario
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(id_usuario) })
+        client.close()
+        if (usuario) {
+            return res.json(
+                { usuario: usuario.usuario }
+                )
+        }
+        return res.json(null)
+    } catch (error) {
+        console.log(error)
+    }
+})
+
 // Retrieve all documents from a collection
 app.get("/obtener-usuarios", async (req, res) => {
     try {

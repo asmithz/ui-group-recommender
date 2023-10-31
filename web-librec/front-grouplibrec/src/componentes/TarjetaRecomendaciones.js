@@ -10,7 +10,7 @@ const TarjetaRecomendaciones = (props) => {
     return (
         <div className="columns">
             <div className="column">
-                <div className="box" style={{ height: 660 }}>
+                <div className="box" style={{ height: 660, border: "1px solid #000" }}>
                     <div className="columns">
                         <div className="column">
                             {

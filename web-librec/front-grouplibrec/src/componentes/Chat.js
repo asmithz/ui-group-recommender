@@ -37,7 +37,8 @@ const Chat = (props) => {
 
     const styleBoxChat = {
         height: "660px",
-        position: "relative"
+        position: "relative",
+        border: "1px solid #000" 
     }
 
     useEffect(() => {
@@ -242,7 +243,7 @@ const Mensaje = (props) => {
                         {
                             props.mensaje.tipo_mensaje === "rec_usuario" &&
                             (
-                                <a onClick={() => setEstadoItem(true)} style={{ color: "#0969b3"}}>
+                                <a className="hover-text" onClick={() => setEstadoItem(true)} style={{ color: "#0969b3"}}>
                                     {props.mensaje.usuarioDestinoID === props.idUsuario ? (
                                         <span>
                                             {props.t('main.user.userRecommend.user')} <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {props.t('main.user.userRecommend.recommends')}  <span className="has-text-weight-bold">{props.mensaje.item.nombreItem}</span> -{" "}
@@ -259,19 +260,19 @@ const Mensaje = (props) => {
                         }
                         {
                             props.mensaje.tipo_mensaje === "rec_grupal" &&
-                            <a onClick={() => setEstadoItem(true)} style={{ color: "#09b391"}}>
+                            <a className="hover-text" onClick={() => setEstadoItem(true)} style={{ color: "#09b391"}}>
                                 <span>{props.t('main.group.userRecommend.user')} <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {props.t('main.group.userRecommend.recommends')} <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span></span>
                             </a>
                         }
                         {
                             props.mensaje.tipo_mensaje === "enviar_favoritos" &&
-                            <a onClick={() => setEstadoItem(true)} style={{ color: "#b30925"}}>
+                            <a className="hover-text" onClick={() => setEstadoItem(true)} style={{ color: "#b30925"}}>
                                 <span>{props.t('main.group.addedFavorites.user')} <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {props.t('main.group.addedFavorites.added')} <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span> {props.t('main.group.addedFavorites.toFavorites')}</span>
                             </a>
                         }
                         {
                             props.mensaje.tipo_mensaje === "eliminar_favoritos" &&
-                            <a onClick={() => setEstadoItem(true)} style={{ color: "#b30925"}}>
+                            <a className="hover-text" onClick={() => setEstadoItem(true)} style={{ color: "#b30925"}}>
                                 <span>{props.t('main.group.removedFavorites.user')}  <span className="has-text-weight-bold">{props.mensaje.usuario}</span> {props.t('main.group.removedFavorites.removed')} <span className="has-text-weight-bold">{props.mensaje.item.nombreItem} </span>- <span className="has-text-weight-bold">{props.mensaje.item.nombre_autor}</span>  {props.t('main.group.removedFavorites.toFavorites')} </span>
                             </a>
                         }

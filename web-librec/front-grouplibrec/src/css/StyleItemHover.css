@@ -19,3 +19,12 @@
     height: 300px;
     transition: all 0.3s ease-in-out;
 }
+
+.hover-text {
+    background-color:  transparent;
+    transition: background-color 0.1s;
+}
+
+.hover-text:hover {
+    background-color: #c0c0c0;
+}

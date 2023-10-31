@@ -20,7 +20,7 @@ const TarjetaUsuario = (props) => {
             <div className="column" style={textoUsuario}>
                 {
                     props.usuario.usuario === props.liderGrupo.usuario_lider &&
-                    <FontAwesomeIcon icon={faCrown} style={{color: "#efe815"}} />
+                    <FontAwesomeIcon icon={faCrown} size="lg" style={{color: "#efe815"}} />
                 }
                 <p className="is-size-5 has-text-weight-bold">{props.usuario.usuario}</p>
             </div>

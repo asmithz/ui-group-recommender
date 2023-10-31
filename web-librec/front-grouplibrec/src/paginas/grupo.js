@@ -43,7 +43,7 @@ const Grupo = () => {
     }
 
     const stylePagina = {
-        margin: "20px"
+        margin: "20px",
     }
 
     const activarCalificaciones = () => {
@@ -300,7 +300,7 @@ const Grupo = () => {
 
     return (
         <div style={stylePagina}>
-            <div className="columns">
+            <div className="columns" style={{ border: "1px solid #000", borderRadius: 5}} >
                 <div className="column">
                     <p className="is-size-1 has-text-centered">{t('main.roomName', { leaderName: liderGrupo.usuario_lider })}</p>
                 </div>
@@ -309,14 +309,14 @@ const Grupo = () => {
                 {/* Usuarios */}
                 <div className="column is-one-fifth">
                     <p className="is-size-1 has-text-centered">{t('main.users.connected')}</p>
-                    <div className="box">
+                    <div className="box" style={{border: "1px solid #000"}}>
                         <TarjetaUsuario usuario={usuarioSesion} liderGrupo={liderGrupo} />
                     </div>
                     {
                         Object.values(usuariosSesion).map((usuario, index) => {
                             if (usuario._id !== sessionStorage.getItem("id_usuario")) {
                                 return (
-                                    <div className="box" key={index + "" + usuario.id_sesion} >
+                                    <div className="box" key={index + "" + usuario.id_sesion} style={{border: "1px solid #000"}} >
                                         <TarjetaUsuario usuario={usuario} liderGrupo={liderGrupo} />
                                     </div>
                                 )

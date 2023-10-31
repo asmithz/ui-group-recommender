@@ -21,6 +21,7 @@ const Salas = () => {
     const [modalSalaEstado, setModalSalaEstado] = useState(false)
     const [modalSalaInfo, setModalSalaInfo] = useState({})
     const navigate = useNavigate()
+    const [nombreUsuario, setNombreUsuario] = useState("")
 
     useEffect(() => {
         if (!idSesion) {
@@ -30,6 +31,7 @@ const Salas = () => {
 
     useEffect(() => {
         obtenerSalas()
+        obtenerNombreUsuario()
     }, [])
 
     const obtenerSalas = async () => {
@@ -42,91 +44,117 @@ const Salas = () => {
         }
     }
 
+    const obtenerNombreUsuario = async () => {
+        try {
+            const resp = await api.get("/obtener-usuario-nombre", {
+                params: { idUsuario },
+                headers: {
+                    "Content-type": "application/json"
+                }
+            }
+            )
+            if (resp) {
+                setNombreUsuario(resp.data.usuario)
+            }
+        }
+        catch (error) {
+            console.log("error usuario")
+        }
+    }
+
     const abrirModalSala = (infoModal) => {
         setModalSalaEstado(true)
         setModalSalaInfo(infoModal)
     }
 
+    const styleBorder = {
+        border: "1px solid #000",
+        borderRadius: 5
+    }
+
+    const styleButtonBorder = {
+        border: "1px solid #000",
+    }
+
     return (
-        <>
-            {
-                idSesion ? (
-                    <div>
-                        <NuevaSalaModal idSesion={idSesion} idUsuario={idUsuario} estado={modalSala} cambiarEstado={setModalSala} />
-                        <div className="container">
-                            <div className="columns">
-                                <div className="column">
-                                    <p className="is-size-1 has-text-centered">{t('main.title')}</p>
+        <section className="hero is-fullheight" style={{ paddingBottom: "20vh" }}>
+            <div className="hero-body">
+                <div className="container">
+                    {
+                        idSesion ? (
+                            <div>
+                                <NuevaSalaModal idSesion={idSesion} idUsuario={idUsuario} estado={modalSala} cambiarEstado={setModalSala} />
+                                <div className="container">
+                                    <p className="is-size-1 has-text-centered" style={{ paddingBottom: "2vh" }}>{t('main.title', { user: nombreUsuario })}</p>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="container">
-                            <div className="columns">
-                                <div className="column">
-                                    <p className="is-size-3 has-text-centered">{t('main.roomsTitle')}</p>
+
+                                <div className="columns" >
+                                    <div className="column is-half is-offset-one-quarter" style={styleBorder}>
+                                        <div className="container" style={{ paddingBottom: "2vh" }}>
+                                            <p className="is-size-3 has-text-centered">{t('main.roomsTitle')}</p>
+                                        </div>
+                                        <table className="table is-rounded">
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ width: "160px" }}>{t('main.table.roomName')}</th>
+                                                    <th style={{ width: "100px" }}>{t('main.table.leaderName')}</th>
+                                                    <th style={{ width: "50px" }}>{t('main.table.availableUsers')}</th>
+                                                    <th style={{ width: "300px" }}>{t('main.table.description')}</th>
+                                                    <th className="has-text-centered">{t('main.table.more')}</th>
+                                                    <th className="has-text-centered">{t('main.table.enter')}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {
+                                                    salas.length > 0 ? (
+                                                        salas.map((salaDisponible, salaIndex) => {
+                                                            return (
+                                                                <tr key={"tabla" + salaDisponible + salaIndex}>
+                                                                    <th>{salaDisponible.titulo}</th>
+                                                                    <td>{salaDisponible.lider}</td>
+                                                                    <td className="has-text-centered">{salaDisponible.usuarios_activos.length}/4</td>
+                                                                    <td className="has-text-justified">{salaDisponible.descripcion}</td>
+                                                                    <td className="has-text-centered" >
+                                                                        <span className="icon-text has-text-info" onClick={() => abrirModalSala(salaDisponible)}>
+                                                                            <button className="button is-info is-light is-rounded">
+                                                                                <FontAwesomeIcon icon={faInfo} />
+                                                                            </button>
+                                                                        </span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <Link to={"/grupo/" + salaDisponible._id.toString()}>
+                                                                            <button className="button is-primary is-light is-rounded">
+                                                                                <FontAwesomeIcon icon={faDoorOpen} />
+                                                                            </button>
+                                                                        </Link>
+                                                                    </td>
+                                                                </tr>
+                                                            )
+                                                        })
+                                                    ) : (<></>)
+                                                }
+                                            </tbody>
+                                        </table>
+
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div className="columns">
-                            <div className="column is-half is-offset-one-quarter">
-                                <table className="table is-rounded">
-                                    <thead>
-                                        <tr>
-                                            <th style={{ width: "160px" }}>{t('main.table.roomName')}</th>
-                                            <th style={{ width: "100px" }}>{t('main.table.leaderName')}</th>
-                                            <th style={{ width: "50px" }}>{t('main.table.availableUsers')}</th>
-                                            <th style={{ width: "300px" }}>{t('main.table.description')}</th>
-                                            <th className="has-text-centered">{t('main.table.more')}</th>
-                                            <th className="has-text-centered">{t('main.table.enter')}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            salas.length > 0 ? (
-                                                salas.map((salaDisponible, salaIndex) => {
-                                                    return (
-                                                            <tr key={"tabla" + salaDisponible + salaIndex}>
-                                                                <th>{salaDisponible.titulo}</th>
-                                                                <td>{salaDisponible.lider}</td>
-                                                                <td className="has-text-centered">{salaDisponible.usuarios_activos.length}/4</td>
-                                                                <td className="has-text-justified">{salaDisponible.descripcion}</td>
-                                                                <td className="has-text-centered" >
-                                                                    <span className="icon-text has-text-info" onClick={() => abrirModalSala(salaDisponible)}>
-                                                                        <button className="button is-info is-light is-rounded">
-                                                                            <FontAwesomeIcon icon={faInfo} />
-                                                                        </button>
-                                                                    </span>
-                                                                </td>
-                                                                <td>
-                                                                    <Link to={"/grupo/" + salaDisponible._id.toString()}>
-                                                                        <button className="button is-primary is-light is-rounded">
-                                                                            <FontAwesomeIcon icon={faDoorOpen} />
-                                                                        </button>
-                                                                    </Link>
-                                                                </td>
-                                                            </tr>
-                                                    )
-                                                })
-                                            ) : (<></>)
-                                        }
-                                    </tbody>
-                                </table>
                                 <div className="has-text-centered">
-                                    <button className="button is-warning is-light is-rounded" onClick={obtenerSalas}>
+                                    <button className="button is-warning is-light is-rounded" onClick={obtenerSalas} style={styleButtonBorder}>
                                         <FontAwesomeIcon icon={faArrowsRotate} />
                                     </button>
-                                    <button className="button is-primary is-light is-rounded" onClick={() => setModalSala(true)}>{t('main.createRoom')}</button>
+                                    <span> </span>
+                                    <button className="button is-primary is-light is-rounded" onClick={() => setModalSala(true)} style={styleButtonBorder}>{t('main.createRoom')}</button>
                                 </div>
+                                <InformacionSalaModal estado={modalSalaEstado} salaInfo={modalSalaInfo} cambiarEstado={setModalSalaEstado} />
                             </div>
-                        </div>
-                        <InformacionSalaModal estado={modalSalaEstado} salaInfo={modalSalaInfo} cambiarEstado={setModalSalaEstado} />
-                    </div>
-                ) :
-                    (
-                        <div>Acceso denegado</div>
-                    )
-            }
-        </>
+                        ) :
+                            (
+                                <div>Acceso denegado</div>
+                            )
+                    }
+                </div>
+            </div>
+        </section>
     )
 }
 

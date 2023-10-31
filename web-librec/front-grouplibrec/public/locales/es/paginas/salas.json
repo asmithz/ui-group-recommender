@@ -1,6 +1,6 @@
 {
     "main":{
-        "title": "GroupLibrec",
+        "title": "Bienvenido/a {{user}}!",
         "roomsTitle": "Salas disponibles",
         "table": {
             "roomName": "Nombre sala",

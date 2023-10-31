@@ -1,6 +1,6 @@
 {
     "main":{
-        "title": "GroupLibrec",
+        "title": "Welcome {{user}}!",
         "roomsTitle": "Available rooms",
         "table": {
             "roomName": "Room name",
