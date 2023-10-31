@@ -690,7 +690,6 @@ app.get("/obtener-ultimo-mensaje-chat", async (req, res) => {
       
           if (sala.chat.length > 0) {
             const latestMessage = sala.chat[0];
-            console.log(latestMessage);
             return res.json(latestMessage);
           } else {
             return res.json(null);
