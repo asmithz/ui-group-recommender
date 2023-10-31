@@ -509,6 +509,92 @@ app.get("/obtener-sala", async (req, res) => {
     }
 })
 
+app.get("/obtener-sala-espera", async (req, res) => {
+    try {
+        const idGrupo = req.query.idGrupo
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo) })
+        client.close()
+        if (sala) {
+            const usuario = await db.collection("usuarios").findOne({ usuario: sala.lider })
+            if (usuario) {
+
+                const user_data = {
+                    _id: usuario._id,
+                    usuario: usuario.usuario,
+                }
+
+                const salaActiva = []
+                const salaEspera = []
+                const sala_lider = sala.lider
+
+                sala.usuarios_activos.forEach((user, i) => {
+                    salaActiva[i] = {
+                        _id: user._id,
+                        usuario: user.usuario,
+                        imagen_usuario: user.imagen_usuario,
+                        idSalaActiva: user.idSalaActiva
+                    }
+                })
+
+                sala.sala_espera.forEach((user, i) => {
+                    salaEspera[i] = {
+                        _id: user._id,
+                        usuario: user.usuario,
+                        imagen_usuario: user.imagen_usuario,
+                        idSalaActiva: user.idSalaActiva
+                    }
+                })
+
+                const resp = {
+                    salaEspera: salaEspera,
+                    salaActiva: salaActiva,
+                    user: user_data
+                }
+
+                console.log(resp)
+
+                return res.json(resp)
+            }
+        }
+        return res.json(null)
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
+
+
+app.get("/obtener-sala-lider", async (req, res) => {
+    try {
+        const idGrupo = req.query.idGrupo
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo) })
+        client.close()
+        if (sala) {
+            const lider_sala = sala.lider
+            const usuario = await db.collection("usuarios").findOne({ usuario: sala.lider })
+            if (usuario) {
+                const user_data = {
+                    _id: usuario._id,
+                    usuario: usuario.usuario,
+                }
+                const resp = {
+                    lider: lider_sala,
+                    user: user_data
+                }
+                return res.json(resp)
+            }
+        }
+        return res.json(null)
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
+
 // Obtener un usuario segun id
 app.get("/obtener-usuario", async (req, res) => {
     try {
@@ -535,7 +621,7 @@ app.get("/obtener-usuarios", async (req, res) => {
         let resp = {}
         usuarios.forEach((doc) => {
             resp[String(doc._id)] = doc
-        });
+        })
         client.close()
         return res.json(resp)
     } catch (error) {
@@ -552,7 +638,16 @@ app.get("/obtener-usuarios-grupo", async (req, res) => {
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala) })
         client.close()
         if (sala) {
-            return res.json(sala.usuarios_activos)
+            const usuarios = []
+            sala.usuarios_activos.forEach((user, i) => {
+                usuarios[i] = {
+                    _id: user._id,
+                    usuario: user.usuario,
+                    imagen_usuario: user.imagen_usuario,
+                    idSalaActiva: user.idSalaActiva
+                }
+            })
+            return res.json(usuarios)
         }
         return res.json(null)
     }

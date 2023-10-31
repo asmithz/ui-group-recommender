@@ -24,6 +24,7 @@ const Grupo = () => {
     const navigate = useNavigate()
     const [idUsuario, setIdUsuario] = useState(sessionStorage.getItem("id_usuario"))
     const [idSesion, setIdSesion] = useState(sessionStorage.getItem("id_sesion"))
+    const [idSala, setIdSala] = useState()
     const [usuarioSesion, setUsuarioSesion] = useState({})
     const [usuariosSesion, setUsuariosSesion] = useState([])
     const [calificacionesEstado, setCalificacionesEstado] = useState(false)
@@ -32,7 +33,6 @@ const Grupo = () => {
     const [recomendacionesGrupales, setRecomendacionesGrupales] = useState([])
     const [cargandoGrupo, setCargandoGrupo] = useState(false)
     const [cargandoIndividual, setCargandoIndividual] = useState(false)
-    const [salaGrupo, setSalaGrupo] = useState({})
     const [liderGrupo, setLiderGrupo] = useState({ id_lider: null, usuario_lider: null })
     const [stackUsuario, setStackUsuario] = useState([])
     const userJoinedRef = useRef(false)
@@ -55,6 +55,8 @@ const Grupo = () => {
         if (sessionStorage.getItem("id_sesion") !== null) {
             setIdSesion(sessionStorage.getItem("id_sesion"))
             setIdUsuario(sessionStorage.getItem("id_usuario"))
+            sessionStorage.setItem("id_sala", idGrupo)
+            setIdSala(sessionStorage.getItem("id_sala"))
         }
         else {
             navigate("/ingresar", { replace: true })
@@ -79,7 +81,9 @@ const Grupo = () => {
                             "Content-type": "application/json"
                         }
                     })
-                    setUsuarioSesion(usuario.data)
+                    if (usuario){
+                        setUsuarioSesion(usuario.data)
+                    }
                 }
                 catch (error) {
                     console.log(error)
@@ -93,19 +97,19 @@ const Grupo = () => {
     useEffect(() => {
         const obtenerSalaGrupo = async () => {
             try {
-                const sala = await api.get("/obtener-sala", { params: { idGrupo } }, {
+                const sala = await api.get("/obtener-sala-lider", { params: { idGrupo } }, {
                     headers: {
                         "Content-type": "application/json"
                     }
                 })
-                setSalaGrupo(sala.data)
-                const lider_del_grupo = sala.data.usuarios_activos.find(lider => lider.usuario === sala.data.lider)
-                const lider_grupo = {
-                    ...liderGrupo,
-                    id_lider: lider_del_grupo._id,
-                    usuario_lider: lider_del_grupo.usuario
+                if (sala) {
+                    const lider_grupo = {
+                        ...liderGrupo,
+                        id_lider: sala.data.user._id,
+                        usuario_lider: sala.data.user.usuario
+                    }
+                    setLiderGrupo(lider_grupo)
                 }
-                setLiderGrupo(lider_grupo)
             }
             catch (error) {
                 console.log(error)
@@ -123,12 +127,17 @@ const Grupo = () => {
                         "Content-type": "application/json"
                     }
                 })
-                setUsuariosSesion(resp_grupo.data)
+                if (resp_grupo) {
+                    setUsuariosSesion(resp_grupo.data)
+                }
             }
             catch (error) {
                 console.log("Error al obtener usuarios")
             }
         })
+        return () => {
+            socket.off("update-grupo")
+        }
     }, [emitirSignal])
 
     const mostrarIngreso = async () => {
@@ -162,6 +171,7 @@ const Grupo = () => {
     }, [])
 
     const salirGrupo = () => {
+        sessionStorage.removeItem("id_sala")
         socket.emit("salir-sala", idGrupo, idSesion)
         setEmitirSignal(emitirSignal + 1)
     }
@@ -292,7 +302,7 @@ const Grupo = () => {
         <div style={stylePagina}>
             <div className="columns">
                 <div className="column">
-                    <p className="is-size-1 has-text-centered">{t('main.roomName', { leaderName: salaGrupo.lider })}</p>
+                    <p className="is-size-1 has-text-centered">{t('main.roomName', { leaderName: liderGrupo.usuario_lider })}</p>
                 </div>
             </div>
             <div className="columns">

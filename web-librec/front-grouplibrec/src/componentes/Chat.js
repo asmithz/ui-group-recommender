@@ -64,13 +64,16 @@ const Chat = (props) => {
         props.socket.on("chat-desplegar-mensajes", () => {
             obtenerChatGrupo()
         })
+        return () => {
+            props.socket.off("chat-desplegar-mensajes")
+        }
     }, [emitirMensaje])
 
-    useEffect(() => {
-        props.socket.on("chat-desplegar-mensajes", () => {
-            obtenerChatGrupo()
-        })
-    }, [])
+    //useEffect(() => {
+    //    props.socket.on("chat-desplegar-mensajes", () => {
+    //        obtenerChatGrupo()
+    //    })
+    //}, [])
 
 
     const enviarMensaje = async (mensaje, tipo) => {

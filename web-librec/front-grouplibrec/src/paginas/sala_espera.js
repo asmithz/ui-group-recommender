@@ -70,19 +70,18 @@ const SalaEspera = () => {
         socket.on("update-sala-espera", async () => {
             try {
                 const idGrupo = idSala
-                const sala = await api.get("/obtener-sala", { params: { idGrupo } }, {
+                const sala = await api.get("/obtener-sala-espera", { params: { idGrupo } }, {
                     headers: {
                         "Content-type": "application/json"
                     }
                 })
                 if (sala) {
-                    setSala(sala.data.usuarios_activos)
-                    setSalaEspera(sala.data.sala_espera)
-                    const lider_del_grupo = sala.data.usuarios_activos.find(lider => lider.usuario === sala.data.lider)
+                    setSala(sala.data.salaActiva)
+                    setSalaEspera(sala.data.salaEspera)
                     const lider_grupo = {
                         ...liderGrupo,
-                        id_lider: lider_del_grupo._id,
-                        usuario_lider: lider_del_grupo.usuario
+                        id_lider: sala.data.user._id,
+                        usuario_lider: sala.data.user.usuario
                     }
                     setLiderGrupo(lider_grupo)
                 }
@@ -91,7 +90,10 @@ const SalaEspera = () => {
                 console.log("Error al obtener usuarios ", error)
             }
         })
-    }, [emitirSignal])
+        return () => {
+            socket.off("update-sala-espera")
+        }
+    }, [])
 
     // señal cuando alguien se une a la sala de espera
     useEffect(() => {
@@ -102,7 +104,7 @@ const SalaEspera = () => {
     }, [idSala, idSesion])
 
     const cambiarPaginaEncuesta = () => {
-        if (idSala && idSesion){
+        if (idSala && idSesion) {
             sessionStorage.setItem("idSala", idSala)
             socket.emit("solicitar-pagina-final", (idSala))
         }
@@ -114,10 +116,14 @@ const SalaEspera = () => {
             if (result) {
                 navigate(`/encuesta-final/${idSala}`)
             }
-            else{
+            else {
                 window.alert("Error")
             }
         })
+
+        return () => {
+            socket.off("mostrar-pagina-final")
+        }
     }, [])
 
 
