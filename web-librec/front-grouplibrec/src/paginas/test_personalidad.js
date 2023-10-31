@@ -84,7 +84,7 @@ const TestPersonalidad = () => {
                     <p className="is-size-1 has-text-centered">{t('main.title')}</p>
                 </div>
             </div>
-            <div className="box">
+            <div className="box" style={{ border: "1px solid #000"}}>
                 <div className="columns">
                     <div className="column">
                         <div className="block">
@@ -152,7 +152,7 @@ const TestPersonalidad = () => {
                                 </div>
                             })
                         }
-                        <div className="has-text-centered">
+                        <div className="has-text-centered" style={{ paddingTop: 40}}>
                             <button className="button is-primary is-rounded" onClick={handleRetrieveValues}>{t('main.button')}</button>
                         </div>
                     </div>

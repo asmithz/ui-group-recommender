@@ -69,7 +69,7 @@ const TestPerfilUsuario = () => {
             </div>
             <div className="columns">
                 <div className="column">
-                    <div className="box">
+                    <div className="box" style={{ border: "1px solid #000"}}>
                         <div className="block">
                             <p className="is-size-4"><FontAwesomeIcon icon={faHeadphonesSimple} style={{ color: "#e1092a", }} /> {t('main.subtitle')} </p>
                         </div>

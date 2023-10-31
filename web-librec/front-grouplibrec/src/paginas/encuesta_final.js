@@ -112,7 +112,7 @@ const EncuestaFinal = () => {
         <>
             <div className="container mt-6 has-text-centered">
                 <p className="is-size-1" style={{ paddingBottom: 20 }}>{t('main.title')}:</p>
-                <div className="box" style={{ paddingBottom: 50, paddingTop: 50, paddingLeft: 100, paddingRight: 100 }}>
+                <div className="box" style={{ paddingBottom: 50, paddingTop: 50, paddingLeft: 100, paddingRight: 100, border: "1px solid #000" }}>
                     <p className="is-size-3" style={{ paddingBottom: 20 }}><span>{finalItem.nombreItem}</span> - <span>{finalItem.nombre_autor}</span></p>
                     <div className="columns">
                         <div className="column">
@@ -147,7 +147,7 @@ const EncuestaFinal = () => {
                 <p className="is-size-1">{t('main.questionnaire.title')}</p>
             </div>
             <div className="container mt-6">
-                <div className="box" style={{ paddingBottom: 50, paddingTop: 50, paddingLeft: 100, paddingRight: 100 }}>
+                <div className="box" style={{ paddingBottom: 50, paddingTop: 50, paddingLeft: 100, paddingRight: 100, border: "1px solid #000" }}>
                     <Formik
                         initialValues={initialValuesForm}
                         onSubmit={enviarCuestionario}

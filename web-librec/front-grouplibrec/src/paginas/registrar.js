@@ -27,7 +27,7 @@ const Registrar = () => {
         valores.imagen_usuario = seleccionImagen
         try {
             const resp = await api.post("/registrar-usuario", valores, {
-                headers: {"Content-Type": "multipart/form-data"}
+                headers: { "Content-Type": "multipart/form-data" }
             })
             if (resp) {
                 navigate("/ingresar", { replace: true })
@@ -102,10 +102,10 @@ const Registrar = () => {
 
     return (
         <div style={registrarStyle}>
-            <div>
-                <div>
-                    <p className="is-size-1 has-text-centered">{t('main.register.title')}</p>
-                </div>
+            <div style={{ paddingBottom: 20}}>
+                <p className="is-size-1 has-text-centered">{t('main.register.title')}</p>
+            </div>
+            <div style={{ border: "1px solid #000", padding: 40, borderRadius: 4}}>
                 <Formik
                     initialValues={{
                         usuario: "",
@@ -202,7 +202,7 @@ const Registrar = () => {
                             <Field placeholder={t('main.register.passwordPlaceHolder')} className="input is-rounded" type="password" name="password" />
                         </div>
                         {/* Boton */}
-                        <div className="field has-text-centered">
+                        <div className="field has-text-centered" style={{ paddingTop: 20}}>
                             <button className="button is-primary is-rounded pl-6 pr-6" type="submit">{t('main.register.button')}</button>
                         </div>
                     </Form>
