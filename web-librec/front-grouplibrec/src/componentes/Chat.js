@@ -60,9 +60,28 @@ const Chat = (props) => {
         }
     }
 
+    const obtenerUltimoMensajeGrupo = async () => {
+        try{
+            const resp_chat = await props.api.get("/obtener-ultimo-mensaje-chat", { params: { idGrupo } }, {
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+            if (resp_chat.data) {
+                setChatGrupo([...chatGrupo, resp_chat.data])
+                console.log(resp_chat.data)
+                console.log(chatGrupo)
+            }
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         props.socket.on("chat-desplegar-mensajes", () => {
             obtenerChatGrupo()
+            //obtenerUltimoMensajeGrupo()
         })
         return () => {
             props.socket.off("chat-desplegar-mensajes")
@@ -143,7 +162,7 @@ const Chat = (props) => {
                     </div>
                 </div>
             </div>
-            <div className="columns" style={{ position: "absolute", bottom: 0, paddingBottom: "20px" }}>
+            <div className="columns" style={{ paddingBottom: "20px" }}>
                 <div className="column">
                     <Formik
                         initialValues={{
@@ -156,12 +175,12 @@ const Chat = (props) => {
                         }}>
                         <Form>
                             <div className="columns">
-                                <div className="column is-full">
+                                <div className="column is-four-fifths">
                                     <div className="field">
                                         <Field className="input" placeholder={t('main.input')} name="texto" />
                                     </div>
                                 </div>
-                                <div className="column">
+                                <div className="column has-text-right">
                                     <div className="field">
                                         <button className="button is-light is-success is-rounded" type="submit">
                                             <FontAwesomeIcon icon={faPaperPlane} />

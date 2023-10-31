@@ -676,6 +676,33 @@ app.get("/obtener-chat-grupo", async (req, res) => {
     }
 })
 
+// Obtener ultimo mensaje chat sala
+app.get("/obtener-ultimo-mensaje-chat", async (req, res) => {
+    try {
+        const idSala = req.query.idGrupo;
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala)});
+        client.close();
+      
+        if (sala) {
+          sala.chat.sort((a, b) => b.timestamp - a.timestamp);
+      
+          if (sala.chat.length > 0) {
+            const latestMessage = sala.chat[0];
+            console.log(latestMessage);
+            return res.json(latestMessage);
+          } else {
+            return res.json(null);
+          }
+        }
+        return res.json(null);
+      } catch (error) {
+        console.error(error);
+        return res.json(null);
+      }
+})
+
 // Enviar mensaje chat
 app.post("/enviar-mensaje-chat", async (req, res) => {
     try {
