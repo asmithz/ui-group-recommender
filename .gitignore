@@ -31,3 +31,4 @@ instalar_docker.sh
 /.dotnet
 /.nvm
 /data
+/logs

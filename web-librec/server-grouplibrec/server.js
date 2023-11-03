@@ -9,6 +9,9 @@ import { MongoClient, ObjectId } from "mongodb";
 import child_process from 'child_process'
 import fileUpload from 'express-fileupload'
 import * as fs from "fs"
+import winston from "winston"
+
+const { combine, timestamp, json } = winston.format
 
 const exec = child_process.exec
 const spawn = child_process.spawn
@@ -48,8 +51,38 @@ const dir_icons = process.env.DIR_ICONS
 const db_url = process.env.DB_URL
 const db_name = process.env.DB_NAME
 
+const dir_logs = process.env.DIR_LOG
+
 const socket_port = process.env.SOCKET_PORT
 const server_port = process.env.SERVER_PORT
+
+const consoleFormatLog = winston.format.printf(({ message }) => {
+    return `${message}`
+})
+
+const fileFormatLog = winston.format.combine(
+    timestamp({
+        format: 'hh:mm:ss A DD-MM-YYYY'
+    }), json()
+)
+
+const LOG = winston.createLogger({
+    level: 'info',
+    transports: [
+        new winston.transports.File({
+            filename: `${dir_logs}/system.log`,
+            format: fileFormatLog
+        }),
+        new winston.transports.Console({
+            format: consoleFormatLog
+        }
+        )
+    ],
+})
+
+const systemLogEvent = (newEvent) => {
+    return { "event": newEvent }
+}
 
 io.attach(socket_port)
 
@@ -119,6 +152,7 @@ io.on("connection", (socket) => {
                                 $set: { idSalaActiva: idGrupo }
                             }
                         )
+                        LOG.info(`[JOIN-ROOM] Room ${idGrupo}: User ${sesion_usuario.id_usuario}`, systemLogEvent("room-join"))
                         // añadir usuario a sala eventos
                         const userEvento = await db.collection("salas_eventos").findOne({ id_sala: idGrupo, usuarios: { $elemMatch: { id_usuario: sesion_usuario.id_usuario } } })
                         if (!userEvento) {
@@ -138,6 +172,7 @@ io.on("connection", (socket) => {
                                     }
                                 }
                             )
+                            LOG.info(`[JOIN-EVENT-ROOM] Room ${idGrupo}: User ${sesion_usuario.id_usuario} was added to event room ${idGrupo}`, systemLogEvent("event-room-join"))
                         }
                     }
                 }
@@ -176,6 +211,7 @@ io.on("connection", (socket) => {
                                 { usuarios_activos: { _id: new ObjectId(user._id) } }
                         }
                     )
+                    LOG.info(`[EXIT-ROOM] Room ${userGrupo._id}: User ${user._id} has left the room`, systemLogEvent("exit-room"))
                 }
             }
             io.in(idGrupo).emit("update-grupo")
@@ -203,6 +239,7 @@ io.on("connection", (socket) => {
                             { _id: new ObjectId(idSala) },
                             { $addToSet: { sala_espera: user } }
                         )
+                        LOG.info(`[JOIN-WAITING-ROOM] Room: ${userGrupo._id}: User ${user._id} joinned waiting room`, systemLogEvent("waiting-room-join"))
                     }
                 }
             }
@@ -243,6 +280,7 @@ io.on("connection", (socket) => {
                                 $set: { idSalaActiva: "" }
                             }
                         )
+                        LOG.info(`[DISCONNECT] User ${user._id} disconnected`, systemLogEvent("disconnect"))
                     }
                 }
             }
@@ -338,6 +376,8 @@ app.post("/registrar-usuario", async (req, res) => {
                 console.log(error)
             }
         }
+
+        LOG.info(`[REGISTER] User ${usuario} was created`, systemLogEvent("register"))
         return res.json(req.body)
     })
 })
@@ -376,9 +416,12 @@ app.post("/login-usuario", async (req, res) => {
                 else {
                     test = "no"
                 }
+
+                LOG.info(`[LOGIN] User ${usuario._id} logged in`, systemLogEvent("login"))
                 return res.json({ "respuesta": "ingreso", "usuario_id": usuario._id.toString(), "test": test })
             }
             else {
+                LOG.info(`[LOGIN] User ${usuario._id} failed to log in`, systemLogEvent("login"))
                 return res.json("error")
             }
         }
@@ -386,6 +429,8 @@ app.post("/login-usuario", async (req, res) => {
     catch (error) {
         return res.json(error)
     }
+
+    LOG.info(`[LOGIN] User not found`, systemLogEvent("login"))
     return res.json("no se encontro el usuario o contraseña equivocada")
 })
 
@@ -447,7 +492,9 @@ app.post("/crear-sala", async (req, res) => {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         await db.collection("salas").insertOne(sala)
+        LOG.info(`[CREATE-ROOM] Room ${sala._id} created by ${req.body.lider}`, systemLogEvent("create-room"))
         await db.collection("salas_eventos").insertOne(sala_eventos)
+        LOG.info(`[CREATE-EVENT-ROOM] Event room ${sala_eventos.id_sala} created by ${req.body.lider}`, systemLogEvent("create-room"))
         client.close()
         return res.json("ok")
     }
@@ -623,7 +670,7 @@ app.get("/obtener-usuario-nombre", async (req, res) => {
         if (usuario) {
             return res.json(
                 { usuario: usuario.usuario }
-                )
+            )
         }
         return res.json(null)
     } catch (error) {
@@ -701,24 +748,24 @@ app.get("/obtener-ultimo-mensaje-chat", async (req, res) => {
         const idSala = req.query.idGrupo;
         const client = await MongoClient.connect(url);
         const db = client.db(dbName);
-        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala)});
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala) });
         client.close();
-      
+
         if (sala) {
-          sala.chat.sort((a, b) => b.timestamp - a.timestamp);
-      
-          if (sala.chat.length > 0) {
-            const latestMessage = sala.chat[0];
-            return res.json(latestMessage);
-          } else {
-            return res.json(null);
-          }
+            sala.chat.sort((a, b) => b.timestamp - a.timestamp);
+
+            if (sala.chat.length > 0) {
+                const latestMessage = sala.chat[0];
+                return res.json(latestMessage);
+            } else {
+                return res.json(null);
+            }
         }
         return res.json(null);
-      } catch (error) {
+    } catch (error) {
         console.error(error);
         return res.json(null);
-      }
+    }
 })
 
 // Enviar mensaje chat
@@ -738,6 +785,7 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
                     "timestamp": req.body.timestamp,
                     "tipo_mensaje": "texto"
                 }
+                LOG.info(`[CHAT] Room: ${idSala} User ${n_usuario.usuario} ${n_usuario._id} sent a message: ${req.body.texto}`, systemLogEvent("chat"))
             }
             else if (req.body.tipo_mensaje === "item") {
                 let path_imagen = dir_lastfm_images + "/" + String(req.body.itemId) + ".jpg"
@@ -888,6 +936,7 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
     const idUsuario = req.query.idUsuario
     const idGrupo = req.query.idGrupo
     try {
+        LOG.info(`[INDIVIDUAL-RECOMMENDATION] Room: ${idGrupo}: User ${idUsuario} has started individual recommendation`, systemLogEvent("individual-rec"))
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(idUsuario) })
@@ -1026,6 +1075,8 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
 app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
     const idSala = req.query.idGrupo
     try {
+
+        LOG.info(`[GROUP-RECOMMENDATION] Room ${idSala}: Group Recommendation has started`, systemLogEvent("group-rec"))
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala) })
@@ -1525,12 +1576,14 @@ app.post("/calificar-item", async (req, res) => {
                     }
                 }
             )
+            LOG.info(`[ITEM-RATING] User ${id_usuario} has changed itemId: ${id_item} rating to ${rating_item}`, systemLogEvent("item-rating"))
         }
         else {
             await db.collection("usuarios").updateOne(
                 { _id: new ObjectId(rating_usuario.id_usuario) },
                 { $addToSet: { calificaciones: item_calificado } }
             )
+            LOG.info(`[ITEM-RATING] User ${id_usuario} rated itemId: ${id_item} a ${rating_item}`, systemLogEvent("item-rating"))
         }
 
         //await db.collection("usuarios").updateOne(
@@ -1579,12 +1632,12 @@ app.get("/obtener-item-calificacion", async (req, res) => {
         if (user) {
             const itemCalificado = user.calificaciones.find(item => item.id_item === idItem);
             if (itemCalificado) {
+                client.close();
                 return res.json({
                     item: itemCalificado
                 })
             }
         }
-        client.close();
     }
     catch (error) {
         console.log(error);
@@ -1636,6 +1689,7 @@ app.post("/enviar-al-stack", async (req, res) => {
                 }
             }
         )
+        LOG.info(`[FAVORITES] User ${idUsuario} added itemId: ${idItem} to room ${idGrupo} favorites`, systemLogEvent("add-favorites"))
         client.close()
         return res.json({
             resp: "agregado"
@@ -1674,6 +1728,8 @@ app.delete("/eliminar-del-stack", async (req, resp) => {
         )
         const usuarioStack = sala.recomendaciones_stack.find(obj => obj.id_usuario === idUsuario)
         client.close()
+
+        LOG.info(`[FAVORITES] User ${idUsuario} removed itemId: ${idItem} from room ${idGrupo} favorites`, systemLogEvent("remove-favorites"))
         if (usuarioStack) {
             return resp.json({
                 items: usuarioStack.items
@@ -1713,6 +1769,7 @@ app.delete("/eliminar-de-favoritos", async (req, resp) => {
         )
         const salaFavoritos = sala.recomendaciones_favoritos
         client.close()
+        LOG.info(`[FAVORITES] User ${idUsuario} removed itemId: ${idItem} from room ${idGrupo} favorites`, systemLogEvent("remove-favorites"))
         if (salaFavoritos) {
             return resp.json({
                 items: salaFavoritos.items
@@ -1778,6 +1835,7 @@ app.post("/enviar-a-favoritos", async (req, res) => {
                     }
                 )
                 client.close()
+                LOG.info(`[FAVORITES] User ${idUsuario} added itemId: ${idItem} to room ${idGrupo} favorites`, systemLogEvent("add-favorites"))
                 return res.json({
                     respuesta: "agregado"
                 })
@@ -1804,13 +1862,15 @@ app.post("/enviar-a-favoritos", async (req, res) => {
 
 app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
     try {
+        const idUsuario = req.query.idUsuario
+        const idGrupo = req.query.idGrupo
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne(
-            { _id: new ObjectId(req.query.idGrupo) }
+            { _id: new ObjectId(idGrupo) }
         )
         const usuario = await db.collection("usuarios").findOne(
-            { _id: new ObjectId(req.query.idUsuario) }
+            { _id: new ObjectId(idUsuario) }
         )
         client.close()
         const verificar = {
@@ -1832,7 +1892,6 @@ app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
                     console.log(itemFavorito.idItem)
                 }
             })
-            console.log(no_calificados)
 
             /*
             // obtener los calificados del usuario
@@ -1846,22 +1905,24 @@ app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
             */
 
             if (no_calificados.length === 0) {
-                console.log("ninguno por calificar")
+                LOG.info(`[CONSENSUS] Room ${idGrupo}: User ${idUsuario}. Every item is rated in favorites`, systemLogEvent("consensus-favorites"))
                 verificar.todos_calificados = true
             }
             else {
+                LOG.info(`[CONSENSUS] Room ${idGrupo}: User ${idUsuario}. Missing items to rate in favorites: ${no_calificados}`, systemLogEvent("consensus-favorites"))
                 console.log("faltan calificar ", no_calificados)
             }
 
             if (sala.recomendaciones_favoritos.length === maxFavoritos) {
-                console.log(`cantidad ${maxFavoritos} verificada`)
+                LOG.info(`[CONSENSUS] Room ${idGrupo}: User ${idUsuario}. ${maxFavoritos} items reached in favorites`, systemLogEvent("consensus-favorites"))
                 verificar.cantidad_calificados = true
             }
             else {
-                console.log("deben ser 10 items")
+                LOG.info(`[CONSENSUS] Room ${idGrupo}: User ${idUsuario}. ${maxFavoritos} items are needed in favorites`, systemLogEvent("consensus-favorites"))
             }
 
             if (verificar.todos_calificados && verificar.cantidad_calificados) {
+                LOG.info(`[CONSENSUS] Room ${idGrupo}: User ${idUsuario} joinned the consensus and is waiting for everyone to finish`, systemLogEvent("consensus-favorites"))
                 return resp.json({
                     respuesta: "ok",
                     code: 1,
@@ -1869,6 +1930,7 @@ app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
                 })
             }
 
+            LOG.info(`[CONSENSUS] Room ${idGrupo}: User ${idUsuario} started the consensus but failed. Cause: missing verifiers`, systemLogEvent("consensus-favorites"))
             return resp.json({
                 respuesta: "stop",
                 code: 0,
@@ -1989,6 +2051,7 @@ app.post("/generar-personalidad", async (req, resp) => {
         }
         await db.collection("personalidades").insertOne(personalidad)
         client.close()
+        LOG.info(`[TEST-PERSONALITY] Personality test for user ${idUsuario} generated`, systemLogEvent("personality-test"))
         return resp.json({
             ok: "si"
         })
@@ -2074,6 +2137,7 @@ app.post("/generar-perfil", async (req, res) => {
         //var perfil = fs.readFileSync("/home/asmith/recomendaciones/profiles", "utf-8")
         //console.log(gustos, idUsuario)
         client.close()
+        LOG.info(`[USER-TASTE] Taste Profile for user ${idUsuario} generated`, systemLogEvent("user-taste"))
         return res.json({
             ok: "ok"
         })
@@ -2156,6 +2220,7 @@ app.post("/evento-usuario", async (req, res) => {
         client.close();
         if (result.matchedCount > 0) {
             // Update successful
+            LOG.info(`[USER-EVENT] Room ${idSala}: User ${idUsuario} made an event: ${evento_tipo}`, systemLogEvent("user-event"))
             return res.json({
                 "resp": `Updated ${evento_tipo} for user ${idUsuario} in sala ${idSala}`
             })
