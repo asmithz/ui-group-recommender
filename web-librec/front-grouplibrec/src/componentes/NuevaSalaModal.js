@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
-import { Formik, Form, Field } from "formik"
+import { Formik, Form, Field, isInteger } from "formik"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { useTranslation } from "react-i18next" 
@@ -69,7 +69,8 @@ const NuevaSalaModal = (props) => {
                                     id_sala: props.idSesion,
                                     titulo: "",
                                     descripcion: "",
-                                    lider: ""
+                                    lider: "",
+                                    maxUsers: ""
                                 }}
                                 onSubmit={(datos) => {
                                     crearSala(datos)
@@ -81,6 +82,15 @@ const NuevaSalaModal = (props) => {
                                     }
                                     if (!datos.descripcion) {
                                         error.descripcion = `${t('main.alert.description')}`
+                                    }
+                                    if (!datos.maxUsers) {
+                                        if (Number(datos.maxUsers)){
+                                            error.maxUsers = `${t('main.alert.maxUsersInteger')}`
+                                        }
+                                        error.maxUsers = `${t('main.alert.maxUsers')}`
+                                    }
+                                    else if (!Number(datos.maxUsers)) {
+                                        error.maxUsers = `${t('main.alert.maxUsersInteger')}`
                                     }
                                     return error
                                 }}>
@@ -98,6 +108,11 @@ const NuevaSalaModal = (props) => {
                                                     {props.errors.descripcion && <p className="help is-danger">{props.errors.descripcion}</p>}
                                                     <Field className={props.errors.descripcion ? "textarea is-danger" : "textarea"} name="descripcion" as="textarea" />
                                                 </div>
+                                            </div>
+                                            <div className="field">
+                                                <label className="label">{t('main.roomTitleMaxUsers')}</label>
+                                                {props.errors.maxUsers && <p className="help is-danger">{props.errors.maxUsers}</p>}
+                                                <Field className={props.errors.maxUsers ? "input is-danger" : "input"} type="text" name="maxUsers" />
                                             </div>
                                             <div className="has-text-centered">
                                                 <button className="button is-primary is-rounded is-hover is-light" type="submit">

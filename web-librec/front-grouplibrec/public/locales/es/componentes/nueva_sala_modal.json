@@ -3,9 +3,12 @@
         "title": "Crear una sala",
         "roomTitleName": "Nombre sala",
         "roomTitleDescription": "Descripción sala",
+        "roomTitleMaxUsers": "Cantidad máxima de usuarios",
         "alert": {
             "roomName": "La sala debe tener un nombre",
-            "description": "La sala debe tener una descripción"
+            "description": "La sala debe tener una descripción",
+            "maxUsers": "La sala debe tener una cantidad maxima de usuarios (numero)",
+            "maxUsersInteger": "Debe ser un numero"
         }
     }
 }

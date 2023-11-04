@@ -76,6 +76,28 @@ const Salas = () => {
         border: "1px solid #000",
     }
 
+    const checkSalaDisponible = async (event, idSala) => {
+        event.preventDefault();
+        try {
+            const resp = await api.get("/check-sala-espacio-disponible", {
+                params: {idSala},
+                headers: {
+                    "Content-type": "application/json"
+                }
+            }
+            )
+            if (resp.data.enter) {
+                window.location.href = "/grupo/" + idSala;
+            }
+            else{
+                window.alert("Max reached")
+            }
+        }
+        catch (error) {
+            console.log("error usuario")
+        }
+    }
+
     return (
         <section className="hero is-fullheight" style={{ paddingBottom: "20vh" }}>
             <div className="hero-body">
@@ -112,7 +134,7 @@ const Salas = () => {
                                                                 <tr key={"tabla" + salaDisponible + salaIndex}>
                                                                     <th>{salaDisponible.titulo}</th>
                                                                     <td>{salaDisponible.lider}</td>
-                                                                    <td className="has-text-centered">{salaDisponible.usuarios_activos.length}/4</td>
+                                                                    <td className="has-text-centered">{salaDisponible.usuarios_activos.length}/{salaDisponible.max_users}</td>
                                                                     <td className="has-text-justified">{salaDisponible.descripcion}</td>
                                                                     <td className="has-text-centered" >
                                                                         <span className="icon-text has-text-info" onClick={() => abrirModalSala(salaDisponible)}>
@@ -122,7 +144,7 @@ const Salas = () => {
                                                                         </span>
                                                                     </td>
                                                                     <td>
-                                                                        <Link to={"/grupo/" + salaDisponible._id.toString()}>
+                                                                        <Link to={"/grupo/" + salaDisponible._id.toString()} onClick={(event) => checkSalaDisponible(event, salaDisponible._id.toString()) }>
                                                                             <button className="button is-primary is-light is-rounded">
                                                                                 <FontAwesomeIcon icon={faDoorOpen} />
                                                                             </button>

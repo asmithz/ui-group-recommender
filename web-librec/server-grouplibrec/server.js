@@ -477,6 +477,7 @@ app.post("/crear-sala", async (req, res) => {
         lider: req.body.lider,
         usuarios_activos: [],
         chat: [],
+        max_users: req.body.maxUsers,
         recomendaciones_grupal: [],
         recomendaciones_individual: [],
         recomendaciones_stack: [],
@@ -515,6 +516,30 @@ app.get("/obtener-salas", async (req, res) => {
     catch (error) {
         console.log(error)
         return res.json("error")
+    }
+})
+
+app.get("/check-sala-espacio-disponible", async (req, res) => {
+    try {
+        const idGrupo = req.query.idSala
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo) })
+        client.close()
+        if (sala.usuarios_activos.length < parseInt(sala.max_users)) {
+            console.log(sala.usuarios_activos.length, parseInt(sala.max_users))
+            return res.json({
+                "enter": true
+            })
+        }
+        else{
+            return res.json({
+                "enter": false
+            })
+        }
+    }
+    catch (error) {
+        console.log(error)
     }
 })
 
