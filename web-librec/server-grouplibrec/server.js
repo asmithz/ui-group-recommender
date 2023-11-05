@@ -371,6 +371,7 @@ app.post("/registrar-usuario", async (req, res) => {
                 const client = await MongoClient.connect(url)
                 const db = client.db(dbName)
                 await db.collection("usuarios").insertOne(usuario)
+                LOG.info(`[REGISTER] User ${usuario.nombre} was created`, systemLogEvent("register"))
                 client.close()
             }
             catch (error) {
@@ -378,7 +379,6 @@ app.post("/registrar-usuario", async (req, res) => {
             }
         }
 
-        LOG.info(`[REGISTER] User ${usuario} was created`, systemLogEvent("register"))
         return res.json(req.body)
     })
 })
