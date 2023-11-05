@@ -511,8 +511,26 @@ app.get("/obtener-salas", async (req, res) => {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const salas = await db.collection("salas").find({}).toArray()
+        const salasDisponibles = []
+        salas.forEach((sala) => {
+            const users = []
+            sala.usuarios_activos.forEach((user) => {
+                console.log(user._id)
+                users.push(user._id)
+            })
+            const struct_sala = {
+                _id: sala._id,
+                id_sala: sala.id_sala,
+                titulo: sala.titulo,
+                descripcion: sala.descripcion,
+                lider: sala.lider,
+                usuarios_activos: users,
+                max_users: sala.max_users
+            }
+            salasDisponibles.push(struct_sala)
+        })
         client.close()
-        return res.json(salas)
+        return res.json(salasDisponibles)
     }
     catch (error) {
         console.log(error)
