@@ -2042,14 +2042,26 @@ app.get("/obtener-stack-usuario", async (req, resp) => {
 
 app.get("/obtener-test-personalidad", async (req, resp) => {
     try {
+        const currentLang = req.query.currentLang
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
-        const preguntas = await db.collection("FFM_Test").find({}).toArray()
-        if (preguntas) {
-            client.close()
-            return resp.json({
-                preguntas: preguntas
-            })
+        if (currentLang === "es"){
+            const preguntas = await db.collection("FFM_Test").find({}).toArray()
+            if (preguntas) {
+                client.close()
+                return resp.json({
+                    preguntas: preguntas
+                })
+            }
+        }
+        else if (currentLang === "en"){
+            const preguntas = await db.collection("FFM_Test_en").find({}).toArray()
+            if (preguntas) {
+                client.close()
+                return resp.json({
+                    preguntas: preguntas
+                })
+            }
         }
     }
     catch (error) {

@@ -64,8 +64,11 @@ const TestPersonalidad = () => {
 
     useEffect(() => {
         const obtenerPreguntas = async () => {
+            const currentLang = i18n.language
             try {
-                const response = await api.get("/obtener-test-personalidad")
+                const response = await api.get("/obtener-test-personalidad", {
+                    params: {currentLang}
+                })
                 if (response.data) {
                     setPreguntas(response.data.preguntas)
                 }
@@ -75,7 +78,7 @@ const TestPersonalidad = () => {
             }
         }
         obtenerPreguntas()
-    }, [])
+    }, [i18n.language])
 
     return (
         <div className="container" style={{ maxWidth: "800px" }}>
@@ -102,7 +105,7 @@ const TestPersonalidad = () => {
                             <p>5. {t('main.agreement.strongAgree')}</p>
                         </div>
                         <div className="block">
-                            <p className="is-size-4 has-text-centered has-text-justified">Questionnaire</p>
+                            <p className="is-size-4 has-text-centered has-text-justified">{t('main.questionnaireTitle')}</p>
                         </div>
                         {
                             preguntas.length > 0 &&
