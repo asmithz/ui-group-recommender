@@ -315,7 +315,7 @@ io.on("connection", (socket) => {
     socket.on("entrar-panel-favoritos", (idGrupo) => {
         socket.join(idGrupo + "favoritos")
     })
-    socket.on("eliminar-favorito-grupo", async (idGrupo, idItem) => {
+    socket.on("eliminar-favorito-grupo", async (idGrupo, idItem, idUsuario) => {
         try {
             const client = await MongoClient.connect(url)
             const db = client.db(dbName)
@@ -332,6 +332,7 @@ io.on("connection", (socket) => {
                 }
             )
             client.close()
+            LOG.info(`[FAVORITES] User ${idUsuario} removed itemId: ${idItem} from room ${idGrupo} favorites`, systemLogEvent("remove-favorites"))
             io.in(idGrupo + "favoritos").emit("obtener-favoritos")
         }
         catch (error) {

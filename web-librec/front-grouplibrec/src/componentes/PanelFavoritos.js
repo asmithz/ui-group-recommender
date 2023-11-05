@@ -85,7 +85,7 @@ const PanelFavoritos = (props) => {
                 }
             })
             if (mensaje_eliminar_favoritos) {
-                socket.emit("eliminar-favorito-grupo", idGrupo, idItem)
+                socket.emit("eliminar-favorito-grupo", idGrupo, idItem, idUsuario)
                 socket.emit("chat-enviar-mensaje", idGrupo)
                 setFavoritoEliminado(favoritoEliminado + 1)
             }
