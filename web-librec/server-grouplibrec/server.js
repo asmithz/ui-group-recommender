@@ -546,7 +546,6 @@ app.get("/check-sala-espacio-disponible", async (req, res) => {
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo) })
         client.close()
         if (sala.usuarios_activos.length < parseInt(sala.max_users)) {
-            console.log(sala.usuarios_activos.length, parseInt(sala.max_users))
             return res.json({
                 "enter": true
             })
@@ -674,7 +673,8 @@ app.get("/obtener-sala-lider", async (req, res) => {
                 }
                 const resp = {
                     lider: lider_sala,
-                    user: user_data
+                    user: user_data,
+                    titulo: sala.titulo
                 }
                 return res.json(resp)
             }
@@ -1932,9 +1932,6 @@ app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
                 if (!checkItem || checkItem.rating === undefined) {
                     no_calificados.push(itemFavorito.idItem);
                 }
-                else {
-                    console.log(itemFavorito.idItem)
-                }
             })
 
             /*
@@ -1954,7 +1951,6 @@ app.get("/verificar-calificaciones-favoritos", async (req, resp) => {
             }
             else {
                 LOG.info(`[CONSENSUS] Room ${idGrupo}: User ${idUsuario}. Missing items to rate in favorites: ${no_calificados}`, systemLogEvent("consensus-favorites"))
-                console.log("faltan calificar ", no_calificados)
             }
 
             if (sala.recomendaciones_favoritos.length === maxFavoritos) {

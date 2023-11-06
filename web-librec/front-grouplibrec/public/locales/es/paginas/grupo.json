@@ -1,6 +1,6 @@
 {
     "main":{
-        "roomName": "Sala de {{leaderName}}",
+        "roomName": "{{titleRoom}} - Sala de {{leaderName}}",
         "users": {
             "connected": "Conectados"
         },

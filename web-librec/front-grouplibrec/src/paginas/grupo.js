@@ -106,7 +106,8 @@ const Grupo = () => {
                     const lider_grupo = {
                         ...liderGrupo,
                         id_lider: sala.data.user._id,
-                        usuario_lider: sala.data.user.usuario
+                        usuario_lider: sala.data.user.usuario,
+                        titulo: sala.data.titulo
                     }
                     setLiderGrupo(lider_grupo)
                 }
@@ -338,7 +339,7 @@ const Grupo = () => {
         <div style={stylePagina}>
             <div className="columns" style={{ border: "1px solid #000", borderRadius: 5 }} >
                 <div className="column">
-                    <p className="is-size-1 has-text-centered">{t('main.roomName', { leaderName: liderGrupo.usuario_lider })}</p>
+                    <p className="is-size-1 has-text-centered">{t('main.roomName', { titleRoom: liderGrupo.titulo, leaderName: liderGrupo.usuario_lider })}</p>
                 </div>
             </div>
             <div className="columns">
