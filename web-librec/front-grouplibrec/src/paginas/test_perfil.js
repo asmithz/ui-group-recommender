@@ -46,9 +46,17 @@ const TestPerfilUsuario = () => {
                     "Content-type": "application/json"
                 }
             })
-            if(resp.data.ok == "ok"){
-                console.log("ok")
-                navigate("/salas", { replace: true })
+
+            const trainSala = await api.get("/obtener-sala-trainning", {
+                params: { idUsuario }, 
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+
+            if(resp.data.ok == "ok" && trainSala){
+                //navigate("/salas", { replace: true })
+                navigate(`/trainning-room/${trainSala.data._id}`, { replace: true })
             }
         }
         catch (error) {

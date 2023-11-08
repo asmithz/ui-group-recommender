@@ -78,7 +78,7 @@ const TestPersonalidad = () => {
             }
         }
         obtenerPreguntas()
-    }, [i18n.language])
+    }, [i18n.language, idUsuario])
 
     return (
         <div className="container" style={{ maxWidth: "800px" }}>

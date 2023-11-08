@@ -11,6 +11,8 @@ import TestPerfilUsuario from "./paginas/test_perfil"
 import EncuestaFinal from "./paginas/encuesta_final"
 import { Suspense } from "react"
 import ChangeLanguage from "./componentes/ChangeLanguage" 
+import EndTest from "./paginas/end-test"
+import TrainningRoom from "./paginas/train"
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
           <Route exact path="/encuesta-final/:id" element={<EncuestaFinal />}></Route>
           <Route exact path="/test-personalidad" element={<TestPersonalidad />}></Route>
           <Route exact path="/test-perfil" element={<TestPerfilUsuario />}></Route>
+          <Route exact path="/end-test" element={<EndTest />}></Route>
+          <Route exact path="/trainning-room/:id" element={<TrainningRoom />}></Route>
         </Routes>
       </BrowserRouter>
   );

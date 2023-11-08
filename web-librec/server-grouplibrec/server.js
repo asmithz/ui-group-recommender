@@ -370,8 +370,40 @@ app.post("/registrar-usuario", async (req, res) => {
             try {
                 const client = await MongoClient.connect(url)
                 const db = client.db(dbName)
-                await db.collection("usuarios").insertOne(usuario)
+                const insertedUser = await db.collection("usuarios").insertOne(usuario)
                 LOG.info(`[REGISTER] User ${usuario.nombre} was created`, systemLogEvent("register"))
+
+                const bob = await db.collection("usuarios").findOne({ "usuario": "bob" });
+                const alice = await db.collection("usuarios").findOne({ "usuario": "alice" });
+
+                if (bob && alice){
+                    let idSala = new ObjectId()
+                    let trainning_room = {
+                        _id: idSala,
+                        id_sala: idSala,
+                        tipo: "train",
+                        titulo: "Trainning room",
+                        descripcion: "Trainning room",
+                        lider: req.body.usuario,
+                        liderId: insertedUser.insertedId,
+                        usuarios_activos: [ bob, alice ],
+                        chat: [],
+                        max_users: "3",
+                        recomendaciones_grupal: [],
+                        recomendaciones_individual: [],
+                        recomendaciones_stack: [],
+                        recomendaciones_favoritos: [],
+                    }
+                    await db.collection("salas").insertOne(trainning_room)
+                    LOG.info(`[TRAINNING-ROOM] Trainning room created for user ${usuario.nombre}`, systemLogEvent("trainning-room"))
+                    let sala_eventos = {
+                        id_sala: idSala.toString(),
+                        usuarios: []
+                    }
+                    await db.collection("salas_eventos").insertOne(sala_eventos)
+                    LOG.info(`[CREATE-EVENT-ROOM] Event room ${sala_eventos.id_sala} created by ${usuario.nombre}`, systemLogEvent("create-room"))
+            
+                }
                 client.close()
             }
             catch (error) {
@@ -474,6 +506,7 @@ app.post("/crear-sala", async (req, res) => {
         _id: idSalaEventos,
         id_sala: req.body.id_sala,
         titulo: req.body.titulo,
+        tipo: "normal",
         descripcion: req.body.descripcion,
         lider: req.body.lider,
         usuarios_activos: [],
@@ -513,21 +546,22 @@ app.get("/obtener-salas", async (req, res) => {
         const salas = await db.collection("salas").find({}).toArray()
         const salasDisponibles = []
         salas.forEach((sala) => {
-            const users = []
-            sala.usuarios_activos.forEach((user) => {
-                console.log(user._id)
-                users.push(user._id)
-            })
-            const struct_sala = {
-                _id: sala._id,
-                id_sala: sala.id_sala,
-                titulo: sala.titulo,
-                descripcion: sala.descripcion,
-                lider: sala.lider,
-                usuarios_activos: users,
-                max_users: sala.max_users
+            if (sala.tipo !== "train" || sala.tipo === undefined){
+                const users = []
+                sala.usuarios_activos.forEach((user) => {
+                    users.push(user._id)
+                })
+                const struct_sala = {
+                    _id: sala._id,
+                    id_sala: sala.id_sala,
+                    titulo: sala.titulo,
+                    descripcion: sala.descripcion,
+                    lider: sala.lider,
+                    usuarios_activos: users,
+                    max_users: sala.max_users
+                }
+                salasDisponibles.push(struct_sala)
             }
-            salasDisponibles.push(struct_sala)
         })
         client.close()
         return res.json(salasDisponibles)
@@ -588,6 +622,23 @@ app.get("/obtener-sala", async (req, res) => {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo) })
+        client.close()
+        if (sala) {
+            return res.json(sala)
+        }
+        return res.json(null)
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
+
+app.get("/obtener-sala-trainning", async (req, res) => {
+    try {
+        const idUsuario = req.query.idUsuario
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = await db.collection("salas").findOne({ liderId: new ObjectId(idUsuario), tipo: "train" })
         client.close()
         if (sala) {
             return res.json(sala)
