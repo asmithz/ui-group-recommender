@@ -1,7 +1,7 @@
 //import 'dotenv/config'
 import dotenv from "dotenv"
 import dotenvExpand from "dotenv-expand"
-import express from "express"
+import express, { application } from "express"
 import { Server as socketServer } from "socket.io"
 import http from "http"
 import cors from "cors"
@@ -2335,6 +2335,56 @@ app.post("/evento-usuario", async (req, res) => {
 
     } catch (error) {
         console.error(error);
+    }
+})
+
+app.delete("/delete-room", async (req, resp) => {
+    const idSala = req.query.idSala
+    try{
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+
+        const sala = await db.collection("sala").deleteOne({ _id: ObjectId(idSala) })
+        if (sala.deletedCount === 1){
+            LOG.info(`[DELETE-ROOM] Room ${idSala} was deleted`, systemLogEvent("delete-room"))
+            return resp.json({
+                "resp": `Deleted room ${idSala}`
+            })
+        }
+        else{
+            LOG.info(`[DELETE-ROOM] Room ${idSala} was not deleted`, systemLogEvent("delete-room"))
+            return resp.json({
+                "resp": `Room ${idSala} not deleted`
+            })
+        }
+
+    }
+    catch(error){
+        console.log(error)
+    }
+})
+
+app.delete("/delete-all-rooms", async (req, resp) => {
+    try{
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+        const result = await db.collection("sala").deleteMany({});
+
+        if (result.deletedCount === 1){
+            LOG.info(`[DELETE-ROOM] All rooms were deleted`, systemLogEvent("delete-room"))
+            return resp.json({
+                "resp": `All rooms deleted`
+            })
+        }
+        else{
+            LOG.info(`[DELETE-ROOM] Error while deleting all rooms`, systemLogEvent("delete-room"))
+            return resp.json({
+                "resp": `Error: rooms not deleted`
+            })
+        }
+    }
+    catch(error){
+        console.log(error)
     }
 })
 
