@@ -7,7 +7,7 @@
             "leaderName": "Leader",
             "availableUsers": "Users",
             "description": "Description",
-            "more": "Currently",
+            "more": "Status",
             "enter": "Enter",
             "state": {
                 "open": "Open",
