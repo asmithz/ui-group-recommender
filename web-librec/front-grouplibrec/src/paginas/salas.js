@@ -137,11 +137,26 @@ const Salas = () => {
                                                                     <td className="has-text-centered">{salaDisponible.usuarios_activos.length}/{salaDisponible.max_users}</td>
                                                                     <td className="has-text-justified">{salaDisponible.descripcion}</td>
                                                                     <td className="has-text-centered" >
-                                                                        <span className="icon-text has-text-info" onClick={() => abrirModalSala(salaDisponible)}>
-                                                                            <button className="button is-info is-light is-rounded">
-                                                                                <FontAwesomeIcon icon={faInfo} />
-                                                                            </button>
-                                                                        </span>
+                                                                        {/*
+                                                                            <span className="icon-text has-text-info" onClick={() => abrirModalSala(salaDisponible)}>
+                                                                                <button className="button is-info is-light is-rounded">
+                                                                                    <FontAwesomeIcon icon={faInfo} />
+                                                                                </button>
+                                                                            </span>
+                                                                        */}
+
+                                                                        <p className="has-text-weight-bold has-text-success"> 
+                                                                        {
+                                                                            salaDisponible.estado === "open" &&
+                                                                            t('main.table.state.open')
+                                                                        }
+                                                                        </p>
+                                                                        <p className="has-text-weight-bold has-text-danger"> 
+                                                                        {
+                                                                            salaDisponible.estado === "closed" &&
+                                                                            t('main.table.state.closed')
+                                                                        }
+                                                                        </p>
                                                                     </td>
                                                                     <td>
                                                                         <Link to={"/grupo/" + salaDisponible._id.toString()} onClick={(event) => checkSalaDisponible(event, salaDisponible._id.toString()) }>

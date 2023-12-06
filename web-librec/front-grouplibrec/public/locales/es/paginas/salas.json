@@ -7,8 +7,13 @@
             "leaderName": "Líder",
             "availableUsers": "Usuarios",
             "description": "Descripción",
-            "more": "Ver más",
-            "enter": "Entrar"
+            "more": "Estado",
+            "enter": "Entrar",
+            "state": {
+                "open": "Abierta",
+                "closed": "Cerrada",
+                "full": "Llena"
+            }
         },
         "createRoom": "Crear sala"
     }

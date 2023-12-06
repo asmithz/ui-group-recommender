@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -21,6 +21,7 @@ const EncuestaFinal = () => {
     const [consensoItems, setConsensoItems] = useState({})
     const [finalItem, setFinalItem] = useState({})
     const [usuariosSala, setSala] = useState([])
+    const navigate = useNavigate()
 
     const usersInitialValuesForm = {}
 
@@ -88,7 +89,7 @@ const EncuestaFinal = () => {
         obtener_consenso()
     }, [])
 
-    const enviarCuestionario = (values) => {
+    const enviarCuestionario = async (values) => {
         if (!values.question1 ||
             !values.question2 ||
             !values.question3 ||
@@ -104,7 +105,15 @@ const EncuestaFinal = () => {
 
         }
         else {
-            console.log(values)
+            const encuesta = {
+                idUsuario: sessionStorage.getItem("id_usuario"),
+                idSala: idSala,
+                respuestas: values
+            }
+            const req = await api.post("/enviar-encuesta-final", (encuesta))
+            if (req.data.resp === "ok"){
+                navigate("/room-end")
+            }
         }
     }
 

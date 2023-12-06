@@ -108,22 +108,38 @@ const SalaEspera = () => {
         }
     }, [idSala, idSesion])
 
-    const cambiarPaginaEncuesta = () => {
-        if (idSala && idSesion) {
-            sessionStorage.setItem("idSala", idSala)
-            socket.emit("solicitar-pagina-final", (idSala))
+    const cambiarPaginaEncuesta = async () => {
+        const idGrupo = idSala
+        const result = await api.get("/check-sala-espera", { params: { idGrupo } }, {
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+        if (result.data.resp) {
+            if (idSala && idSesion) {
+                sessionStorage.setItem("idSala", idSala)
+                socket.emit("solicitar-pagina-final", (idSala))
+            }
+        }
+        else {
+            window.alert(t('main.error'))
         }
     }
 
     useEffect(() => {
-        socket.on("mostrar-pagina-final", () => {
-            const result = usuariosSalaEspera.every(obj1 => usuariosSala.some(obj2 => obj2._id === obj1._id));
-            if (result) {
-                navigate(`/encuesta-final/${idSala}`)
+        socket.on("mostrar-pagina-final", async () => {
+            //const result = usuariosSalaEspera.every(obj1 => usuariosSala.some(obj2 => obj2._id === obj1._id));
+            const salaInfo = {
+                idGrupo: idSala,
+                nuevoEstado: "closed"
             }
-            else {
-                window.alert("Error")
-            }
+            // change to ended state
+            await api.post("/cambiar-estado-sala", (salaInfo), {
+                headers: {
+                    "Content-type": "application/json"
+                }
+            })
+            navigate(`/encuesta-final/${idSala}`)
         })
 
         return () => {

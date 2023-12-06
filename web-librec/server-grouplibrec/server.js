@@ -507,6 +507,7 @@ app.post("/crear-sala", async (req, res) => {
         id_sala: req.body.id_sala,
         titulo: req.body.titulo,
         tipo: "normal",
+        estado: "open",
         descripcion: req.body.descripcion,
         lider: req.body.lider,
         usuarios_activos: [],
@@ -558,7 +559,8 @@ app.get("/obtener-salas", async (req, res) => {
                     descripcion: sala.descripcion,
                     lider: sala.lider,
                     usuarios_activos: users,
-                    max_users: sala.max_users
+                    max_users: sala.max_users,
+                    estado: sala.estado
                 }
                 salasDisponibles.push(struct_sala)
             }
@@ -616,6 +618,39 @@ app.get("/check-usuario", async (req, res) => {
     }
 })
 
+app.post("/cambiar-estado-sala", async (req, res) => {
+    try{
+        const idGrupo = req.body.idGrupo
+        const estado = req.body.nuevoEstado
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo) })
+        let cambiado = false
+        if (sala.estado !== estado){
+            await db.collection("salas").updateOne(
+                { _id: new ObjectId(idGrupo) },
+                {
+                    $set: { estado: estado }
+                }
+            )
+            cambiado = true
+        }
+        client.close()
+        if (cambiado) {
+            return res.json({
+                resp: "ok",
+            })
+        }
+        return res.json({
+            resp: "error",
+            error: "same room state"
+        })
+    }
+    catch(error){
+        console.log(error)
+    }
+})
+
 app.get("/obtener-sala", async (req, res) => {
     try {
         const idGrupo = req.query.idGrupo
@@ -646,6 +681,41 @@ app.get("/obtener-sala-trainning", async (req, res) => {
         return res.json(null)
     }
     catch (error) {
+        console.log(error)
+    }
+})
+
+app.get("/check-sala-espera", async(req, res) => {
+    try{
+        const idGrupo = req.query.idGrupo
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo) })
+        client.close()
+        if (sala) {
+            if (sala.usuarios_activos.length === 0 && sala.sala_espera.length === 0){
+                return res.json({
+                    resp: false,
+                    msg: "both empty"
+                })
+            }
+            const ids1 = sala.usuarios_activos.map(obj => obj._id.toString());
+            const ids2 = sala.sala_espera.map(obj => obj._id.toString());
+            // Check if every user is in waiting room
+            const result = ids1.every(id => ids2.includes(id));
+            if (result){
+                return res.json({
+                    resp: true,
+                    msg: "all users ready"
+                })
+            }
+            return res.json({
+                resp: false,
+                msg: "users missing in waiting room" 
+            })
+        }
+    }
+    catch(error){
         console.log(error)
     }
 })
@@ -693,8 +763,6 @@ app.get("/obtener-sala-espera", async (req, res) => {
                     salaActiva: salaActiva,
                     user: user_data
                 }
-
-                console.log(resp)
 
                 return res.json(resp)
             }
@@ -2283,6 +2351,27 @@ app.delete("/vaciar-sala-espera", async (req, res) => {
         }
         await db.collection('salas').updateOne(sala, update)
         return res.json({
+            status: "sala espera vaciada"
+        })
+    }
+    catch (error) {
+        console.log(error)
+        return res.json({
+            status: "sala espera no vaciada"
+        })
+    }
+})
+
+app.delete("/vaciar-sala", async (req, res) => {
+    try {
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = { _id: new ObjectId(req.query.idSala) }
+        const update = {
+            $set: { usuarios_activos: [] }
+        }
+        await db.collection('salas').updateOne(sala, update)
+        return res.json({
             status: "sala vaciada"
         })
     }
@@ -2335,6 +2424,36 @@ app.post("/evento-usuario", async (req, res) => {
 
     } catch (error) {
         console.error(error);
+    }
+})
+
+app.post("/enviar-encuesta-final", async (req, resp) => {
+    try{
+        let idUsuario = req.body.idUsuario
+        let idSala = req.body.idSala
+        let respuestas = req.body.respuestas
+        let encuesta = {
+            idSala: idSala,
+            idUsuario: idUsuario,
+            respuestas: respuestas
+        }
+        const client = await MongoClient.connect(url);
+        const db = client.db(dbName);
+        const result = await db.collection("cuestionario-final").insertOne(encuesta)
+        client.close()
+        if (result.insertedId) {
+            LOG.info(`[USER-QUESTIONNAIRE] Room ${idSala}: User ${idUsuario} ended the questionnaire`, systemLogEvent("user-final-questionnaire"))
+            return resp.json({
+                resp: "ok"
+            })
+        } 
+        return resp.json({
+            resp: "error"
+        })
+          
+    }
+    catch(error){
+        console.log(error)
     }
 })
 

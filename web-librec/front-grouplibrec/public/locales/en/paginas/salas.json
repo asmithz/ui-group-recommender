@@ -7,8 +7,13 @@
             "leaderName": "Leader",
             "availableUsers": "Users",
             "description": "Description",
-            "more": "View more",
-            "enter": "Enter"
+            "more": "Currently",
+            "enter": "Enter",
+            "state": {
+                "open": "Open",
+                "closed": "Closed",
+                "full": "Full"
+            }
         },
         "createRoom": "Create room"
     }

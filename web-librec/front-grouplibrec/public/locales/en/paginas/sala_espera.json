@@ -2,7 +2,7 @@
     "main":{
         "title": "Waiting room",
         "usersReady": "Users ready: {{waiting}}/{{total}}",
-        "button": "Consensus"
-
+        "button": "Consensus",
+        "error": "All users must be in the waiting room to proceed..."
     }
 }
