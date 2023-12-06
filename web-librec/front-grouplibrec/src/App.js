@@ -13,6 +13,7 @@ import { Suspense } from "react"
 import ChangeLanguage from "./componentes/ChangeLanguage" 
 import EndTest from "./paginas/end-test"
 import TrainningRoom from "./paginas/train"
+import RoomEnd from "./paginas/room-end"
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
           <Route exact path="/test-perfil" element={<TestPerfilUsuario />}></Route>
           <Route exact path="/end-test" element={<EndTest />}></Route>
           <Route exact path="/trainning-room/:id" element={<TrainningRoom />}></Route>
+          <Route exact path="/room-end" element={<RoomEnd />}></Route>
         </Routes>
       </BrowserRouter>
   );
