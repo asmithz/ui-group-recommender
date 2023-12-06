@@ -13,6 +13,12 @@
                 "open": "Abierta",
                 "closed": "Cerrada",
                 "full": "Llena"
+            },
+            "alert": {
+                "state": {
+                    "closed": "La sala se encuentra cerrada, no es posible entrar",
+                    "full": "La sala se encuentra llena, no es posible entrar"
+                }
             }
         },
         "createRoom": "Crear sala"

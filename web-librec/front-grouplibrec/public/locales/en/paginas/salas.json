@@ -13,6 +13,12 @@
                 "open": "Open",
                 "closed": "Closed",
                 "full": "Full"
+            },
+            "alert": {
+                "state": {
+                    "closed": "The room is closed, is not posible to enter",
+                    "full": "The room is full, is not posible to enter"
+                }
             }
         },
         "createRoom": "Create room"

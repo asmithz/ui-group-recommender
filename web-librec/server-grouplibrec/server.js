@@ -574,6 +574,56 @@ app.get("/obtener-salas", async (req, res) => {
     }
 })
 
+app.get("/check-sala-estado", async (req, res) => {
+    try{
+        const idGrupo = req.query.idSala
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo) })
+        client.close()
+        const estados = {
+            full: false,
+            open: false,
+            closed: false
+        }
+        if (sala){
+            if (sala.usuarios_activos.length >= parseInt(sala.max_users)) {
+                estados.full = true
+            }
+            const salaEstado = sala.estado
+            if (salaEstado === "open"){
+                estados.open = true
+            }
+            else if (salaEstado === "closed"){
+                estados.closed = true
+            }
+        }
+        if (estados.full && estados.open && !estados.closed){
+            return res.json({
+                resp: "full-open"
+            })
+        }
+        else if (estados.full && !estados.open && estados.closed){
+            return res.json({
+                resp: "full-closed"
+            })
+        }
+        else if (!estados.full && !estados.open && estados.closed){
+            return res.json({
+                resp: "closed"
+            })
+        }
+        else if (!estados.full && estados.open && !estados.closed){
+            return res.json({
+                resp: "open"
+            })
+        }
+    }
+    catch(error){
+        console.log(error)
+    }
+})
+
 app.get("/check-sala-espacio-disponible", async (req, res) => {
     try {
         const idGrupo = req.query.idSala

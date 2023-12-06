@@ -79,18 +79,24 @@ const Salas = () => {
     const checkSalaDisponible = async (event, idSala) => {
         event.preventDefault();
         try {
-            const resp = await api.get("/check-sala-espacio-disponible", {
+            const estado = await api.get("/check-sala-estado", {
                 params: {idSala},
                 headers: {
                     "Content-type": "application/json"
                 }
             }
             )
-            if (resp.data.enter) {
+            if (estado.data.resp === "open") {
                 window.location.href = "/grupo/" + idSala;
             }
-            else{
-                window.alert("Max reached")
+            else if (estado.data.resp == "closed"){
+                window.alert(t('main.table.alert.state.closed'))
+            }
+            else if (estado.data.resp == "full-open"){
+                window.alert(t('main.table.alert.state.full'))
+            }
+            else if (estado.data.resp == "full-closed"){
+                window.alert(t('main.table.alert.state.closed'))
             }
         }
         catch (error) {
