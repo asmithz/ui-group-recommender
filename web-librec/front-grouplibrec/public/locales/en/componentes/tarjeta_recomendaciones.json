@@ -5,6 +5,20 @@
         },
         "group": {
             "title": "Recommendations for everyone"
+        },
+        "loading":{
+            "first": {
+                "msg": "Loading preferences",
+                "stepNumber": "1"
+            },
+            "second": {
+                "msg": "Generating custom recommendations",
+                "stepNumber": "2"
+            },
+            "third": {
+                "msg": "Retrieving the best recommendations",
+                "stepNumber": "3"
+            }
         }
     }
 }

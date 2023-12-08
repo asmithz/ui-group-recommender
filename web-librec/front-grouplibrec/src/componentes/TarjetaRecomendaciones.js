@@ -1,8 +1,8 @@
-import Lottie from "lottie-react"
-import loadingRecommendation from "../animations/loading-recommendation.json"
 import ListaItems from "./ListaItems"
 import PanelHistorialRecomendaciones from "./PanelHistorialRecomendaciones"
 import { useTranslation } from "react-i18next"
+import '../css/LoadingDots.css'
+import ProgressBar from "./ProgressBar"
 
 const TarjetaRecomendaciones = (props) => {
     const { t, i18n } = useTranslation("componentes/tarjeta_recomendaciones")
@@ -41,22 +41,19 @@ const TarjetaRecomendaciones = (props) => {
                             }
                         </div>
                     </div>
-                    <div className="columns" style={{ overflowY: "scroll" , height: 500}} >
+                    <div className="columns" style={{ overflowY: "scroll", height: 500 }} >
                         {
+                            
                             !props.cargando &&
                             <div className="column">
                                 <ListaItems recomendaciones={props.recomendaciones} socket={props.socket} tipo={props.tipoRecomendacion} enviarAlStack={props.enviarAlStack} idGrupo={props.idGrupo} idUsuario={props.idUsuario} />
                             </div>
+                            
                         }
                         {
                             props.cargando &&
                             <div className="column">
-                                <div style={{ width: "250px", height: "250px" }}>
-                                    <Lottie
-                                        animationData={loadingRecommendation}
-                                        loop={true}
-                                    />
-                                </div>
+                                <ProgressBar loaded={props.cargando} t={t} />
                             </div>
                         }
                     </div>
@@ -65,5 +62,7 @@ const TarjetaRecomendaciones = (props) => {
         </div>
     )
 }
+
+
 
 export default TarjetaRecomendaciones

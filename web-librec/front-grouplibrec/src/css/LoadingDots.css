@@ -1,0 +1,28 @@
+.loading {
+    display: inline-block;
+    position: relative;
+}
+
+.dot {
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 100%;
+    background-color: #1e1e1e;
+    margin: 0 5px;
+    animation: dot-bounce 1.0s ease infinite alternate;
+}
+
+@keyframes dot-bounce {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.5);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
