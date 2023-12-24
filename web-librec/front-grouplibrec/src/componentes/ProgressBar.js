@@ -26,7 +26,7 @@ const ProgressBar = ({ loaded, t }) => {
                 }
                 return newProgress
             });
-        }, 2500)
+        }, 4500)
 
         // Clear the interval when the component unmounts or when needed
         return () => clearInterval(intervalId);

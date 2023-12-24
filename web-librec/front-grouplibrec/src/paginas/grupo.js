@@ -208,7 +208,7 @@ const Grupo = () => {
         setCargandoGrupo(true)
         socket.emit("cargando-enviar", idGrupo, true)
         try {
-            const recomendacion_grupal = await api.get("/ejecutar-recomendacion-grupal", { params: { idGrupo } }, {
+            const recomendacion_grupal = await api.get("/ejecutar-recomendacion-grupalv2", { params: { idGrupo } }, {
                 headers: {
                     "Content-type": "application/json"
                 }
@@ -227,7 +227,7 @@ const Grupo = () => {
     const ejecutarRecomendacionIndividual = async () => {
         setCargandoIndividual(true)
         try {
-            const recomendacion_individual = await api.get("/ejecutar-recomendacion-individual", { params: { idUsuario, idGrupo } }, {
+            const recomendacion_individual = await api.get("/ejecutar-recomendacion-individualv2", { params: { idUsuario, idGrupo } }, {
                 headers: {
                     "Content-type": "application/json"
                 }
@@ -320,7 +320,7 @@ const Grupo = () => {
                 }
             })
 
-            if(sala_espera){
+            if (verificar.data.respuesta === "ok") {
                 socket.emit("chat-enviar-mensaje", idGrupo)
             }
 

@@ -54,7 +54,7 @@ const TestPerfilUsuario = () => {
                 }
             })
 
-            if(resp.data.ok == "ok" && trainSala){
+            if(resp.data.ok === "ok" && trainSala){
                 //navigate("/salas", { replace: true })
                 navigate(`/trainning-room/${trainSala.data._id}`, { replace: true })
             }
@@ -63,10 +63,6 @@ const TestPerfilUsuario = () => {
             console.log(error)
         }
     }
-
-    useEffect(() => {
-        console.log(categories)
-    }, [categories])
 
     return (
         <div className="container mt-6" style={{ maxWidth: "500px" }}>
@@ -250,7 +246,7 @@ const TestPerfilUsuario = () => {
                                     <label className="checkbox">
                                         <div className="columns is-vcentered">
                                             <div className="column">
-                                                <p className="is-size-5"> <FontAwesomeIcon icon={faMusic} style={{ color: "#335BFF" }} /> Espiritual</p>
+                                                <p className="is-size-5"> <FontAwesomeIcon icon={faMusic} style={{ color: "#335BFF" }} /> Gospel</p>
                                             </div>
                                             <input
                                                 type="checkbox"

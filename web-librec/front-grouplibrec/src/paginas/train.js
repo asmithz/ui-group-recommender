@@ -221,7 +221,7 @@ const TrainningRoom = () => {
     const ejecutarRecomendacionIndividual = async () => {
         setCargandoIndividual(true)
         try {
-            const recomendacion_individual = await api.get("/ejecutar-recomendacion-individual", { params: { idUsuario, idGrupo } }, {
+            const recomendacion_individual = await api.get("/ejecutar-recomendacion-individualv2", { params: { idUsuario, idGrupo } }, {
                 headers: {
                     "Content-type": "application/json"
                 }

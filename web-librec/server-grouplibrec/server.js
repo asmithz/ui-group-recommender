@@ -30,6 +30,19 @@ dotenvExpand.expand(dotenv.config())
 const server_ip = process.env.SERVER_IP
 const exec_grouplibrec = process.env.DIR_GROUPLIBREC
 const exec_individualLibrec = process.env.DIR_INDIVIDUALLIBREC
+const exec_librec = process.env.DIR_LIBREC
+
+const dir_individual_basemodel =   process.env.DIR_INDIVIDUAL_BASEMODEL 
+const dir_group_size_2_basemodel = process.env.DIR_GROUP_SIZE_2_BASEMODEL
+const dir_group_size_3_basemodel = process.env.DIR_GROUP_SIZE_3_BASEMODEL
+const dir_group_size_4_basemodel = process.env.DIR_GROUP_SIZE_4_BASEMODEL
+
+const dir_individual_datamodel =   process.env.DIR_INDIVIDUAL_DATAMODEL 
+const dir_group_size_2_datamodel = process.env.DIR_GROUP_SIZE_2_DATAMODEL
+const dir_group_size_3_datamodel = process.env.DIR_GROUP_SIZE_3_DATAMODEL
+const dir_group_size_4_datamodel = process.env.DIR_GROUP_SIZE_4_DATAMODEL
+
+const dir_recommendations = process.env.DIR_RECOMMENDATIONS
 const dir_recommendations_users = process.env.DIR_RECOMMENDATIONS_USERS
 const dir_recommendations_dataset_users = process.env.DIR_RECOMMENDATIONS_DATASET_USERS_DATA
 const dir_recommendations_dataset_users_lastfm = process.env.DIR_RECOMMENDATIONS_DATASET_USERS_DATA_LASTFM
@@ -1069,7 +1082,7 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
                 }
             }
             else if (req.body.tipo_mensaje === "enviar_favoritos") {
-                const item = await db.collection("tracks").findOne({ track_id: parseInt(req.body.itemId) })
+                const item = await db.collection("tracks").findOne({ item_id: parseInt(req.body.itemId) })
                 let path_imagen = dir_lastfm_images + "/" + String(item.artist_id) + ".jpg"
                 if (fs.existsSync(path_imagen)) {
                     path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(item.artist_id) + ".jpg"
@@ -1082,7 +1095,7 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
                     "usuario": n_usuario.usuario,
                     item: {
                         idGrupo: idSala,
-                        idItem: item.track_id,
+                        idItem: item.item_id,
                         id_autor: item.artist_id,
                         nombreItem: item.track_name,
                         nombre_autor: item.artist_name,
@@ -1099,7 +1112,7 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
                 }
             }
             else if (req.body.tipo_mensaje === "eliminar_favoritos") {
-                const item = await db.collection("tracks").findOne({ track_id: parseInt(req.body.itemId) })
+                const item = await db.collection("tracks").findOne({ item_id: parseInt(req.body.itemId) })
                 let path_imagen = dir_lastfm_images + "/" + String(item.artist_id) + ".jpg"
                 if (fs.existsSync(path_imagen)) {
                     path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(item.artist_id) + ".jpg"
@@ -1112,7 +1125,7 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
                     "usuario": n_usuario.usuario,
                     item: {
                         idGrupo: idSala,
-                        idItem: item.track_id,
+                        idItem: item.item_id,
                         id_autor: item.artist_id,
                         nombreItem: item.track_name,
                         nombre_autor: item.artist_name,
@@ -1145,6 +1158,351 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
     }
 })
 
+app.get("/ejecutar-recomendacion-individualv2", async (req, res) => {
+    const idUsuario = req.query.idUsuario
+    const idGrupo = req.query.idGrupo
+    try {
+        LOG.info(`[INDIVIDUAL-RECOMMENDATION] Room: ${idGrupo}: User ${idUsuario} has started individual recommendation`, systemLogEvent("individual-rec"))
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(idUsuario) })
+        if (usuario) {
+            // fecha recomendacion
+            const tiempo_actual = Date.now()
+
+            // crear directorio del usuario si no existe /recomendaciones/usuarios/id
+            const directorioUsuario = dir_recommendations_users + "/" + idUsuario
+            // /recomendaciones/usuarios/id/data
+            const directorioDataUsuario = directorioUsuario + "/data"
+
+            if (!fs.existsSync(directorioUsuario)) {
+                fs.mkdirSync(directorioUsuario)
+            }
+            if (!fs.existsSync(directorioDataUsuario)) {
+                fs.mkdirSync(directorioDataUsuario)
+            }
+            //const userData = directorioDataUsuario + "/user_data"
+
+            // /recomendaciones/usuarios/id/data/users_data_lastfm
+            const userData = directorioDataUsuario + "/users_data_lastfm"
+
+            fs.writeFileSync(userData, '')
+
+            // añadir calificaciones de usuario al dataset
+            usuario.calificaciones.forEach((item) => {
+                var linea = item.linea
+                fs.appendFileSync(userData, linea)
+            })
+
+            // crear y/o reiniciar properties de la sala
+            const directorioUsuarioProperties = directorioUsuario + "/user.properties"
+            fs.copyFileSync(user_recomendations_properties, directorioUsuarioProperties)
+
+            // agregar propiedades a las propiedades del grupo
+            const semilla = String(8348)
+            const recommenderAlgo = "biasedmf"
+            const directorioResultado = recommendations_results_users + "/" + idGrupo 
+
+            if (!fs.existsSync(directorioResultado)){
+                fs.mkdirSync(directorioResultado)
+            }
+
+            if (!fs.existsSync(directorioResultado+"/"+idUsuario)){
+                fs.mkdirSync(directorioResultado+"/"+idUsuario)
+            }
+
+            const dataInputPathName = "users_data_lastfm"
+            fs.appendFileSync(directorioUsuarioProperties, "\nrec.random.seed=" + semilla + "\n")
+            fs.appendFileSync(directorioUsuarioProperties, "rec.recommender.class=" + recommenderAlgo + "\n")
+            fs.appendFileSync(directorioUsuarioProperties, "dfs.data.dir=" + directorioDataUsuario + "\n")
+            fs.appendFileSync(directorioUsuarioProperties, "data.input.path=" + dataInputPathName + "\n")
+            fs.appendFileSync(directorioUsuarioProperties, "user.id=" + idUsuario +"\n")
+            fs.appendFileSync(directorioUsuarioProperties, "show.dataset.ratings=false" + "\n")
+            fs.appendFileSync(directorioUsuarioProperties, "show.individual.ratings=true" + "\n")
+            fs.appendFileSync(directorioUsuarioProperties, "dfs.result.dir=" + directorioResultado)
+
+            // ejectuar grouplibrec
+            const args = ["-jar", exec_librec, "individual", directorioUsuarioProperties, dir_individual_datamodel, dir_individual_basemodel]
+            const grouplibrec = spawn("java", args)
+            grouplibrec.stdout.on("data", (data) => {
+                console.log(`${data}`)
+            })
+            grouplibrec.stderr.on("data", (data) => {
+                console.log(`${data}`)
+            })
+            grouplibrec.on("close", async (code) => {
+                if (code === 0) {
+                    // devolver items recomendados para el grupo
+                    console.log(`exit success: ${code}`)
+                    const directorioResultadosSala = recommendations_results_users + "/" + idGrupo + "/" + idUsuario + "/"
+                    let items = []
+                    const recomendaciones = fs.readdirSync(directorioResultadosSala)
+                    //const directorioUltimaRecomendacion = recomendaciones.sort()[recomendaciones.length - 1]
+
+                    const currentTimestamp = Date.now();
+                    const differences = recomendaciones.map(millisecond => Math.abs(parseInt(millisecond) - currentTimestamp));
+                    const closestIndex = differences.indexOf(Math.min(...differences));
+                    const directorioUltimaRecomendacion = recomendaciones[closestIndex];
+
+                    let trecomendaciones = fs.readFileSync(directorioResultadosSala + directorioUltimaRecomendacion + "/recommendations.txt", "utf-8")
+                    let arrayRecomendaciones = trecomendaciones.split("\n")
+
+                    //var data2 = fs.readFileSync(dir_tracks_data, "utf-8")
+                    //data2 = data2.split("\n")
+
+                    for (let i = 0; i < arrayRecomendaciones.length - 1; i++) {
+                        if(arrayRecomendaciones[i] === ''){
+                            continue
+                        }
+                        let recomendacion = arrayRecomendaciones[i].split(",");
+                        let grupo = recomendacion[0];
+                        let item = parseInt(recomendacion[1]);
+                        let rating_individual = recomendacion[2];
+
+                        let found_item = await db.collection("tracks").findOne({ item_id: parseInt(item) })
+
+                        if(found_item === null || found_item.item_id === null){
+                            continue
+                        }
+
+                        let trackItemId = found_item.item_id
+                        let nombreItem = found_item.track_name
+                        let tipoItem = found_item.track_category
+                        let url_item = found_item.track_url
+                        let idAutor = found_item.artist_id
+                        let nombreAutor = found_item.artist_name
+                        let urlAutor = found_item.artist_url
+                        let originAutor = found_item.artist_country
+                        let continentAutor = found_item.artist_continent
+
+                        let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg";
+                        if (fs.existsSync(path_imagen)) {
+                            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg";
+                        } else {
+                            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png";
+                        }
+                        items.push({
+                            idItem: String(item),
+                            rating: rating_individual,
+                            pathImagen: path_imagen,
+                            pathItem: path_imagen,
+                            nombreItem: nombreItem,
+                            tipoItem: tipoItem,
+                            url_item: url_item,
+                            id_autor: idAutor,
+                            nombre_autor: nombreAutor,
+                            url_autor: urlAutor,
+                            origin_autor: originAutor,
+                            continent_autor: continentAutor,
+                        });
+                    }
+                    let items_ordenados = items.sort(function (a, b) {
+                        return b.ratingGrupo - a.ratingGrupo
+                    })
+
+                    await db.collection("usuarios").updateOne(
+                        { _id: new ObjectId(idUsuario) },
+                        {
+                            $push:
+                            {
+                                recomendaciones:
+                                    { idSala: idGrupo, time: tiempo_actual, items: items_ordenados }
+                            }
+                        }
+                    )
+                    client.close()
+                    return res.json(items_ordenados)
+                }
+                else {
+                    console.log(`exit error: ${code}`)
+                }
+            })
+        }
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
+
+app.get("/ejecutar-recomendacion-grupalv2", async (req, res) => {
+    const idSala = req.query.idGrupo
+    try {
+
+        LOG.info(`[GROUP-RECOMMENDATION] Room ${idSala}: Group Recommendation has started`, systemLogEvent("group-rec"))
+        const client = await MongoClient.connect(url)
+        const db = client.db(dbName)
+        const sala = await db.collection("salas").findOne({ _id: new ObjectId(idSala) })
+        const groupUsers = []
+        if (sala) {
+            // fecha recomendacion
+            const tiempo_actual = Date.now()
+
+            // crear directorio del grupo si no existe
+            const directorioGrupo = dir_recommendations_rooms + "/" + idSala
+            const directorioDataGrupo = directorioGrupo + "/data"
+
+            if (!fs.existsSync(directorioGrupo)) {
+                fs.mkdirSync(directorioGrupo)
+            }
+            if (!fs.existsSync(directorioDataGrupo)) {
+                fs.mkdirSync(directorioDataGrupo)
+            }
+            //const usersDataGroup = directorioDataGrupo + "/users_data"
+            const usersDataGroup = directorioDataGrupo + "/users_data_lastfm"
+
+            fs.writeFileSync(usersDataGroup, '')
+
+            // añadir calificaciones de usuarios al dataset
+            sala.usuarios_activos.forEach(async (usuario) => {
+                groupUsers.push(usuario._id.toString())
+                const user = await db.collection("usuarios").findOne({ _id: new ObjectId(usuario._id.toString()) })
+                user.calificaciones.forEach((calificacion) => {
+                    var idItem = calificacion.id_item
+                    var linea = calificacion.linea
+                    fs.appendFileSync(usersDataGroup, linea)
+                })
+            })
+
+            // crear y/o reiniciar properties de la sala
+            const directorioProperties = directorioGrupo + "/group.properties"
+            fs.copyFileSync(group_recomendations_properties, directorioProperties)
+    
+            let groupSimilarSize = groupUsers.length
+            let groupModelPath
+            let groupDataModelPath
+
+            if (groupSimilarSize <= 1 || groupSimilarSize >= 5){
+                return res.json({
+                    "resp": "group size must be 2, 3 or 4"
+                })
+            }
+
+            if (groupSimilarSize === 2){
+                groupModelPath = dir_group_size_2_basemodel
+                groupDataModelPath = dir_group_size_2_datamodel
+            }
+            else if(groupSimilarSize === 3){
+                groupModelPath = dir_group_size_3_basemodel
+                groupDataModelPath = dir_group_size_3_datamodel
+            }
+            else if(groupSimilarSize === 4){
+                groupModelPath = dir_group_size_4_basemodel
+                groupDataModelPath = dir_group_size_4_datamodel
+            }
+
+            let group_ids = groupUsers.join(",")
+
+
+            // agregar propiedades a las propiedades del grupo
+            const semilla = String(834585349) + "\n"
+            const recommenderAlgo = "biasedmf"
+            const directorioData = usersDataGroup 
+            const directorioResultado = dir_recommendations_results 
+            const dataInputPathName = "users_data_lastfm" 
+            fs.appendFileSync(directorioProperties, "\nrec.random.seed=" + semilla + "\n")
+            fs.appendFileSync(directorioProperties, "group.base.recommender.class=" + recommenderAlgo + "\n")
+            fs.appendFileSync(directorioProperties, "dfs.data.dir=" + directorioDataGrupo + "\n")
+            fs.appendFileSync(directorioProperties, "group.similar.groupSize=" + String(groupSimilarSize) +"\n")
+            fs.appendFileSync(directorioProperties, "data.input.group.path=" + dataInputPathName +"\n")
+            fs.appendFileSync(directorioProperties, "group.new=true" + "\n")
+            fs.appendFileSync(directorioProperties, "group.users.ids="+ group_ids + "\n")
+            fs.appendFileSync(directorioProperties, "group.id="+ idSala + "\n")
+            fs.appendFileSync(directorioProperties, "show.group.ratings=true" + "\n")
+
+            fs.appendFileSync(directorioProperties, "dfs.result.dir=" + directorioResultado +"\n")
+
+            // ejectuar grouplibrec
+            const args = ["-jar", exec_librec, "group", directorioProperties, groupDataModelPath, groupModelPath ]
+            //const javaVersionPath = "/home/asmith/java/java-11-openjdk-amd64/bin/java"
+            const grouplibrec = spawn("java", args)
+            grouplibrec.stdout.on("data", (data) => {
+                console.log(`out: ${data}`)
+            })
+            grouplibrec.stderr.on("data", (data) => {
+                console.log(`error: ${data}`)
+            })
+            grouplibrec.on("close", async (code) => {
+                if (code === 0) {
+                    // devolver items recomendados para el grupo
+                    console.log(`exit success: ${code}`)
+                    const directorioResultadosSala = dir_recommendations_results + "/" + idSala + "/"
+                    let items = []
+                    const recomendaciones = fs.readdirSync(directorioResultadosSala)
+                    const directorioUltimaRecomendacion = recomendaciones.sort()[recomendaciones.length - 1]
+                    let trecomendaciones = fs.readFileSync(directorioResultadosSala + directorioUltimaRecomendacion + "/recommendations.txt", "utf-8")
+                    let arrayRecomendaciones = trecomendaciones.split("\n")
+                    for (let i = 0; i < arrayRecomendaciones.length - 1; i++) {
+                        let recomendacion = arrayRecomendaciones[i].split(",")
+                        let grupo = recomendacion[0]
+                        let item = recomendacion[1]
+                        let rating_grupo = recomendacion[2]
+                        if (item) {
+                            let found_item = await db.collection("tracks").findOne({ item_id: parseInt(item) })
+
+                            let trackItemId = found_item.item_id
+                            let nombreItem = found_item.track_name
+                            let tipoItem = found_item.track_category
+                            let url_item = found_item.track_url
+                            let idAutor = found_item.artist_id
+                            let nombreAutor = found_item.artist_name
+                            let urlAutor = found_item.artist_url
+                            let originAutor = found_item.artist_country
+                            let continentAutor = found_item.artist_continent
+
+                            let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg"
+                            if (fs.existsSync(path_imagen)) {
+                                path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg"
+                            }
+                            else {
+                                path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+                            }
+
+                            items.push({
+                                idGrupo: grupo,
+                                idItem: item,
+                                rating: rating_grupo,
+                                pathImagen: path_imagen,
+                                pathItem: path_imagen,
+                                nombreItem: nombreItem,
+                                tipoItem: tipoItem,
+                                url_item: url_item,
+                                id_autor: idAutor,
+                                nombre_autor: nombreAutor,
+                                url_autor: urlAutor,
+                                origin_autor: originAutor,
+                                continent_autor: continentAutor,
+                            })
+                        }
+                    }
+                    let items_ordenados = items.sort(function (a, b) {
+                        return b.ratingGrupo - a.ratingGrupo
+                    })
+
+                    await db.collection("salas").updateOne(
+                        { _id: new ObjectId(idSala) },
+                        {
+                            $addToSet: {
+                                recomendaciones_grupal: {
+                                    time: tiempo_actual,
+                                    items: items_ordenados
+                                }
+                            }
+                        }
+                    )
+                    client.close()
+                    return res.json(items_ordenados)
+                }
+                else {
+                    console.log(`exit error: ${code}`)
+                }
+            })
+        }
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
+
 app.get("/ejecutar-recomendacion-individual", async (req, res) => {
     const idUsuario = req.query.idUsuario
     const idGrupo = req.query.idGrupo
@@ -1157,8 +1515,9 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
             // fecha recomendacion
             const tiempo_actual = Date.now()
 
-            // crear directorio del usuario si no existe
+            // crear directorio del usuario si no existe /recomendaciones/usuarios/id
             const directorioUsuario = dir_recommendations_users + "/" + idUsuario
+            // /recomendaciones/usuarios/id/data
             const directorioDataUsuario = directorioUsuario + "/data"
 
             if (!fs.existsSync(directorioUsuario)) {
@@ -1169,6 +1528,7 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
             }
             //const userData = directorioDataUsuario + "/user_data"
 
+            // /recomendaciones/usuarios/data/users_data_lastfm
             const userData = directorioDataUsuario + "/users_data_lastfm"
 
             // crear y/o reiniciar dataset del usuario
@@ -1224,9 +1584,9 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
                         let item = parseInt(recomendacion[1]);
                         let rating_individual = recomendacion[2];
 
-                        let found_item = await db.collection("tracks").findOne({ track_id: parseInt(item) })
+                        let found_item = await db.collection("tracks").findOne({ item_id: parseInt(item) })
 
-                        let trackItemId = found_item.track_id
+                        let trackItemId = found_item.item_id
                         let nombreItem = found_item.track_name
                         let tipoItem = found_item.track_category
                         let url_item = found_item.track_url
@@ -1369,9 +1729,9 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
                         let item = recomendacion[1]
                         let rating_grupo = recomendacion[2]
                         if (item) {
-                            let found_item = await db.collection("tracks").findOne({ track_id: parseInt(item) })
+                            let found_item = await db.collection("tracks").findOne({ item_id: parseInt(item) })
 
-                            let trackItemId = found_item.track_id
+                            let trackItemId = found_item.item_id
                             let nombreItem = found_item.track_name
                             let tipoItem = found_item.track_category
                             let url_item = found_item.track_url
@@ -1555,9 +1915,9 @@ app.get("/obtener-item", async (req, res) => {
 
     const client = await MongoClient.connect(url)
     const db = client.db(dbName)
-    const item = await db.collection("tracks").findOne({ track_id: parseInt(idItem) })
+    const item = await db.collection("tracks").findOne({ item_id: parseInt(idItem) })
 
-    let idTrack = item.track_id
+    let idTrack = item.item_id
     let nombreItem = item.track_name
     let tipoItem = item.track_category
     let url_item = item.track_url
@@ -1622,7 +1982,7 @@ app.get("/obtener-item", async (req, res) => {
 
 app.get("/obtener-item-no-calificado", async (req, res) => {
     const id_usuario = req.query.id_usuario
-    const cant_data = 646153
+    const cant_data = 443920
     let idItem = Math.floor(Math.random() * cant_data) + 1
     let idTrack
     let nombreItem
@@ -1633,21 +1993,25 @@ app.get("/obtener-item-no-calificado", async (req, res) => {
     let urlAutor
     let originAutor
     let continentAutor
+    let itemId
     let splitType = ","
     try {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
         const usuario = await db.collection("usuarios").findOne({ _id: new ObjectId(id_usuario) })
 
+        const randomDocument = await db.collection("tracks").find().skip(idItem).limit(1).toArray();
+        const doc = randomDocument[0]
+
         let isIdFound = true
 
         while (isIdFound) {
-            isIdFound = usuario.calificaciones.some(item => item.id_item === String(idItem))
+            isIdFound = usuario.calificaciones.some(item => item.id_item === String(doc.item_id))
         }
 
-        const item = await db.collection("tracks").findOne({ track_id: idItem })
+        const item = doc
 
-        idTrack = item.track_id
+        idTrack = item.item_id
         nombreItem = item.track_name
         tipoItem = item.track_category
         urlItem = item.track_url
@@ -1656,51 +2020,7 @@ app.get("/obtener-item-no-calificado", async (req, res) => {
         urlAutor = item.artist_url
         originAutor = item.artist_country
         continentAutor = item.artist_continent
-
-        ////leer fichero de tracks...
-        //var data2 = fs.readFileSync(dir_tracks_data, "utf-8")
-        //data2 = data2.split("\n")
-
-        //let foundTrack = true;
-        //let left = 0;
-        //let right = data2.length - 1;
-
-        //while (foundTrack) {
-        //    const idItem = Math.floor(Math.random() * cant_data) + 1;
-        //    let index = -1;
-
-        //    while (left <= right) {
-        //        const mid = Math.floor((left + right) / 2);
-        //        const currentItem = parseInt(data2[mid].split(splitType)[0]);
-
-        //        if (currentItem === idItem) {
-        //            index = mid;
-        //            break;
-        //        } else if (currentItem < idItem) {
-        //            left = mid + 1;
-        //        } else {
-        //            right = mid - 1;
-        //        }
-        //    }
-
-        //    if (index !== -1) {
-        //        const itemData = data2[index].split(splitType);
-        //        idTrack = itemData[0];
-        //        nombreItem = itemData[1];
-        //        tipoItem = itemData[2];
-        //        urlItem = itemData[3];
-        //        idAutor = itemData[4];
-        //        nombreAutor = itemData[5];
-        //        urlAutor = itemData[6];
-        //        originAutor = itemData[7];
-        //        continentAutor = itemData[8];
-        //        foundTrack = false;
-        //    }
-
-        //    // Reset left and right pointers for the next iteration
-        //    left = 0;
-        //    right = data2.length - 1;
-        //}
+        itemId = item.item_id
 
         let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg"
         if (fs.existsSync(path_imagen)) {
@@ -1711,7 +2031,7 @@ app.get("/obtener-item-no-calificado", async (req, res) => {
         }
         client.close()
         return res.json({
-            id_pelicula: idItem,
+            id_pelicula: itemId,
             nombre_pelicula: nombreItem,
             tipo_pelicula: tipoItem,
             url_item: urlItem,
@@ -1864,8 +2184,8 @@ app.post("/enviar-al-stack", async (req, res) => {
     try {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
-        const item = await db.collection("tracks").findOne({ track_id: parseInt(idItem) })
-        let idTrack = item.track_id
+        const item = await db.collection("tracks").findOne({ item_id: parseInt(idItem) })
+        let idTrack = item.item_id
         let nombreItem = item.track_name
         let tipoItem = item.track_category
         let urlItem = item.track_url
@@ -2005,8 +2325,8 @@ app.post("/enviar-a-favoritos", async (req, res) => {
     try {
         const client = await MongoClient.connect(url)
         const db = client.db(dbName)
-        const item = await db.collection("tracks").findOne({ track_id: parseInt(idItem) })
-        let idTrack = item.track_id
+        const item = await db.collection("tracks").findOne({ item_id: parseInt(idItem) })
+        let idTrack = item.item_id
         let nombreItem = item.track_name
         let tipoItem = item.track_category
         let urlItem = item.track_url
@@ -2335,7 +2655,7 @@ app.post("/generar-perfil", async (req, res) => {
                         nombre_perfil = nombre_perfil + "Pop"
                         break
                 }
-                var perfil = fs.readFileSync("/home/asmith/recomendaciones/profiles/" + nombre_perfil, "utf-8")
+                var perfil = fs.readFileSync(dir_recommendations+"/profiles/" + nombre_perfil, "utf-8")
                 let calificacion
                 let arrayRecomendaciones = perfil.split("\n")
                 for (let i = 0; i < arrayRecomendaciones.length - 1; i++) {
