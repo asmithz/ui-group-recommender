@@ -89,7 +89,6 @@ const ItemModal = (props) => {
                         "Content-type": "application/json"
                     }
                 })
-                console.log(enviar_evento.data)
             }
         }
         catch (error) {
@@ -110,7 +109,6 @@ const ItemModal = (props) => {
                         "Content-type": "application/json"
                     }
                 })
-                console.log(enviar_evento.data)
             }
         }
         catch (error) {

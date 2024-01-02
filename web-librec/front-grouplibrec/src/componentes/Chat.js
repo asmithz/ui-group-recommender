@@ -70,8 +70,6 @@ const Chat = (props) => {
             })
             if (resp_chat.data) {
                 setChatGrupo([...chatGrupo, resp_chat.data])
-                console.log(resp_chat.data)
-                console.log(chatGrupo)
             }
         }
         catch(error){

@@ -88,9 +88,7 @@ const Interfaz = () => {
 
             try {
 		const newUsuariosSesion = { ...usuariosSesion }
-		console.log(newUsuariosSesion)
 		delete newUsuariosSesion[String(id)]
-		console.log(newUsuariosSesion)
 		setUsuariosSesion(newUsuariosSesion)
                 await api.delete("/eliminar-fichero", {
                     id_sesion: id

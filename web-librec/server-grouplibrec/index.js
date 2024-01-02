@@ -52,7 +52,6 @@ io.on("connection", (socket) => {
         try {
             io.emit("usuario-desconectado", socket.id)
             await deleteDoc(doc(db, "sala", socket.id))
-            console.log("desconectado " + socket.id)
         }
         catch (error) {
             console.log(error)

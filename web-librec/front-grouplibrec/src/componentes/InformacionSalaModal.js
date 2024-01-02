@@ -45,7 +45,6 @@ const InformacionSalaModal = (props) => {
 }
 
 const UsuarioEnGrupo = (props) => {
-    console.log(props.salaInfo)
     props.salaInfo.usuarios_activos.map((nombreIntegrante, integranteIndex) => {
         return (
             <li key={nombreIntegrante + integranteIndex}>{nombreIntegrante}</li>

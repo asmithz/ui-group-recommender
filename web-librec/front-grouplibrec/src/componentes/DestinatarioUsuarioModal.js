@@ -70,7 +70,6 @@ const DestinatarioUsuarioModal = (props) => {
                     "Content-type": "application/json"
                 }
             })
-            console.log(enviar_evento.data)
 
             props.socket.emit("chat-enviar-mensaje", props.idGrupo)
             setEmitirMensaje(emitirMensaje + 1)

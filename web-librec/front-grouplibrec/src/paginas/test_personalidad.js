@@ -49,7 +49,6 @@ const TestPersonalidad = () => {
                     }
                 })
                 if (resp) {
-                    console.log("perfil creado")
                     navigate("/test-perfil", { replace: true })
                 }
             }

@@ -289,7 +289,6 @@ const Grupo = () => {
                     "Content-type": "application/json"
                 }
             })
-            console.log(enviar_evento.data)
             //obtenerStackUsuario(idGrupo, idUsuario)
         }
         catch (error) {
