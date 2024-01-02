@@ -1226,12 +1226,6 @@ app.get("/ejecutar-recomendacion-individualv2", async (req, res) => {
             // ejectuar grouplibrec
             const args = ["-jar", exec_librec, "individual", directorioUsuarioProperties, dir_individual_datamodel, dir_individual_basemodel]
             const grouplibrec = spawn("java", args)
-            grouplibrec.stdout.on("data", (data) => {
-                console.log(`${data}`)
-            })
-            grouplibrec.stderr.on("data", (data) => {
-                console.log(`${data}`)
-            })
             grouplibrec.on("close", async (code) => {
                 if (code === 0) {
                     // devolver items recomendados para el grupo
@@ -1286,7 +1280,6 @@ app.get("/ejecutar-recomendacion-individualv2", async (req, res) => {
                                 { $set: { librec_rec: usuario_rec }}
                                 )
                             if (usuario_rec[item] >= max_recommend){
-                                console.log("skip "+item)
                                 continue
                             }
                         }
@@ -1442,12 +1435,6 @@ app.get("/ejecutar-recomendacion-grupalv2", async (req, res) => {
             const args = ["-jar", exec_librec, "group", directorioProperties, groupDataModelPath, groupModelPath ]
             //const javaVersionPath = "/home/asmith/java/java-11-openjdk-amd64/bin/java"
             const grouplibrec = spawn("java", args)
-            grouplibrec.stdout.on("data", (data) => {
-                console.log(`out: ${data}`)
-            })
-            grouplibrec.stderr.on("data", (data) => {
-                console.log(`error: ${data}`)
-            })
             grouplibrec.on("close", async (code) => {
                 if (code === 0) {
                     // devolver items recomendados para el grupo
@@ -1494,7 +1481,6 @@ app.get("/ejecutar-recomendacion-grupalv2", async (req, res) => {
                                     { $set: { librec_rec: grupo_rec }}
                                     )
                                 if (grupo_rec[item] >= max_recommend){
-                                    console.log("skip "+item)
                                     continue
                                 }
                             }
