@@ -376,6 +376,7 @@ app.post("/registrar-usuario", async (req, res) => {
                 educacion: req.body.educacion,
                 password: req.body.password,
                 recomendaciones: [],
+                librec_rec: {},
                 imagen_usuario: "http://" + server_ip + ":" + server_port + dir_icons + "/" + image.name,
                 calificaciones: [],
                 idSalaActiva: ""
@@ -531,7 +532,8 @@ app.post("/crear-sala", async (req, res) => {
         recomendaciones_stack: [],
         recomendaciones_favoritos: [],
         sala_espera: [],
-        sala_eventos_id: idSalaEventos.toString()
+        sala_eventos_id: idSalaEventos.toString(),
+        librec_rec: {}
     }
     let sala_eventos = {
         id_sala: idSalaEventos.toString(),
@@ -1249,21 +1251,46 @@ app.get("/ejecutar-recomendacion-individualv2", async (req, res) => {
 
                     //var data2 = fs.readFileSync(dir_tracks_data, "utf-8")
                     //data2 = data2.split("\n")
-
+                    let max_recommend = 2
+                    let usuario_rec = usuario.librec_rec
+                    let count_item = 0
                     for (let i = 0; i < arrayRecomendaciones.length - 1; i++) {
+                        if (count_item === 5){
+                            break
+                        }
                         if(arrayRecomendaciones[i] === ''){
                             continue
                         }
+
                         let recomendacion = arrayRecomendaciones[i].split(",");
                         let grupo = recomendacion[0];
                         let item = parseInt(recomendacion[1]);
                         let rating_individual = recomendacion[2];
 
                         let found_item = await db.collection("tracks").findOne({ item_id: parseInt(item) })
-
                         if(found_item === null || found_item.item_id === null){
                             continue
                         }
+
+                        if (usuario_rec[item] === undefined){
+                            usuario_rec[item] = 1
+                            await db.collection("usuarios").updateOne(
+                                { _id: new ObjectId(idUsuario) },
+                                { $set: { librec_rec: usuario_rec }}
+                                )
+                        }
+                        else{
+                            usuario_rec[item] += 1
+                            await db.collection("usuarios").updateOne(
+                                { _id: new ObjectId(idUsuario) },
+                                { $set: { librec_rec: usuario_rec }}
+                                )
+                            if (usuario_rec[item] >= max_recommend){
+                                console.log("skip "+item)
+                                continue
+                            }
+                        }
+                        count_item+=1
 
                         let trackItemId = found_item.item_id
                         let nombreItem = found_item.track_name
@@ -1394,7 +1421,7 @@ app.get("/ejecutar-recomendacion-grupalv2", async (req, res) => {
 
 
             // agregar propiedades a las propiedades del grupo
-            const semilla = String(834585349) + "\n"
+            const semilla = String(647483) + "\n"
             const recommenderAlgo = "biasedmf"
             const directorioData = usersDataGroup 
             const directorioResultado = dir_recommendations_results 
@@ -1431,13 +1458,47 @@ app.get("/ejecutar-recomendacion-grupalv2", async (req, res) => {
                     const directorioUltimaRecomendacion = recomendaciones.sort()[recomendaciones.length - 1]
                     let trecomendaciones = fs.readFileSync(directorioResultadosSala + directorioUltimaRecomendacion + "/recommendations.txt", "utf-8")
                     let arrayRecomendaciones = trecomendaciones.split("\n")
+
+                    let max_recommend = 2
+                    let grupo_rec = sala.librec_rec
+                    let count_item = 0
+
                     for (let i = 0; i < arrayRecomendaciones.length - 1; i++) {
+                        if (count_item === 5){
+                            break
+                        }
+                        if(arrayRecomendaciones[i] === ''){
+                            continue
+                        }
                         let recomendacion = arrayRecomendaciones[i].split(",")
                         let grupo = recomendacion[0]
                         let item = recomendacion[1]
                         let rating_grupo = recomendacion[2]
                         if (item) {
                             let found_item = await db.collection("tracks").findOne({ item_id: parseInt(item) })
+                            if(found_item === null || found_item.item_id === null){
+                                continue
+                            }
+
+                            if (grupo_rec[item] === undefined){
+                                grupo_rec[item] = 1
+                                await db.collection("salas").updateOne(
+                                    { _id: new ObjectId(idSala) },
+                                    { $set: { librec_rec: grupo_rec }}
+                                    )
+                            }
+                            else{
+                                grupo_rec[item] += 1
+                                await db.collection("salas").updateOne(
+                                    { _id: new ObjectId(idSala) },
+                                    { $set: { librec_rec: grupo_rec }}
+                                    )
+                                if (grupo_rec[item] >= max_recommend){
+                                    console.log("skip "+item)
+                                    continue
+                                }
+                            }
+                            count_item+=1
 
                             let trackItemId = found_item.item_id
                             let nombreItem = found_item.track_name
