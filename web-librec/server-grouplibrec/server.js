@@ -22,7 +22,8 @@ const server = http.createServer(app)
 const io = new socketServer(server, {
     cors: {
         origin: "*"
-    }
+    },
+    transports: ["websocket", "polling"],
 })
 
 dotenvExpand.expand(dotenv.config())
@@ -363,7 +364,8 @@ app.post("/registrar-usuario", async (req, res) => {
     }
     const image = req.files.imagen_usuario
     const uploadDirectory = dir_icons_users
-    const filePath = uploadDirectory + "/" + image.name;
+    //const filePath = uploadDirectory + "/" + image.name;
+    const filePath = "/home/asmith/app/front-build/iconos/" + req.body.usuario + "_" + image.name
     image.mv(filePath, async (err) => {
         if (err) {
             console.error(err)
@@ -377,7 +379,7 @@ app.post("/registrar-usuario", async (req, res) => {
                 password: req.body.password,
                 recomendaciones: [],
                 librec_rec: {},
-                imagen_usuario: "http://" + server_ip + ":" + server_port + dir_icons + "/" + image.name,
+                imagen_usuario: "http://" + server_ip + dir_icons + "/" + req.body.usuario + "_" + image.name,
                 calificaciones: [],
                 idSalaActiva: ""
             }
@@ -387,8 +389,8 @@ app.post("/registrar-usuario", async (req, res) => {
                 const insertedUser = await db.collection("usuarios").insertOne(usuario)
                 LOG.info(`[REGISTER] User ${usuario.nombre} was created`, systemLogEvent("register"))
 
-                const bob = await db.collection("usuarios").findOne({ "usuario": "bob" });
-                const alice = await db.collection("usuarios").findOne({ "usuario": "alice" });
+                const bob = await db.collection("usuarios").findOne({ "usuario": "bobbot" });
+                const alice = await db.collection("usuarios").findOne({ "usuario": "alicebot" });
 
                 if (bob && alice){
                     let idSala = new ObjectId()
@@ -407,6 +409,7 @@ app.post("/registrar-usuario", async (req, res) => {
                         recomendaciones_individual: [],
                         recomendaciones_stack: [],
                         recomendaciones_favoritos: [],
+                        librec_rec: {}
                     }
                     await db.collection("salas").insertOne(trainning_room)
                     LOG.info(`[TRAINNING-ROOM] Trainning room created for user ${usuario.nombre}`, systemLogEvent("trainning-room"))
@@ -1018,10 +1021,10 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
             else if (req.body.tipo_mensaje === "item") {
                 let path_imagen = dir_lastfm_images + "/" + String(req.body.itemId) + ".jpg"
                 if (fs.existsSync(path_imagen)) {
-                    path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(req.body.itemId) + ".jpg"
+                    path_imagen = "http://" + server_ip + lastfm_images + "/" + String(req.body.itemId) + ".jpg"
                 }
                 else {
-                    path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+                    path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
                 }
                 info_mensaje = {
                     "id_usuario": req.body.id_usuario,
@@ -1087,10 +1090,10 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
                 const item = await db.collection("tracks").findOne({ item_id: parseInt(req.body.itemId) })
                 let path_imagen = dir_lastfm_images + "/" + String(item.artist_id) + ".jpg"
                 if (fs.existsSync(path_imagen)) {
-                    path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(item.artist_id) + ".jpg"
+                    path_imagen = "http://" + server_ip + lastfm_images + "/" + String(item.artist_id) + ".jpg"
                 }
                 else {
-                    path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+                    path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
                 }
                 info_mensaje = {
                     "id_usuario": req.body.id_usuario,
@@ -1117,10 +1120,10 @@ app.post("/enviar-mensaje-chat", async (req, res) => {
                 const item = await db.collection("tracks").findOne({ item_id: parseInt(req.body.itemId) })
                 let path_imagen = dir_lastfm_images + "/" + String(item.artist_id) + ".jpg"
                 if (fs.existsSync(path_imagen)) {
-                    path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(item.artist_id) + ".jpg"
+                    path_imagen = "http://" + server_ip + lastfm_images + "/" + String(item.artist_id) + ".jpg"
                 }
                 else {
-                    path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+                    path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
                 }
                 info_mensaje = {
                     "id_usuario": req.body.id_usuario,
@@ -1297,9 +1300,9 @@ app.get("/ejecutar-recomendacion-individualv2", async (req, res) => {
 
                         let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg";
                         if (fs.existsSync(path_imagen)) {
-                            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg";
+                            path_imagen = "http://" + server_ip + lastfm_images + "/" + String(idAutor) + ".jpg";
                         } else {
-                            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png";
+                            path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png";
                         }
                         items.push({
                             idItem: String(item),
@@ -1498,10 +1501,10 @@ app.get("/ejecutar-recomendacion-grupalv2", async (req, res) => {
 
                             let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg"
                             if (fs.existsSync(path_imagen)) {
-                                path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg"
+                                path_imagen = "http://" + server_ip + lastfm_images + "/" + String(idAutor) + ".jpg"
                             }
                             else {
-                                path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+                                path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
                             }
 
                             items.push({
@@ -1645,9 +1648,9 @@ app.get("/ejecutar-recomendacion-individual", async (req, res) => {
 
                         let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg";
                         if (fs.existsSync(path_imagen)) {
-                            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg";
+                            path_imagen = "http://" + server_ip + lastfm_images + "/" + String(idAutor) + ".jpg";
                         } else {
-                            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png";
+                            path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png";
                         }
                         items.push({
                             idItem: String(item),
@@ -1790,10 +1793,10 @@ app.get("/ejecutar-recomendacion-grupal", async (req, res) => {
 
                             let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg"
                             if (fs.existsSync(path_imagen)) {
-                                path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg"
+                                path_imagen = "http://" + server_ip + lastfm_images + "/" + String(idAutor) + ".jpg"
                             }
                             else {
-                                path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+                                path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
                             }
 
                             items.push({
@@ -1943,10 +1946,10 @@ app.get("/obtener-pelicula", (req, res) => {
 
     let path_imagen = dir_lastfm_images + "/" + String(idPelicula) + ".jpg"
     if (fs.existsSync(path_imagen)) {
-        path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idPelicula) + ".jpg"
+        path_imagen = "http://" + server_ip + lastfm_images + "/" + String(idPelicula) + ".jpg"
     }
     else {
-        path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+        path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
     }
 
     return res.json({
@@ -1976,10 +1979,10 @@ app.get("/obtener-item", async (req, res) => {
 
     let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg"
     if (fs.existsSync(path_imagen)) {
-        path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg"
+        path_imagen = "http://" + server_ip + lastfm_images + "/" + String(idAutor) + ".jpg"
     }
     else {
-        path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+        path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
     }
     client.close()
     return res.json({
@@ -2006,10 +2009,10 @@ app.get("/obtener-item", async (req, res) => {
     //        idAutor = data2[item].split(splitType)[6]
     //        let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg"
     //        if (fs.existsSync(path_imagen)) {
-    //            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg"
+    //            path_imagen = "http://" + server_ip + lastfm_images + "/" + String(idAutor) + ".jpg"
     //        }
     //        else {
-    //            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+    //            path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
     //        }
     //        return res.json({
     //            idItem: idItem,
@@ -2071,10 +2074,10 @@ app.get("/obtener-item-no-calificado", async (req, res) => {
 
         let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg"
         if (fs.existsSync(path_imagen)) {
-            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg"
+            path_imagen = "http://" + server_ip + lastfm_images + "/" + String(idAutor) + ".jpg"
         }
         else {
-            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+            path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
         }
         client.close()
         return res.json({
@@ -2208,16 +2211,18 @@ app.get("/obtener-item-calificacion", async (req, res) => {
                 "calificaciones.id_item": idItem
             }
         )
-
+        client.close();
         if (user) {
             const itemCalificado = user.calificaciones.find(item => item.id_item === idItem);
             if (itemCalificado) {
-                client.close();
                 return res.json({
                     item: itemCalificado
                 })
             }
         }
+        return res.json({
+            item: null
+        })
     }
     catch (error) {
         console.log(error);
@@ -2243,10 +2248,10 @@ app.post("/enviar-al-stack", async (req, res) => {
         let continentAutor = item.artist_continent
         let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg"
         if (fs.existsSync(path_imagen)) {
-            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg"
+            path_imagen = "http://" + server_ip + lastfm_images + "/" + String(idAutor) + ".jpg"
         }
         else {
-            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+            path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
         }
         await db.collection("salas").updateOne(
             { _id: new ObjectId(idGrupo), "recomendaciones_stack.id_usuario": idUsuario },
@@ -2384,10 +2389,10 @@ app.post("/enviar-a-favoritos", async (req, res) => {
         let continentAutor = item.artist_continent
         let path_imagen = dir_lastfm_images + "/" + String(idAutor) + ".jpg"
         if (fs.existsSync(path_imagen)) {
-            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/" + String(idAutor) + ".jpg"
+            path_imagen = "http://" + server_ip + lastfm_images + "/" + String(idAutor) + ".jpg"
         }
         else {
-            path_imagen = "http://" + server_ip + ":" + server_port + lastfm_images + "/no_existe.png"
+            path_imagen = "http://" + server_ip + lastfm_images + "/no_existe.png"
         }
         const sala = await db.collection("salas").findOne({ _id: new ObjectId(idGrupo) })
         if (sala) {
@@ -2924,6 +2929,6 @@ app.delete("/delete-all-rooms", async (req, resp) => {
     }
 })
 
-server.listen(8000)
+server.listen(server_port, "0.0.0.0")
 
 console.log("Servidor iniciado en puerto 8000")
